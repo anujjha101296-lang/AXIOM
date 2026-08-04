@@ -1,0 +1,72 @@
+[tool.poetry]
+name = "axiom"
+version = "0.2.0"
+description = "AXIOM — Autonomous eXploration of Ideas, Observations & Models"
+authors = ["AXIOM Labs Team"]
+readme = "README.md"
+packages = [{include = "axiom"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.0.0"
+networkx = "^3.0"
+sympy = "^1.12"
+pylatexenc = "^2.10"
+requests = "^2.31.0"
+fastapi = "^0.100.0"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+z3-solver = "^4.12.0"
+anyio = "^4.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
+pytest-anyio = "^0.0.0"
+httpx = "^0.27.0"
+ruff = "^0.4.0"
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# ── pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+markers = [
+    "slow: marks tests as slow (deselect with '-m not slow')",
+    "integration: marks tests as integration tests",
+    "benchmark: marks scientific capability benchmark tests",
+]
+
+# ── coverage ──────────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["axiom"]
+omit = [
+    "axiom/__init__.py",
+    "axiom/config/__init__.py",
+    "axiom/observability/__init__.py",
+    "axiom/core/events/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
+# ── mypy ──────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+no_strict_optional = true
+warn_unused_imports = true
+warn_return_any = false
+disallow_untyped_defs = false
+exclude = ["ui/", ".venv/"]

@@ -1,0 +1,36 @@
+name: Security — Dependency Audit
+
+on:
+  push:
+    branches: ["main"]
+  schedule:
+    - cron: "0 6 * * 1"   # Every Monday at 06:00 UTC
+
+jobs:
+  audit:
+    name: pip-audit dependency scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run dependency audit
+        run: |
+          pip install \
+            fastapi uvicorn pydantic pydantic-settings \
+            networkx sympy pylatexenc requests z3-solver
+          pip-audit --format=json --output=audit-report.json || true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-report
+          path: audit-report.json

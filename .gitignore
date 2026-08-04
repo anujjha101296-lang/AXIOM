@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+*.pth
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.secret
+secrets/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Lean 4 artifacts
+*.olean
+*.ilean
+.lake/
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.npm
+.yarn
+
+# Docker
+.docker/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+/tmp/axiom*
