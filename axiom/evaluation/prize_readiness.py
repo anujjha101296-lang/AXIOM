@@ -200,15 +200,112 @@ PRIZE_PROBLEMS: List[PrizeProblem] = [
 
 class PrizeReadinessScorer:
 
-    def __init__(self, problems: List[PrizeProblem] | None = None):
+    def __init__(self, problems: List[PrizeProblem] | None = None, store: Optional[Any] = None):
         self.problems = problems or PRIZE_PROBLEMS
+        self.store = store
 
     def score_all(self) -> List[Tuple[PrizeProblem, float]]:
-        """Return (problem, aggregate_score) sorted descending."""
-        results = [
-            (p, p.axiom_baseline.aggregate())
-            for p in self.problems
-        ]
+        """Return (problem, aggregate_score) sorted descending, dynamically adjusted if store is provided."""
+        import copy
+        
+        nodes = []
+        if self.store:
+            try:
+                kg = self.store.export_knowledge_graph()
+                nodes = kg.nodes
+            except Exception:
+                nodes = []
+                
+        results = []
+        for p in self.problems:
+            # Deep copy to avoid mutating the class level constants
+            b = copy.deepcopy(p.axiom_baseline)
+            
+            if nodes:
+                # Convert string type names/status to lower for robust comparison
+                def get_val(obj, attr):
+                    val = getattr(obj, attr, None)
+                    if hasattr(val, "value"):
+                        val = val.value
+                    return str(val).lower() if val is not None else ""
+
+                num_concepts = sum(1 for n in nodes if get_val(n, "type") == "concept")
+                num_papers = sum(1 for n in nodes if get_val(n, "type") == "paper")
+                num_verified = sum(1 for n in nodes if get_val(n, "status") == "verified")
+                num_conjectures = sum(1 for n in nodes if get_val(n, "status") == "conjectured")
+                
+                # Check for tier 2 proofs
+                num_proofs = 0
+                for n in nodes:
+                    tier_val = getattr(n, "tier", None)
+                    if hasattr(tier_val, "value"):
+                        tier_val = tier_val.value
+                    if tier_val == 2 or str(tier_val) == "2" or str(tier_val).lower() == "tier_2_proven":
+                        num_proofs += 1
+
+                global_knowledge_boost = min(0.1, (num_concepts + num_papers) / 100.0)
+                global_reasoning_boost = min(0.1, num_verified / 50.0)
+                global_verification_boost = min(0.1, num_proofs / 20.0)
+                global_hypothesis_boost = min(0.1, num_conjectures / 50.0)
+                global_coverage_boost = min(0.1, num_papers / 50.0)
+                
+                # Keywords to match relevant nodes for problem-specific boosts
+                keywords = {
+                    "P vs NP": ["complexity", "np-complete", "boolean circuit", "turing machine", "polynomial time"],
+                    "Riemann Hypothesis": ["riemann", "zeta", "prime number", "zero distribution", "l-function", "critical line"],
+                    "Navier–Stokes Existence & Smoothness": ["navier-stokes", "fluid dynamics", "pde", "regularity", "smooth solution", "euler equations"],
+                    "Yang–Mills Existence & Mass Gap": ["yang-mills", "gauge theory", "mass gap", "quantum field", "qft", "gauge field"],
+                    "Hodge Conjecture": ["hodge", "algebraic cycle", "cohomology", "complex variety", "kahler manifold"],
+                    "Birch and Swinnerton-Dyer Conjecture": ["birch", "swinnerton", "elliptic curve", "bsd conjecture", "rank of elliptic", "l-series"],
+                    "Poincaré Conjecture (Reference — Solved 2003)": ["poincare", "sphere", "3-manifold", "ricci flow", "homeomorphic", "perelman"],
+                }
+                
+                p_keys = keywords.get(p.name, [])
+                relevant_nodes = []
+                for n in nodes:
+                    name_text = str(getattr(n, "name", "") or "").lower()
+                    stmt_text = str(getattr(n, "statement", "") or "").lower()
+                    def_text = str(getattr(n, "definition", "") or "").lower()
+                    combined_text = f"{name_text} {stmt_text} {def_text}"
+                    if any(k in combined_text for k in p_keys):
+                        relevant_nodes.append(n)
+                        
+                rel_concepts = sum(1 for n in relevant_nodes if get_val(n, "type") == "concept")
+                rel_papers = sum(1 for n in relevant_nodes if get_val(n, "type") == "paper")
+                rel_verified = sum(1 for n in relevant_nodes if get_val(n, "status") == "verified")
+                rel_conjectures = sum(1 for n in relevant_nodes if get_val(n, "status") == "conjectured")
+                
+                rel_proofs = 0
+                for n in relevant_nodes:
+                    tier_val = getattr(n, "tier", None)
+                    if hasattr(tier_val, "value"):
+                        tier_val = tier_val.value
+                    if tier_val == 2 or str(tier_val) == "2" or str(tier_val).lower() == "tier_2_proven":
+                        rel_proofs += 1
+
+                rel_knowledge_boost = min(0.15, (rel_concepts + rel_papers) / 10.0)
+                rel_reasoning_boost = min(0.15, rel_verified / 5.0)
+                rel_verification_boost = min(0.2, rel_proofs / 3.0)
+                rel_hypothesis_boost = min(0.15, rel_conjectures / 10.0)
+                rel_coverage_boost = min(0.15, rel_papers / 5.0)
+                
+                # Apply updates to baseline capabilities
+                b.knowledge = min(1.0, b.knowledge + global_knowledge_boost + rel_knowledge_boost)
+                b.reasoning = min(1.0, b.reasoning + global_reasoning_boost + rel_reasoning_boost)
+                b.verification = min(1.0, b.verification + global_verification_boost + rel_verification_boost)
+                b.hypothesis_gen = min(1.0, b.hypothesis_gen + global_hypothesis_boost + rel_hypothesis_boost)
+                b.literature_coverage = min(1.0, b.literature_coverage + global_coverage_boost + rel_coverage_boost)
+            
+            p_adjusted = PrizeProblem(
+                name=p.name,
+                description=p.description,
+                required_capabilities=p.required_capabilities,
+                known_approaches=p.known_approaches,
+                axiom_baseline=b,
+                recommended_action=p.recommended_action
+            )
+            results.append((p_adjusted, b.aggregate()))
+            
         return sorted(results, key=lambda x: x[1], reverse=True)
 
     def weakest_problem(self) -> PrizeProblem:
@@ -221,8 +318,9 @@ class PrizeReadinessScorer:
             "knowledge": 0.0, "reasoning": 0.0, "verification": 0.0,
             "hypothesis_gen": 0.0, "literature_coverage": 0.0,
         }
-        n = len(self.problems)
-        for p in self.problems:
+        ranked_probs = [item[0] for item in self.score_all()]
+        n = len(ranked_probs)
+        for p in ranked_probs:
             b = p.axiom_baseline
             dim_totals["knowledge"]           += b.knowledge
             dim_totals["reasoning"]           += b.reasoning

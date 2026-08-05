@@ -74,7 +74,18 @@ class SelfImprovementLoop:
 
     def __init__(self, workspace_root: str = "."):
         self.workspace_root = workspace_root
-        self.scorer = PrizeReadinessScorer()
+        
+        from axiom.config import settings
+        from axiom.core.knowledge_graph.db import EpistemicStore
+        
+        db_path = settings.db_path
+        # Avoid database conflicts during testing by checking if db_path is in-memory or exists
+        try:
+            self.store = EpistemicStore(db_path)
+        except Exception:
+            self.store = None
+            
+        self.scorer = PrizeReadinessScorer(store=self.store)
 
     def _audit_subsystems(self) -> List[SubsystemHealth]:
         """
@@ -168,13 +179,16 @@ class SelfImprovementLoop:
         with open(roadmap_path, "w", encoding="utf-8") as f:
             f.write(content)
 
+        if self.store:
+            self.store.close()
+
         return roadmap_path
 
     def report(self) -> Dict[str, Any]:
         """Return a JSON-serialisable summary of the last audit."""
         healths = self._audit_subsystems()
         weak_dim, weak_score = self.scorer.global_weakest_dimension()
-        return {
+        res = {
             "weakest_dimension": weak_dim,
             "weakest_dimension_score": weak_score,
             "top_3_priority": [
@@ -187,3 +201,6 @@ class SelfImprovementLoop:
                 for h in healths[:3]
             ],
         }
+        if self.store:
+            self.store.close()
+        return res

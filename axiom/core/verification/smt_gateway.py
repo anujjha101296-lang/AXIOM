@@ -67,12 +67,44 @@ class SmtGateway:
             # Parse or solving failure
             raise ValueError(f"Failed to compile SMT formula: {str(e)}")
 
-    def verify_real_inequality(self, lhs: str, rhs: str, variables: List[str], bounds: Dict[str, Tuple[float, float]]) -> Tuple[bool, Optional[Dict[str, float]]]:
+    def _z3_to_python(self, val: Any) -> Any:
+        """Helper to convert Z3 model values to standard Python float or int."""
+        if val is None:
+            return 0.0
+        if z3.is_algebraic_value(val):
+            return float(val.as_double())
+        elif isinstance(val, z3.RatNumRef):
+            return float(val.numerator_as_long()) / float(val.denominator_as_long())
+        elif isinstance(val, z3.IntNumRef):
+            return val.as_long()
+        else:
+            try:
+                # Try decimal conversion
+                dec_str = val.as_decimal(10).replace("?", "")
+                return float(dec_str)
+            except Exception:
+                try:
+                    return float(val.as_long())
+                except Exception:
+                    return str(val)
+
+    def verify_real_inequality(
+        self,
+        lhs: str,
+        rhs: str,
+        variables: List[str],
+        bounds: Dict[str, Tuple[float, float]]
+    ) -> Tuple[bool, Optional[Dict[str, float]]]:
         """
         Verify if lhs <= rhs holds for all real variables within bounds.
         Negate: check if lhs > rhs has any satisfying solution (counterexample).
+        Supports Nonlinear Real Arithmetic (NRA).
         """
         solver = z3.Solver()
+        # Enable nonlinear real arithmetic solver tactics explicitly if needed
+        # Z3 automatically chooses QF_NRA, but configuring parameters helps
+        solver.set("timeout", 10000) # 10s local timeout
+
         z3_vars = {name: z3.Real(name) for name in variables}
         
         # Add bounds
@@ -95,16 +127,7 @@ class SmtGateway:
                 counterexample = {}
                 for name, z3_var in z3_vars.items():
                     val = model[z3_var]
-                    if val is not None:
-                        # Convert Z3 fraction to float
-                        if z3.is_algebraic_value(val):
-                            counterexample[name] = float(val.as_double())
-                        elif isinstance(val, z3.RationalNumRef):
-                            counterexample[name] = float(val.numerator_as_long()) / float(val.denominator_as_long())
-                        else:
-                            counterexample[name] = float(val.as_long())
-                    else:
-                        counterexample[name] = 0.0
+                    counterexample[name] = float(self._z3_to_python(val))
                 return False, counterexample
             elif result == z3.unsat:
                 return True, None
@@ -112,3 +135,48 @@ class SmtGateway:
                 return False, None
         except Exception as e:
             raise ValueError(f"Failed to compile SMT inequality check: {str(e)}")
+
+    def verify_polynomial_identity(
+        self,
+        equation: str,
+        variables: List[str]
+    ) -> Tuple[bool, Optional[Dict[str, float]]]:
+        """
+        Verify if a polynomial equation LHS == RHS holds universally over Reals.
+        Negate: check if LHS != RHS has any satisfying solution (counterexample).
+        """
+        if "==" not in equation:
+            raise ValueError("Equation must contain '==' separator.")
+            
+        lhs_str, rhs_str = equation.split("==")
+        lhs_str = lhs_str.strip()
+        rhs_str = rhs_str.strip()
+        
+        solver = z3.Solver()
+        solver.set("timeout", 10000)
+        
+        z3_vars = {name: z3.Real(name) for name in variables}
+        
+        try:
+            local_dict = {**z3_vars}
+            z3_lhs = eval(lhs_str.replace("^", "**"), {"__builtins__": None}, local_dict)
+            z3_rhs = eval(rhs_str.replace("^", "**"), {"__builtins__": None}, local_dict)
+            
+            # Negate the claim: LHS != RHS
+            solver.add(z3_lhs != z3_rhs)
+            
+            result = solver.check()
+            if result == z3.sat:
+                model = solver.model()
+                counterexample = {}
+                for name, z3_var in z3_vars.items():
+                    val = model[z3_var]
+                    counterexample[name] = float(self._z3_to_python(val))
+                return False, counterexample
+            elif result == z3.unsat:
+                return True, None
+            else:
+                return False, None
+        except Exception as e:
+            raise ValueError(f"Failed to compile SMT polynomial identity check: {str(e)}")
+
