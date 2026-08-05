@@ -110,11 +110,109 @@ def _v3_working_memory_snapshots(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def _v4_mathematical_ontology(conn: sqlite3.Connection) -> None:
+    """V4: EGS Mathematical Ontology tables & memory structures (R1, R8)."""
+    # 1. mathematical_objects table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS mathematical_objects (
+            id              TEXT PRIMARY KEY,
+            node_id         TEXT NOT NULL,
+            object_type     TEXT NOT NULL,
+            formal_symbol   TEXT,
+            domain          TEXT NOT NULL,
+            properties_json TEXT,
+            created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE
+        );
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_math_obj_node_id ON mathematical_objects(node_id);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_math_obj_type ON mathematical_objects(object_type);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_math_obj_domain ON mathematical_objects(domain);")
+
+    # 2. definitions table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS definitions (
+            id                  TEXT PRIMARY KEY,
+            node_id             TEXT NOT NULL,
+            term                TEXT NOT NULL,
+            formal_definition   TEXT,
+            informal_definition TEXT,
+            domain              TEXT,
+            created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE
+        );
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_def_node_id ON definitions(node_id);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_def_term ON definitions(term);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_def_domain ON definitions(domain);")
+
+    # 3. equivalent_statements table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS equivalent_statements (
+            id               TEXT PRIMARY KEY,
+            statement_a_id   TEXT NOT NULL,
+            statement_b_id   TEXT NOT NULL,
+            equivalence_type TEXT NOT NULL DEFAULT 'LOGICAL',
+            proof_reference  TEXT,
+            confidence       REAL NOT NULL DEFAULT 1.0,
+            created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (statement_a_id) REFERENCES nodes(id) ON DELETE CASCADE,
+            FOREIGN KEY (statement_b_id) REFERENCES nodes(id) ON DELETE CASCADE
+        );
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_eq_stmt_a ON equivalent_statements(statement_a_id);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_eq_stmt_b ON equivalent_statements(statement_b_id);")
+    conn.execute("""
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_eq_pair 
+        ON equivalent_statements(statement_a_id, statement_b_id, equivalence_type);
+    """)
+
+    # 4. memory_snapshots table (ensure table and optional domain column exist)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS memory_snapshots (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT    NOT NULL,
+            snapshot   TEXT    NOT NULL,
+            domain     TEXT,
+            created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+        );
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_session ON memory_snapshots(session_id);")
+
+    # Check if domain column exists in memory_snapshots (in case v3 created it without domain)
+    cursor = conn.execute("PRAGMA table_info(memory_snapshots);")
+    columns = {row[1] for row in cursor.fetchall()}
+    if "domain" not in columns:
+        conn.execute("ALTER TABLE memory_snapshots ADD COLUMN domain TEXT;")
+
+    # 5. failed_proof_attempts table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS failed_proof_attempts (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            claim_id        TEXT    NOT NULL,
+            tactic_sequence TEXT    NOT NULL,
+            verifier        TEXT    NOT NULL,
+            error_message   TEXT,
+            created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (claim_id) REFERENCES nodes(id) ON DELETE CASCADE
+        );
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_failed_proofs_claim ON failed_proof_attempts(claim_id);")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_failed_proofs_verifier ON failed_proof_attempts(verifier);")
+    conn.execute("""
+        CREATE INDEX IF NOT EXISTS idx_failed_proofs_claim_verifier 
+        ON failed_proof_attempts(claim_id, verifier);
+    """)
+
+    conn.commit()
+
+
 # Ordered migration list: (version, description, function)
 MIGRATIONS: List[Migration] = [
     (1, "Initial schema: nodes + edges",         _v1_initial_schema),
     (2, "Add proof_lineage table",               _v2_proof_lineage),
     (3, "Add memory_snapshots table",            _v3_working_memory_snapshots),
+    (4, "Mathematical ontology & memory schema", _v4_mathematical_ontology),
 ]
 
 

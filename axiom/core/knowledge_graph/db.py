@@ -1,6 +1,7 @@
 import json
 import sqlite3
-from typing import List, Optional, Tuple, Dict, Any
+from enum import Enum
+from typing import List, Optional, Tuple, Dict, Any, Union
 import networkx as nx
 from pydantic import TypeAdapter
 
@@ -9,8 +10,13 @@ from axiom.core.knowledge_graph.schema import (
     Edge,
     NodeType,
     EdgeType,
-    KnowledgeGraph
+    KnowledgeGraph,
+    MathematicalObjectNode,
+    DefinitionNode,
+    OpenProblemNode,
+    ConjectureNode,
 )
+from axiom.core.knowledge_graph.migrations import run_migrations
 
 # Set up type adapter for polymorphic nodes list parsing
 scientific_node_adapter = TypeAdapter(ScientificNode)
@@ -24,38 +30,13 @@ class EpistemicStore:
     def _init_db(self):
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.conn.execute("PRAGMA foreign_keys = ON;")
-        
-        with self.conn:
-            self.conn.execute("""
-                CREATE TABLE IF NOT EXISTS nodes (
-                    id TEXT PRIMARY KEY,
-                    type TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    data TEXT NOT NULL
-                );
-            """)
-            self.conn.execute("""
-                CREATE TABLE IF NOT EXISTS edges (
-                    source_id TEXT NOT NULL,
-                    target_id TEXT NOT NULL,
-                    type TEXT NOT NULL,
-                    confidence REAL NOT NULL DEFAULT 1.0,
-                    provenance TEXT,
-                    PRIMARY KEY (source_id, target_id, type),
-                    FOREIGN KEY (source_id) REFERENCES nodes(id) ON DELETE CASCADE,
-                    FOREIGN KEY (target_id) REFERENCES nodes(id) ON DELETE CASCADE
-                );
-            """)
-            
-            # Indexes for efficient graph traversal
-            self.conn.execute("CREATE INDEX IF NOT EXISTS idx_nodes_type ON nodes(type);")
-            self.conn.execute("CREATE INDEX IF NOT EXISTS idx_edges_source ON edges(source_id);")
-            self.conn.execute("CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target_id);")
+        run_migrations(self.conn)
 
     def add_node(self, node: ScientificNode) -> None:
         """Upsert a scientific node in the database."""
         node_json = node.model_dump_json()
         assert self.conn is not None
+        type_val = node.type.value if hasattr(node.type, "value") else str(node.type)
         with self.conn:
             self.conn.execute(
                 """
@@ -66,7 +47,7 @@ class EpistemicStore:
                     name = excluded.name,
                     data = excluded.data;
                 """,
-                (node.id, node.type.value, node.name, node_json)
+                (node.id, type_val, node.name, node_json)
             )
 
     def add_edge(self, edge: Edge) -> None:
@@ -80,6 +61,7 @@ class EpistemicStore:
                 f"Cannot create edge {edge.source_id} -> {edge.target_id}. One or both nodes do not exist."
             )
 
+        type_val = edge.type.value if hasattr(edge.type, "value") else str(edge.type)
         with self.conn:
             self.conn.execute(
                 """
@@ -89,7 +71,7 @@ class EpistemicStore:
                     confidence = excluded.confidence,
                     provenance = excluded.provenance;
                 """,
-                (edge.source_id, edge.target_id, edge.type.value, edge.confidence, prov_json)
+                (edge.source_id, edge.target_id, type_val, edge.confidence, prov_json)
             )
 
     def node_exists(self, node_id: str) -> bool:
@@ -106,6 +88,13 @@ class EpistemicStore:
         if not row:
             return None
         return scientific_node_adapter.validate_json(row[0])
+
+    def get_nodes_by_type(self, node_type: Union[NodeType, str]) -> List[ScientificNode]:
+        assert self.conn is not None
+        type_str = node_type.value if hasattr(node_type, "value") else str(node_type)
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT data FROM nodes WHERE type = ?;", (type_str,))
+        return [scientific_node_adapter.validate_json(row[0]) for row in cursor.fetchall()]
 
     def get_edge(self, source_id: str, target_id: str, edge_type: str) -> Optional[Edge]:
         assert self.conn is not None
@@ -124,6 +113,22 @@ class EpistemicStore:
             confidence=row[3],
             provenance=json.loads(row[4]) if row[4] else {}
         )
+
+    def get_edges_by_type(self, edge_type: Union[EdgeType, str]) -> List[Edge]:
+        assert self.conn is not None
+        type_str = edge_type.value if hasattr(edge_type, "value") else str(edge_type)
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT source_id, target_id, type, confidence, provenance FROM edges WHERE type = ?;", (type_str,))
+        results = []
+        for row in cursor.fetchall():
+            results.append(Edge(
+                source_id=row[0],
+                target_id=row[1],
+                type=EdgeType(row[2]),
+                confidence=row[3],
+                provenance=json.loads(row[4]) if row[4] else {}
+            ))
+        return results
 
     def get_neighbors(self, node_id: str, direction: str = "outgoing") -> List[Tuple[Edge, ScientificNode]]:
         """Get connected edges and nodes for a given node."""
@@ -159,6 +164,224 @@ class EpistemicStore:
             )
             node = scientific_node_adapter.validate_json(row[5])
             results.append((edge, node))
+        return results
+
+    # Specialized Table Operations (v4)
+
+    def add_mathematical_object(
+        self,
+        node: MathematicalObjectNode,
+        object_type: str,
+        formal_symbol: Optional[str] = None,
+        domain: Optional[str] = None,
+        properties: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        self.add_node(node)
+        props_json = json.dumps(properties) if properties else "{}"
+        assert self.conn is not None
+        domain_val = domain or node.domain or ""
+        with self.conn:
+            self.conn.execute(
+                """
+                INSERT INTO mathematical_objects (id, node_id, object_type, formal_symbol, domain, properties_json)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    object_type = excluded.object_type,
+                    formal_symbol = excluded.formal_symbol,
+                    domain = excluded.domain,
+                    properties_json = excluded.properties_json;
+                """,
+                (node.id, node.id, object_type, formal_symbol, domain_val, props_json)
+            )
+
+    def get_mathematical_object(self, node_id: str) -> Optional[Dict[str, Any]]:
+        assert self.conn is not None
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT mo.id, mo.node_id, mo.object_type, mo.formal_symbol, mo.domain, mo.properties_json, n.data
+            FROM mathematical_objects mo
+            JOIN nodes n ON mo.node_id = n.id
+            WHERE mo.node_id = ?;
+            """,
+            (node_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return {
+            "id": row[0],
+            "node_id": row[1],
+            "object_type": row[2],
+            "formal_symbol": row[3],
+            "domain": row[4],
+            "properties": json.loads(row[5]) if row[5] else {},
+            "node": scientific_node_adapter.validate_json(row[6]),
+        }
+
+    def add_definition(
+        self,
+        node: DefinitionNode,
+        term: str,
+        formal_definition: str,
+        informal_definition: Optional[str] = None,
+        domain: Optional[str] = None,
+    ) -> None:
+        self.add_node(node)
+        assert self.conn is not None
+        domain_val = domain or node.domain
+        with self.conn:
+            self.conn.execute(
+                """
+                INSERT INTO definitions (id, node_id, term, formal_definition, informal_definition, domain)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    term = excluded.term,
+                    formal_definition = excluded.formal_definition,
+                    informal_definition = excluded.informal_definition,
+                    domain = excluded.domain;
+                """,
+                (node.id, node.id, term, formal_definition, informal_definition, domain_val)
+            )
+
+    def get_definition(self, node_id: str) -> Optional[Dict[str, Any]]:
+        assert self.conn is not None
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT d.id, d.node_id, d.term, d.formal_definition, d.informal_definition, d.domain, n.data
+            FROM definitions d
+            JOIN nodes n ON d.node_id = n.id
+            WHERE d.node_id = ?;
+            """,
+            (node_id,)
+        )
+        row = cursor.fetchone()
+        if not row:
+            return None
+        return {
+            "id": row[0],
+            "node_id": row[1],
+            "term": row[2],
+            "formal_definition": row[3],
+            "informal_definition": row[4],
+            "domain": row[5],
+            "node": scientific_node_adapter.validate_json(row[6]),
+        }
+
+    def add_equivalent_statement(
+        self,
+        statement_a_id: str,
+        statement_b_id: str,
+        equivalence_type: str = "LOGICAL",
+        proof_reference: Optional[str] = None,
+        confidence: float = 1.0,
+    ) -> str:
+        if not self.node_exists(statement_a_id) or not self.node_exists(statement_b_id):
+            raise ValueError(f"Cannot create equivalence between {statement_a_id} and {statement_b_id}. One or both nodes do not exist.")
+        eq_id = f"eq_{statement_a_id}_{statement_b_id}"
+        assert self.conn is not None
+        with self.conn:
+            self.conn.execute(
+                """
+                INSERT INTO equivalent_statements (id, statement_a_id, statement_b_id, equivalence_type, proof_reference, confidence)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    proof_reference = excluded.proof_reference,
+                    confidence = excluded.confidence;
+                """,
+                (eq_id, statement_a_id, statement_b_id, equivalence_type, proof_reference, confidence)
+            )
+        # Also maintain graph edge representation
+        self.add_edge(Edge(source_id=statement_a_id, target_id=statement_b_id, type=EdgeType.EQUIVALENT_TO, confidence=confidence))
+        return eq_id
+
+    def get_equivalent_statements(self, node_id: str) -> List[str]:
+        assert self.conn is not None
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT statement_b_id FROM equivalent_statements WHERE statement_a_id = ?
+            UNION
+            SELECT statement_a_id FROM equivalent_statements WHERE statement_b_id = ?;
+            """,
+            (node_id, node_id)
+        )
+        return [row[0] for row in cursor.fetchall()]
+
+    def save_memory_snapshot(self, session_id: str, snapshot_data: Dict[str, Any], domain: Optional[str] = None) -> int:
+        assert self.conn is not None
+        snap_json = json.dumps(snapshot_data)
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "INSERT INTO memory_snapshots (session_id, snapshot, domain) VALUES (?, ?, ?);",
+                (session_id, snap_json, domain)
+            )
+            return cursor.lastrowid
+
+    def get_memory_snapshots(self, session_id: str) -> List[Dict[str, Any]]:
+        assert self.conn is not None
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT id, session_id, snapshot, domain, created_at FROM memory_snapshots WHERE session_id = ? ORDER BY id ASC;",
+            (session_id,)
+        )
+        results = []
+        for row in cursor.fetchall():
+            results.append({
+                "id": row[0],
+                "session_id": row[1],
+                "snapshot": json.loads(row[2]),
+                "domain": row[3],
+                "created_at": row[4],
+            })
+        return results
+
+    def add_failed_proof_attempt(
+        self,
+        claim_id: str,
+        tactic_sequence: List[str],
+        verifier: str,
+        error_message: Optional[str] = None,
+    ) -> int:
+        if not self.node_exists(claim_id):
+            raise ValueError(f"Claim node {claim_id} does not exist.")
+        assert self.conn is not None
+        tactics_json = json.dumps(tactic_sequence)
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO failed_proof_attempts (claim_id, tactic_sequence, verifier, error_message)
+                VALUES (?, ?, ?, ?);
+                """,
+                (claim_id, tactics_json, verifier, error_message)
+            )
+            return cursor.lastrowid
+
+    def get_failed_proof_attempts(self, claim_id: str) -> List[Dict[str, Any]]:
+        assert self.conn is not None
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT id, claim_id, tactic_sequence, verifier, error_message, created_at
+            FROM failed_proof_attempts
+            WHERE claim_id = ?
+            ORDER BY id ASC;
+            """,
+            (claim_id,)
+        )
+        results = []
+        for row in cursor.fetchall():
+            results.append({
+                "id": row[0],
+                "claim_id": row[1],
+                "tactic_sequence": json.loads(row[2]),
+                "verifier": row[3],
+                "error_message": row[4],
+                "created_at": row[5],
+            })
         return results
 
     def to_networkx(self) -> nx.DiGraph:
@@ -219,3 +442,4 @@ class EpistemicStore:
         if self.conn:
             self.conn.close()
             self.conn = None
+

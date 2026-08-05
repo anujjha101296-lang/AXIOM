@@ -23,6 +23,7 @@ from axiom.evaluation.prize_readiness import PrizeReadinessScorer
 from axiom.observability.logger import configure_logging, get_logger
 from axiom.observability.metrics import METRICS
 from axiom.services.api_gateway.auth import verify_token
+from axiom.services.api_gateway.routes.mip import router as mip_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -60,6 +61,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── MIP Router (EPIC-001: Mathematical Intelligence Platform) ────────────────
+app.include_router(mip_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
