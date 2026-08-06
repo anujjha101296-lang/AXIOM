@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-08-06T17:52:19Z",
+  "scores": {
+    "engineering_health": 70.2,
+    "product_health": 27.6,
+    "research_capability": 20.4,
+    "technical_debt": 95,
+    "security": 26.0,
+    "performance": 70.0,
+    "developer_experience": 67.0,
+    "repository_maturity": 59.5
+  },
+  "collectors": {
+    "technical_debt": {
+      "metrics": [
+        {
+          "name": "inline_debt_markers",
+          "value": 7,
+          "unit": "count",
+          "status": "warn"
+        },
+        {
+          "name": "documented_debt_items",
+          "value": 8,
+          "unit": "count",
+          "status": "warn"
+        }
+      ],
+      "finding_count": 18
+    },
+    "dependencies": {
+      "metrics": [
+        {
+          "name": "pyproject_present",
+          "value": 1,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "ui_package_present",
+          "value": 1,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "python_vulnerabilities",
+          "value": 5,
+          "unit": "count",
+          "status": "fail"
+        },
+        {
+          "name": "npm_high_vulnerabilities",
+          "value": 0,
+          "unit": "count",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 5
+    },
+    "code_quality": {
+      "metrics": [
+        {
+          "name": "python_modules",
+          "value": 104,
+          "unit": "files",
+          "status": "ok"
+        },
+        {
+          "name": "test_files",
+          "value": 20,
+          "unit": "files",
+          "status": "ok"
+        },
+        {
+          "name": "test_file_ratio",
+          "value": 0.19,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "ruff_violations",
+          "value": 1502,
+          "unit": "count",
+          "status": "fail"
+        },
+        {
+          "name": "mypy_errors",
+          "value": 37,
+          "unit": "count",
+          "status": "fail"
+        },
+        {
+          "name": "duplicate_module_patterns",
+          "value": 5,
+          "unit": "count",
+          "status": "warn"
+        }
+      ],
+      "finding_count": 7
+    },
+    "architecture": {
+      "metrics": [
+        {
+          "name": "mounted_routers",
+          "value": 4,
+          "unit": "count",
+          "status": "ok"
+        },
+        {
+          "name": "route_modules",
+          "value": 5,
+          "unit": "count",
+          "status": "ok"
+        },
+        {
+          "name": "architecture_decision_records",
+          "value": 0,
+          "unit": "",
+          "status": "warn"
+        },
+        {
+          "name": "layer_violations",
+          "value": 0,
+          "unit": "",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 2
+    },
+    "performance": {
+      "metrics": [
+        {
+          "name": "cold_import_ms",
+          "value": 563.6,
+          "unit": "ms",
+          "status": "ok"
+        },
+        {
+          "name": "import_regression_pct",
+          "value": -77.5,
+          "unit": "%",
+          "status": "ok"
+        },
+        {
+          "name": "profile_script_present",
+          "value": 0,
+          "unit": "",
+          "status": "warn"
+        }
+      ],
+      "finding_count": 0
+    },
+    "security": {
+      "metrics": [
+        {
+          "name": "security_workflow",
+          "value": 1,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "dependabot_config",
+          "value": 0,
+          "unit": "",
+          "status": "warn"
+        },
+        {
+          "name": "secret_pattern_hits",
+          "value": 0,
+          "unit": "",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 3
+    },
+    "documentation": {
+      "metrics": [
+        {
+          "name": "markdown_files",
+          "value": 1159,
+          "unit": "count",
+          "status": "ok"
+        },
+        {
+          "name": "missing_required_docs",
+          "value": 0,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "module_docstring_coverage_pct",
+          "value": 87.2,
+          "unit": "%",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 0
+    },
+    "testing": {
+      "metrics": [
+        {
+          "name": "tests_collected",
+          "value": 165,
+          "unit": "count",
+          "status": "ok"
+        },
+        {
+          "name": "line_coverage_pct",
+          "value": 72.5,
+          "unit": "%",
+          "status": "ok"
+        },
+        {
+          "name": "e2e_tests",
+          "value": 226,
+          "unit": "count",
+          "status": "ok"
+        },
+        {
+          "name": "ci_workflow",
+          "value": 1,
+          "unit": "",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 2
+    },
+    "benchmarks": {
+      "metrics": [
+        {
+          "name": "benchmark_snapshot",
+          "value": 1,
+          "unit": "",
+          "status": "ok"
+        },
+        {
+          "name": "benchmark_regressions",
+          "value": 2,
+          "unit": "",
+          "status": "fail"
+        },
+        {
+          "name": "benchmark_improvements",
+          "value": 0,
+          "unit": "count",
+          "status": "ok"
+        }
+      ],
+      "finding_count": 2
+    }
+  },
+  "finding_summary": {
+    "critical": 3,
+    "high": 11,
+    "medium": 12,
+    "low": 13,
+    "info": 0
+  },
+  "top_initiative": "S0-E4 \u2014 EPIC-002 Evidence Integration Gate"
+}

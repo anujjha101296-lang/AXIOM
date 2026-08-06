@@ -1,0 +1,58 @@
+name: Governance — Engineering Health Review
+
+on:
+  push:
+    branches: ["main", "cursor/**"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "0 7 * * 1"   # Every Monday at 07:00 UTC
+
+env:
+  PYTHONPATH: .
+  AXIOM_API_TOKEN: test_token
+  JWT_SECRET_KEY: ci-test-secret
+
+jobs:
+  engineering-review:
+    name: Engineering governance review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install \
+            fastapi uvicorn pydantic pydantic-settings \
+            networkx sympy pylatexenc requests pypdf python-multipart \
+            z3-solver anyio "httpx>=0.27.0,<0.28.0" \
+            pytest pytest-cov pytest-anyio \
+            ruff mypy pip-audit
+
+      - name: Run engineering governance review
+        run: python3 scripts/run_engineering_review.py
+
+      - name: Upload governance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engineering-governance-reports
+          path: |
+            ENGINEERING_HEALTH.md
+            PRODUCT_HEALTH.md
+            RESEARCH_HEALTH.md
+            TECH_DEBT_BOARD.md
+            TOP_25_PRIORITIES.md
+            .axiom/governance/dashboard.json
+
+      - name: Verify reports generated
+        run: |
+          test -f ENGINEERING_HEALTH.md
+          test -f TOP_25_PRIORITIES.md
+          test -f .axiom/governance/dashboard.json
