@@ -6,6 +6,36 @@ Authentication: `Authorization: Bearer <token>` on all protected endpoints.
 
 ---
 
+## Authentication
+
+### `POST /auth/register`
+Create a new researcher account. Returns a JWT access token.
+
+```json
+{"email": "you@university.edu", "password": "your-secure-password", "name": "Your Name"}
+```
+
+Response `201`:
+```json
+{
+  "access_token": "<jwt>",
+  "token_type": "bearer",
+  "user": {"id": "...", "email": "...", "name": "...", "role": "RESEARCHER"}
+}
+```
+
+### `POST /auth/login`
+Sign in with email and password.
+
+```json
+{"email": "you@university.edu", "password": "your-secure-password"}
+```
+
+### `GET /auth/me`
+Return the authenticated user profile. Requires bearer token (JWT or static dev token).
+
+---
+
 ## System
 
 ### `GET /health`
