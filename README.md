@@ -23,7 +23,7 @@ axiom/
 ├── observability/          # Structured logging, Prometheus metrics
 └── config/                 # Pydantic settings, secrets management
 ui/                         # Next.js spatial canvas dashboard
-tests/                      # pytest suite (26+ tests)
+tests/                      # pytest suite (193+ core tests; e2e optional)
 ```
 
 ## Quick Start
@@ -81,6 +81,16 @@ Once the server is running, visit:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **Metrics**: http://localhost:8000/metrics
+
+## Contributing
+
+See **`CONTRIBUTOR_GUIDE.md`** for day-1 onboarding, repository map, and development workflow.
+
+```bash
+make setup && make check   # install + lint + test-core
+```
+
+See `CONTRIBUTING.md` for commit conventions and `ARCHITECTURE_DECISION_RECORDS/` for design decisions.
 
 ## License
 

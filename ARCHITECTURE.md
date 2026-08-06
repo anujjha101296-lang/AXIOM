@@ -46,6 +46,10 @@ Only an actual successful compiler/prover invocation may create a `formally_veri
 - Promote a research prototype to a supported feature only after it has acceptance tests, observability, error behavior, and a clear evidence boundary.
 - Do not make prize-readiness or scientific-value scores authoritative unless backed by recorded benchmarks and stated limitations.
 
-## Immediate architectural blocker
+## Current baseline (2026-08-06)
 
-The declared project runtime is Python 3.10+, but the available test runtime was Python 3.9.6. Python 3.9 cannot evaluate existing `str | None` annotations through the installed Pydantic stack, so API tests fail during collection. Establishing a supported Python 3.10+ environment is the first prerequisite to a trustworthy baseline.
+- **Runtime:** Python 3.11 in CI and Docker; minimum Python 3.10
+- **Tests:** `make test-core` — 200+ core tests pass; e2e suite documents MDE API gaps
+- **Coverage:** ≥70% on `axiom/` package (enforced in CI)
+
+See `ARCHITECTURE_DECISION_RECORDS/0002-python-310-runtime-baseline.md` for the runtime decision.
