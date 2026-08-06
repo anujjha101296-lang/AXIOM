@@ -146,8 +146,9 @@ export default function Home() {
           <a href="#platform">Platform</a>
           <a href="#roadmap">Roadmap</a>
           <a href="#mission">Mission</a>
-          <a className="nav-cta" href="/research">Research Workspace ↗</a>
-          <a className="nav-link" href="/workspace">Graph Workspace</a>
+          <a className="nav-cta" href="/login">Sign in ↗</a>
+          <a className="nav-link" href="/research">Research Workspace</a>
+          <a className="nav-link" href="/research/runs">Research Runs</a>
         </nav>
       </header>
 
@@ -165,7 +166,7 @@ export default function Home() {
             world's hardest open problems — with every reasoning step made visible.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-primary" href="/research">
+            <a className="btn btn-primary" href="/login">
               Start Research Project →
             </a>
             <a className="btn btn-secondary" href="/workspace">
