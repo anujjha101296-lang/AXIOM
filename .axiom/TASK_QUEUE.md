@@ -14,7 +14,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 4 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
 | 5 | S0-E3 | Audit verification routes/models for simulation versus formal-proof truthfulness. | S0-E2 test baseline | Regression tests prove fallback results cannot claim formal verification. | **Complete** |
 | 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Ready — highest priority** |
-| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | Deferred |
+| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | Ready after S0-E4 |
 
 ## Queue protocol
 

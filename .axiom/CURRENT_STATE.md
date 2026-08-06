@@ -3,11 +3,13 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-06
-**Active horizon:** Milestone 005 — Autonomous Research Loop v1
+**Active horizon:** Engineering Checkpoint — baseline completion before next feature work
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) and verification truthfulness audit (S0-E3) are **complete for the core suite**. **Engineering Milestone 001 — Research Workspace** delivers a production-ready researcher workflow. **MVP-0 stabilization** adds register/login, UI auth guard, and end-to-end workflow validation (see `MVP_READINESS.md`). **Milestone 005 — Autonomous Research Loop v1** delivers closed-loop bounded research with failure memory, claim verification, historical benchmarks, and Research Run UI.
+AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) and verification truthfulness audit (S0-E3) are **complete for the core suite**. **Engineering Milestone 001 — Research Workspace** delivers a demo-ready researcher workflow (P0 gaps in `MVP_READINESS.md`). **MVP-0 stabilization** adds register/login, UI auth guard, and end-to-end workflow validation. **Milestone 005 — Autonomous Research Loop v1** delivers closed-loop bounded research with heuristic workers, failure memory, claim verification, historical benchmarks, and Research Run UI.
+
+**Engineering checkpoint (2026-08-06):** Feature development frozen for status audit. See `MASTER_PROGRESS.md`, `ROADMAP_STATUS.md`, and `ENGINEERING_SCORECARD.md`. Overall platform completion ~46%; production readiness not met.
 
 ## Completed
 
@@ -28,7 +30,7 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 
 ## Highest priority
 
-**H1-OBS** — Reproducible run/provenance records for research loop and SCEP evaluations (per `TASK_QUEUE.md` rank 7).
+**S0-E4** — EPIC-002 integration gate: all capability scores must expose evidence state, benchmark count, and stated limitations (per `TASK_QUEUE.md` rank 6). **H1-OBS** (provenance records) follows immediately after S0-E4.
 
 ## Worktree integrity
 
