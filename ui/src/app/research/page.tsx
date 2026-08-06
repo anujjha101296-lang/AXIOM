@@ -12,6 +12,8 @@ import {
   getStoredUser,
   parseApiError,
 } from "@/lib/api";
+import OperationModeBanner from "@/components/OperationModeBanner";
+import { RESEARCH_MODE_FALLBACK, type OperationModeContract } from "@/lib/modes";
 
 interface ResearchProject {
   id: string;
@@ -100,6 +102,7 @@ export default function ResearchPage() {
   const [selectedDocId, setSelectedDocId] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modeContract, setModeContract] = useState<OperationModeContract>(RESEARCH_MODE_FALLBACK);
   const statusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showStatus = useCallback((message: string) => {
@@ -128,6 +131,13 @@ export default function ResearchPage() {
     },
     [token, handleUnauthorized]
   );
+
+  useEffect(() => {
+    fetch(`${API_BASE}/research/mode`)
+      .then((r) => r.json())
+      .then(setModeContract)
+      .catch(() => setModeContract(RESEARCH_MODE_FALLBACK));
+  }, []);
 
   useEffect(() => {
     const stored = getStoredToken();
@@ -397,6 +407,7 @@ export default function ResearchPage() {
 
   return (
     <div className="research-app" aria-busy={loading}>
+      <OperationModeBanner mode="research" disclaimer={modeContract.disclaimer} />
       {loading && (
         <div className="research-overlay" aria-hidden="true">
           <div className="research-spinner" />
@@ -409,7 +420,7 @@ export default function ResearchPage() {
             ← AXIOM
           </Link>
           <h1>Research Workspace</h1>
-          <p>Projects · PDFs · Notes · Q&amp;A · Search · Sessions</p>
+          <p>Research Mode · Live PDFs · Real models · Uncertain results possible</p>
         </div>
         <div className="research-user">
           <Link href="/research/runs" className="research-runs-link">
@@ -698,6 +709,7 @@ export default function ResearchPage() {
                 <h3 id="search-heading">Search Papers &amp; Notes</h3>
                 <p className="research-muted">
                   Full-text search across uploaded PDFs and saved notes (keyword matching, not vector semantic search).
+                  Results reflect actual document content — verify important claims manually.
                 </p>
                 <div className="research-search">
                   <input

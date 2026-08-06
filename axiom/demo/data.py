@@ -17,7 +17,9 @@ from axiom.demo.schema import (
     DemoState,
     DemoTimelineEvent,
     DemoTourStep,
+    OperationModeInfo,
 )
+from axiom.modes import DEMO_MODE_CONTRACT
 
 
 def build_demo_state() -> DemoState:
@@ -458,6 +460,14 @@ def build_demo_state() -> DemoState:
     ]
 
     return DemoState(
+        operation_mode=OperationModeInfo(
+            mode="demo",
+            label=DEMO_MODE_CONTRACT.label,
+            represents_scientific_capability=False,
+            data_source=DEMO_MODE_CONTRACT.data_source,
+            disclaimer=DEMO_MODE_CONTRACT.disclaimer,
+            suitable_for=DEMO_MODE_CONTRACT.suitable_for,
+        ),
         project=project,
         papers=papers,
         knowledge_nodes=nodes,

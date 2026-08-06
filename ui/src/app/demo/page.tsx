@@ -13,6 +13,8 @@ import {
   PHASE_ORDER,
 } from "@/lib/demo-types";
 import { API_BASE } from "@/lib/api";
+import { DEMO_MODE_FALLBACK } from "@/lib/modes";
+import OperationModeBanner from "@/components/OperationModeBanner";
 import "./demo.css";
 
 const PHASE_DURATIONS: Record<DemoPhase, number> = {
@@ -146,10 +148,14 @@ export default function GoldenDemoPage() {
 
   return (
     <div className="demo-app">
+      <OperationModeBanner
+        mode="demo"
+        disclaimer={state.operation_mode?.disclaimer ?? DEMO_MODE_FALLBACK.disclaimer}
+      />
       <header className="demo-hero" data-highlight="hero">
         <div>
           <Link href="/" className="demo-back">← AXIOM Labs</Link>
-          <span className="demo-badge-demo">Golden Demo · v0.5</span>
+          <span className="demo-badge-demo">Demo Mode · Curated presentation</span>
           <h1>{state.project.name}</h1>
           <p className="demo-hero-sub">{state.project.description}</p>
         </div>
@@ -173,7 +179,7 @@ export default function GoldenDemoPage() {
             Guided Tour
           </button>
           <Link href="/research" className="demo-btn-secondary" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
-            Open Workspace
+            Open Research Mode
           </Link>
         </div>
       </header>
@@ -225,10 +231,11 @@ export default function GoldenDemoPage() {
         <main className="demo-panel">
           {phase === "complete" && (
             <div className="demo-complete-banner">
-              <strong>Research session complete</strong>
+              <strong>Demo presentation complete</strong>
               <p style={{ margin: "0.5rem 0 0", color: "#a0a0c0", fontSize: "0.9rem" }}>
-                AXIOM ingested {state.stats.papers_ingested} papers, extracted {state.stats.concepts_extracted} concepts,
-                and produced a publication-ready report in {state.stats.elapsed_minutes} minutes.
+                This curated illustration walked through {state.stats.papers_ingested} sample papers and
+                {state.stats.concepts_extracted} concepts in {state.stats.elapsed_minutes} minutes.
+                Outputs are illustrative — not live scientific results.
               </p>
             </div>
           )}
@@ -369,6 +376,9 @@ export default function GoldenDemoPage() {
 
           {phaseAtLeast(phase, "report") && (
             <section className={`demo-report ${phaseAtLeast(phase, "report") ? "demo-visible" : ""}`} data-highlight="report">
+              <p className="demo-report-watermark" role="note">
+                {state.report.mode_notice}
+              </p>
               <h3>{state.report.title}</h3>
               <p className="abstract">{state.report.abstract}</p>
               {state.report.sections.map((s) => (
@@ -385,8 +395,8 @@ export default function GoldenDemoPage() {
           <h2>Live Insights</h2>
           {phase === "intro" && (
             <p style={{ color: "#8888a0", fontSize: "0.9rem", lineHeight: 1.6 }}>
-              Press <strong>Play Demo</strong> to watch AXIOM transform a new research topic into a complete
-              research program — no manual setup required.
+              Press <strong>Play Demo</strong> to watch a curated presentation of the AXIOM research workflow.
+              This is <strong>Demo Mode</strong> — illustrative outputs only. For live PDFs and real models, use Research Mode.
             </p>
           )}
           {phaseAtLeast(phase, "question") && (
@@ -416,9 +426,10 @@ export default function GoldenDemoPage() {
             </div>
           )}
           {phase === "complete" && (
-            <div style={{ marginTop: "1rem", padding: "1rem", background: "rgba(99,102,241,0.08)", borderRadius: "12px" }}>
-              <p style={{ fontSize: "0.85rem", lineHeight: 1.6, margin: 0 }}>
-                Ready for researchers, investors, and lab pilots. All outputs are evidence-classified with explicit limitations.
+            <div style={{ marginTop: "1rem", padding: "1rem", background: "rgba(245,158,11,0.08)", borderRadius: "12px", border: "1px solid rgba(245,158,11,0.25)" }}>
+              <p style={{ fontSize: "0.85rem", lineHeight: 1.6, margin: 0, color: "#fcd34d" }}>
+                Demo Mode complete. This was a curated illustration — not a measurement of scientific capability.
+                <Link href="/research" style={{ color: "#818cf8", marginLeft: "0.35rem" }}>Try Research Mode →</Link>
               </p>
             </div>
           )}

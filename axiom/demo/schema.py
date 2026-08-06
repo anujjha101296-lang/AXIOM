@@ -97,6 +97,11 @@ class DemoResearchReport(BaseModel):
     abstract: str
     sections: List[DemoReportSection] = Field(default_factory=list)
     generated_at: str
+    illustrative_only: bool = True
+    mode_notice: str = (
+        "DEMO MODE — This report is a curated illustration for presentation purposes. "
+        "It does not represent output from live AI models or verified scientific work."
+    )
 
 
 class DemoTourStep(BaseModel):
@@ -115,9 +120,20 @@ class DemoProject(BaseModel):
     created_at: str
 
 
+class OperationModeInfo(BaseModel):
+    """Embedded in every demo response so clients cannot confuse modes."""
+
+    mode: Literal["demo"] = "demo"
+    label: str = "Demo Mode"
+    represents_scientific_capability: bool = False
+    data_source: str = "curated"
+    disclaimer: str
+    suitable_for: List[str] = Field(default_factory=list)
+
+
 class DemoState(BaseModel):
     version: str = "0.5-demo"
-    mode: str = "golden"
+    operation_mode: OperationModeInfo
     project: DemoProject
     papers: List[DemoPaper]
     knowledge_nodes: List[DemoKnowledgeNode]

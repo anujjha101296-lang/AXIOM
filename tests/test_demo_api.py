@@ -12,19 +12,52 @@ def test_demo_health():
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "ready"
-    assert data["version"] == "0.5-demo"
+    assert data["operation_mode"] == "demo"
+    assert data["represents_scientific_capability"] is False
+
+
+def test_demo_mode_contract():
+    res = client.get("/demo/mode")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["mode"] == "demo"
+    assert data["represents_scientific_capability"] is False
+    assert data["uses_curated_data"] is True
+    assert data["uses_live_models"] is False
+    assert "DEMO MODE" in data["disclaimer"]
+
+
+def test_research_mode_contract():
+    res = client.get("/research/mode")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["mode"] == "research"
+    assert data["represents_scientific_capability"] is True
+    assert data["uncertainty_expected"] is True
+    assert data["evidence_required"] is True
+
+
+def test_research_loop_mode_contract():
+    res = client.get("/research-loop/mode")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["mode"] == "research"
+    assert data["uncertainty_expected"] is True
 
 
 def test_demo_state():
     res = client.get("/demo/state")
     assert res.status_code == 200
     data = res.json()
-    assert data["mode"] == "golden"
+    assert data["operation_mode"]["mode"] == "demo"
+    assert data["operation_mode"]["represents_scientific_capability"] is False
     assert data["project"]["name"]
     assert len(data["papers"]) == 3
     assert len(data["knowledge_nodes"]) >= 5
     assert len(data["hypotheses"]) >= 2
     assert data["report"]["title"]
+    assert data["report"]["illustrative_only"] is True
+    assert "DEMO MODE" in data["report"]["mode_notice"]
     assert data["stats"]["papers_ingested"] == 3
 
 

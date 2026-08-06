@@ -30,6 +30,7 @@ from axiom.research.summarizer import DocumentSummarizer
 from axiom.research.qa import PaperQA
 from axiom.services.api_gateway.auth import verify_token
 from axiom.services.model_gateway.client import ModelClient
+from axiom.modes import RESEARCH_MODE_CONTRACT, OperationModeContract
 
 logger = get_logger("axiom.api.research")
 
@@ -67,6 +68,12 @@ def _not_found(resource: str, identifier: str) -> HTTPException:
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"{resource} not found: {identifier}",
     )
+
+
+@router.get("/mode", response_model=OperationModeContract)
+def get_research_mode() -> OperationModeContract:
+    """Return the Research Mode honesty contract for the workspace."""
+    return RESEARCH_MODE_CONTRACT
 
 
 @router.post("/projects", response_model=ResearchProject, status_code=status.HTTP_201_CREATED)

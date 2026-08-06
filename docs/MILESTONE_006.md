@@ -65,10 +65,22 @@ bash scripts/demo_golden.sh
 
 ## Honest Limitations
 
-1. Curated sample data — not live LLM extraction during demo playback
-2. Does not seed Research Workspace database (future enhancement)
-3. Requires API running for state fetch
-4. Keyword/heuristic narrative; real workspace uses ModelClient for Q&A
+1. **Demo Mode only** — `/demo` uses curated sample data, not live LLM extraction
+2. **Two-mode policy** — Demo Mode and Research Mode are always labeled; see `docs/MODES.md`
+3. Does not seed Research Workspace database (future enhancement)
+4. Requires API running for state fetch
+5. Research Mode (`/research`) uses ModelClient for Q&A — mock fallback when no API key
+
+---
+
+## Operation Modes (Required)
+
+| Mode | Route | Represents capability? |
+|------|-------|---------------------|
+| **Demo Mode** | `/demo` | **No** — curated illustration |
+| **Research Mode** | `/research`, `/research/runs` | Yes — with uncertainty |
+
+Every page displays a persistent mode banner. API exposes `GET /demo/mode`, `/research/mode`, `/research-loop/mode`.
 
 ---
 

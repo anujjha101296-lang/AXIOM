@@ -15,6 +15,7 @@ from axiom.research_loop.engine import ResearchLoopEngine, get_research_loop_eng
 from axiom.research_loop.roles import list_roles
 from axiom.research_loop.schema import ResearchRunConfig, ResearchRunStatus, ResearchState
 from axiom.services.api_gateway.auth import verify_token
+from axiom.modes import RESEARCH_LOOP_MODE_CONTRACT, OperationModeContract
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/research-loop", tags=["research-loop"])
@@ -27,6 +28,12 @@ def get_engine() -> ResearchLoopEngine:
     if _engine is None:
         _engine = ResearchLoopEngine(settings.db_path)
     return _engine
+
+
+@router.get("/mode", response_model=OperationModeContract)
+def get_research_loop_mode() -> OperationModeContract:
+    """Return Research Mode contract for the autonomous research loop."""
+    return RESEARCH_LOOP_MODE_CONTRACT
 
 
 class CreateRunRequest(BaseModel):

@@ -69,7 +69,7 @@ Click **▶ Play Demo**. Do not narrate over the intro — let the UI breathe.
 **On screen:** Professional report with sections.
 
 **Say:**
-> "A publication-ready synthesis in four minutes. AXIOM remembered the full session — papers, contradictions, gaps, plan. That's the product: research memory that compounds."
+> "A curated research report illustration in four minutes. AXIOM remembered the full session — papers, contradictions, gaps, plan. **This was Demo Mode** — for live work, I'll show you Research Mode next."
 
 **Close:**
 > "Questions? The Research Workspace is live at `/research`. This demo is at `/demo` anytime."
@@ -80,7 +80,7 @@ Click **▶ Play Demo**. Do not narrate over the intro — let the UI breathe.
 
 | Question | Answer |
 |----------|--------|
-| Is this real AI? | Demo uses curated data for reliability; workspace uses real PDFs + model gateway |
+| Is this real AI? | **Demo Mode** uses curated data. **Research Mode** (`/research`) uses live PDFs + model gateway with real uncertainty. |
 | vs ChatGPT? | AXIOM structures evidence, tracks contradictions, plans experiments, remembers sessions |
 | Production ready? | Demo-ready; see `MVP_READINESS.md` for alpha blockers |
 | Pricing? | Not yet — focused on researcher pilots |
@@ -93,6 +93,8 @@ Click **▶ Play Demo**. Do not narrate over the intro — let the UI breathe.
 - "AXIOM solved drug discovery"
 - "Autonomous scientific discovery" (say "research orchestration")
 - "Production SaaS ready" (say "demo-ready with documented limitations")
+- "Publication-ready" or "real results" while in **Demo Mode**
+- Anything that implies demo outputs measure scientific capability
 
 ---
 

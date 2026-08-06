@@ -10,6 +10,8 @@ import {
   getStoredToken,
   parseApiError,
 } from "@/lib/api";
+import OperationModeBanner from "@/components/OperationModeBanner";
+import { RESEARCH_MODE_FALLBACK, type OperationModeContract } from "@/lib/modes";
 
 interface RunSummary {
   id: string;
@@ -63,7 +65,15 @@ export default function ResearchRunsPage() {
   const [question, setQuestion] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modeContract, setModeContract] = useState<OperationModeContract>(RESEARCH_MODE_FALLBACK);
   const [pollId, setPollId] = useState<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/research-loop/mode`)
+      .then((r) => r.json())
+      .then(setModeContract)
+      .catch(() => setModeContract(RESEARCH_MODE_FALLBACK));
+  }, []);
 
   useEffect(() => {
     const t = getStoredToken();
@@ -203,11 +213,12 @@ export default function ResearchRunsPage() {
 
   return (
     <div className="runs-app">
+      <OperationModeBanner mode="research" disclaimer={modeContract.disclaimer} compact />
       <header className="runs-header">
         <div>
           <Link href="/research" className="runs-back">← Research Workspace</Link>
           <h1>Autonomous Research Runs</h1>
-          <p>Closed-loop research with evidence tracking and failure memory</p>
+          <p>Research Mode · Live loop · Claim-classified outputs · Uncertainty expected</p>
         </div>
       </header>
 

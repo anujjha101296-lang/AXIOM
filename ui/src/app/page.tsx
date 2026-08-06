@@ -179,8 +179,12 @@ export default function Home() {
           </div>
           <div className="status-badge">
             <span className="status-dot" aria-hidden="true" />
-            Golden Demo live · v0.5-demo
+            Two modes: Demo (presentations) · Research (live work)
           </div>
+          <p style={{ marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", maxWidth: "520px", lineHeight: 1.6 }}>
+            <strong style={{ color: "var(--text-secondary)" }}>Demo Mode</strong> (/demo) uses curated data for reliable presentations.
+            {" "}<strong style={{ color: "var(--text-secondary)" }}>Research Mode</strong> (/research) uses live PDFs and real models — results may be uncertain.
+          </p>
         </div>
 
         {/* Terminal visual */}
