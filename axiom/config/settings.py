@@ -29,7 +29,7 @@ class AxiomSettings(BaseSettings):
 
     # ── Application ──────────────────────────────────────────────────────────
     app_name: str = Field(default="AXIOM", description="Application name")
-    app_version: str = Field(default="0.2.0", description="Semantic version")
+    app_version: str = Field(default="0.5.0", description="Semantic version")
     environment: Literal["development", "staging", "production"] = Field(
         default="development", description="Deployment environment"
     )

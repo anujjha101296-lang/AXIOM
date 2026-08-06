@@ -30,6 +30,7 @@ from axiom.services.api_gateway.routes.research import router as research_router
 from axiom.services.api_gateway.routes.auth_api import router as auth_router
 from axiom.services.api_gateway.routes.research_loop import router as research_loop_router
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
+from axiom.services.api_gateway.routes.demo import router as demo_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -88,6 +89,9 @@ app.include_router(workflow_router)
 
 # ── Autonomous Research Loop v1 (Milestone 005) ─────────────────────────────
 app.include_router(research_loop_router)
+
+# ── Golden Demo (Milestone 006) — public, no auth ───────────────────────────
+app.include_router(demo_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
