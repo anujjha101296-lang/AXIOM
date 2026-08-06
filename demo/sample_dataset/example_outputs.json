@@ -1,0 +1,17 @@
+{
+  "project": "GNN Generalization for Molecular Property Prediction",
+  "research_question": "Under what structural conditions do message-passing GNNs generalize to unseen molecular scaffolds on ADMET prediction tasks?",
+  "outputs": {
+    "papers_ingested": 3,
+    "concepts_extracted": 9,
+    "relationships": 8,
+    "notes": 4,
+    "contradictions": 2,
+    "gaps": 3,
+    "hypotheses": 3,
+    "experiments": 3,
+    "report_sections": 5
+  },
+  "demo_url": "/demo",
+  "api_endpoint": "/demo/state"
+}

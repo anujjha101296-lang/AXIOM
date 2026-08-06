@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "axiom"
-version = "0.2.0"
+version = "0.5.0"
 description = "AXIOM — Autonomous eXploration of Ideas, Observations & Models"
 authors = ["AXIOM Labs Team"]
 readme = "README.md"

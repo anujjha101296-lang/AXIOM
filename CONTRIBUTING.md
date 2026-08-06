@@ -1,27 +1,34 @@
 # Contributing to AXIOM
 
-Thank you for contributing to the world's first AI Scientific Discovery Platform.
+> **Start here:** [`CONTRIBUTOR_GUIDE.md`](CONTRIBUTOR_GUIDE.md) — full day-1 onboarding guide.
+
+Thank you for contributing to the AXIOM research platform.
 
 ## Core Principle
 
-> Every line of code must exist because it improves scientific capability.
+> Every line of code must exist because it improves scientific capability — honestly measured.
 
-Before submitting any change, ask: **Does this increase AXIOM's probability of making genuine scientific discoveries?**
+Before submitting any change, ask: **Does this increase AXIOM's ability to help researchers, and are capability claims truthful?**
+
+## Quick Commands
+
+```bash
+make setup      # Install deps, copy .env.example
+make test-core  # Core tests (CI gate)
+make check      # lint + type-check + test-core
+make dev        # API server :8000
+```
 
 ## Development Setup
 
-```bash
-make setup   # Install deps, set up pre-commit hooks
-make dev     # Start the API server in dev mode
-make test    # Run the full test suite
-make lint    # Run ruff + mypy
-```
+See `CONTRIBUTOR_GUIDE.md` for prerequisites, repository structure, and architecture overview.
 
 ## Branch Strategy
 
 | Branch | Purpose |
 |--------|---------|
 | `main` | Production-ready code. Protected. CI must pass. |
+| `cursor/<name>-dc7e` | Cloud agent feature branches |
 | `sprint/<name>` | Sprint feature branches |
 | `fix/<name>` | Bug fixes |
 | `docs/<name>` | Documentation only |
@@ -31,64 +38,45 @@ make lint    # Run ruff + mypy
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat(EIE): add LaTeX macro expansion to arXiv parser
-fix(MCTS): correct boundary regex for identity rewrite rules
-docs(API): add /hypothesize endpoint documentation
-test(benchmark): add Dimension F: Lean tactic synthesis coverage
+feat(research): add per-project note tagging
+fix(demo): clarify Demo Mode banner text
+docs(contributor): update CI section
+test(workflow): add Workflow model unit tests
+ci: align coverage gate with pyproject.toml
 ```
 
 **Types**: `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `ci`, `chore`
 
-**Scopes** (use AXIOM module codes):
-- `EIE` — Epistemic Ingest Engine
-- `EGS` — Epistemic Graph Store
-- `LRK` — Lean 4 reasoning/exporter
-- `AVT` — Verification (SMT, Z3)
-- `MCTS` — Monte Carlo proof search
-- `HYP` — Hypothesis Engine
-- `MEM` — Working Memory
-- `SIL` — Self-Improvement Loop
-- `PRS` — Prize Readiness Scorer
-- `API` — API Gateway
-- `UI` — Frontend canvas
-- `OBS` — Observability (logging, metrics)
-- `CFG` — Configuration
-
 ## Pull Request Process
 
-1. Branch off `main` with `git checkout -b sprint/<name>`
-2. Make changes. Write/update tests. Update docs.
-3. Run `make test` — all tests must pass.
-4. Run `make lint` — zero violations.
-5. Open a PR. Fill in the PR template.
-6. Request review. Address feedback.
-7. Squash and merge.
+1. Branch off `main`
+2. Run `make check`
+3. Open PR — fill in `.github/pull_request_template.md`
+4. Significant design changes: add or update ADR in `ARCHITECTURE_DECISION_RECORDS/`
 
 ## Code Standards
 
-- **Python 3.10+** with full type annotations
-- **Pydantic v2** for all data models
-- **ruff** for linting (zero violations)
-- **mypy** in strict mode
-- **Docstrings**: every public class and function
-- **Tests**: every new feature must include a pytest test
-- **Coverage**: maintain ≥ 80% overall
+- **Python 3.10+** with type annotations on public APIs
+- **Pydantic v2** for data models
+- **ruff** for lint + format
+- **Tests** for new behavior in `tests/test_<module>.py`
+- **Coverage** ≥70% on `axiom/` (CI enforced)
 
-## Testing Requirements
+## Architecture Decisions
 
-- Unit tests go in `tests/test_<module>.py`
-- Integration tests go in `tests/test_<feature>_integration.py`
-- Benchmark tests go in `tests/test_benchmark.py`
-- Fixtures go in `tests/conftest.py`
+Important design choices are recorded in `ARCHITECTURE_DECISION_RECORDS/`.
+
+- Auth and modes (ADR-0003, ADR-0005 in `ARCHITECTURE_DECISION_RECORDS/`)
+- Verification labeling (ADR-0004)
+- Runtime baseline (ADR-0002)
 
 ## Security
 
-- **Never commit secrets, API keys, or credentials** — use `.env` (gitignored)
-- Secrets are managed via Pydantic `BaseSettings` reading from environment
-- Report vulnerabilities privately to the maintainers
+- Never commit secrets — see `docs/SECURITY.md`
+- Run `make security-audit` before releases
 
 ## Documentation
 
-- Every public API endpoint must have an OpenAPI docstring
-- Every new module must have a docstring at the top explaining its purpose
-- Significant architectural changes require updating `docs/architecture.md`
+- Public API: OpenAPI at `/docs` and `docs/api.md`
+- Operation modes: `docs/MODES.md`
+- Observability: `docs/OBSERVABILITY.md`

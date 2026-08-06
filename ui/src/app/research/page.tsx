@@ -1,8 +1,19 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  API_BASE,
+  AuthUser,
+  authHeaders,
+  clearAuth,
+  getStoredToken,
+  getStoredUser,
+  parseApiError,
+} from "@/lib/api";
+import OperationModeBanner from "@/components/OperationModeBanner";
+import { RESEARCH_MODE_FALLBACK, type OperationModeContract } from "@/lib/modes";
 
 interface ResearchProject {
   id: string;
@@ -70,7 +81,10 @@ interface ProjectDetail {
 }
 
 export default function ResearchPage() {
-  const [token, setToken] = useState("axiom-dev-token");
+  const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [projects, setProjects] = useState<ResearchProject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ProjectDetail | null>(null);
@@ -82,79 +96,123 @@ export default function ResearchPage() {
   const [noteBody, setNoteBody] = useState("");
   const [noteTags, setNoteTags] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [chatQuestion, setChatQuestion] = useState("");
   const [selectedDocId, setSelectedDocId] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modeContract, setModeContract] = useState<OperationModeContract>(RESEARCH_MODE_FALLBACK);
+  const statusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const headers = useCallback(
-    () => ({
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    }),
-    [token]
+  const showStatus = useCallback((message: string) => {
+    setStatus(message);
+    if (statusTimer.current) clearTimeout(statusTimer.current);
+    statusTimer.current = setTimeout(() => setStatus(null), 6000);
+  }, []);
+
+  const handleUnauthorized = useCallback(() => {
+    clearAuth();
+    router.replace("/login");
+  }, [router]);
+
+  const apiFetch = useCallback(
+    async (path: string, init?: RequestInit) => {
+      if (!token) throw new Error("Not authenticated");
+      const res = await fetch(`${API_BASE}${path}`, {
+        ...init,
+        headers: { ...authHeaders(token), ...(init?.headers || {}) },
+      });
+      if (res.status === 401) {
+        handleUnauthorized();
+        throw new Error("Session expired. Please sign in again.");
+      }
+      return res;
+    },
+    [token, handleUnauthorized]
   );
 
+  useEffect(() => {
+    fetch(`${API_BASE}/research/mode`)
+      .then((r) => r.json())
+      .then(setModeContract)
+      .catch(() => setModeContract(RESEARCH_MODE_FALLBACK));
+  }, []);
+
+  useEffect(() => {
+    const stored = getStoredToken();
+    if (!stored) {
+      router.replace("/login");
+      return;
+    }
+    setToken(stored);
+    setUser(getStoredUser());
+    setAuthChecked(true);
+  }, [router]);
+
   const loadProjects = useCallback(async () => {
+    if (!token) return;
     try {
-      const res = await fetch(`${API_BASE}/research/projects`, { headers: headers() });
-      if (!res.ok) throw new Error(await res.text());
+      const res = await apiFetch("/research/projects");
+      if (!res.ok) throw new Error(await parseApiError(res));
       setProjects(await res.json());
     } catch (e) {
-      setStatus(`Failed to load projects: ${e}`);
+      showStatus(`Failed to load projects: ${e instanceof Error ? e.message : e}`);
     }
-  }, [headers]);
+  }, [token, apiFetch, showStatus]);
 
   const loadProject = useCallback(
     async (projectId: string) => {
+      if (!token) return;
       setLoading(true);
       try {
-        await fetch(`${API_BASE}/research/projects/${projectId}/sessions/resume`, {
-          method: "POST",
-          headers: headers(),
-        });
-        const res = await fetch(`${API_BASE}/research/projects/${projectId}`, {
-          headers: headers(),
-        });
-        if (!res.ok) throw new Error(await res.text());
+        await apiFetch(`/research/projects/${projectId}/sessions/resume`, { method: "POST" });
+        const res = await apiFetch(`/research/projects/${projectId}`);
+        if (!res.ok) throw new Error(await parseApiError(res));
         const data: ProjectDetail = await res.json();
         setDetail(data);
         setSelectedId(projectId);
         setEditProjectName(data.project.name);
         setEditProjectDesc(data.project.description);
-        setStatus(`Resumed session for "${data.project.name}"`);
+        if (data.session?.active_document_id) {
+          setSelectedDocId(data.session.active_document_id);
+        }
+        showStatus(`Resumed session for "${data.project.name}"`);
       } catch (e) {
-        setStatus(`Failed to load project: ${e}`);
+        showStatus(`Failed to load project: ${e instanceof Error ? e.message : e}`);
       } finally {
         setLoading(false);
       }
     },
-    [headers]
+    [token, apiFetch, showStatus]
   );
 
   useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
+    if (authChecked && token) loadProjects();
+  }, [authChecked, token, loadProjects]);
+
+  const logout = () => {
+    clearAuth();
+    router.replace("/login");
+  };
 
   const createProject = async () => {
     if (!newProjectName.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/research/projects`, {
+      const res = await apiFetch("/research/projects", {
         method: "POST",
-        headers: headers(),
         body: JSON.stringify({ name: newProjectName, description: newProjectDesc }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       const project = await res.json();
       setNewProjectName("");
       setNewProjectDesc("");
       await loadProjects();
       await loadProject(project.id);
-      setStatus(`Created project "${project.name}"`);
+      showStatus(`Created project "${project.name}"`);
     } catch (e) {
-      setStatus(`Create failed: ${e}`);
+      showStatus(`Create failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -164,38 +222,47 @@ export default function ResearchPage() {
     if (!selectedId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/research/projects/${selectedId}`, {
+      const res = await apiFetch(`/research/projects/${selectedId}`, {
         method: "PUT",
-        headers: headers(),
         body: JSON.stringify({ name: editProjectName, description: editProjectDesc }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       await loadProjects();
       await loadProject(selectedId);
-      setStatus("Project updated");
+      showStatus("Project updated");
     } catch (e) {
-      setStatus(`Update failed: ${e}`);
+      showStatus(`Update failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
   };
 
   const uploadPdf = async (file: File) => {
-    if (!selectedId) return;
+    if (!selectedId || !token) return;
     setLoading(true);
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch(`${API_BASE}/research/projects/${selectedId}/documents/upload`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-      if (!res.ok) throw new Error(await res.text());
+      const res = await fetch(
+        `${API_BASE}/research/projects/${selectedId}/documents/upload`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: form,
+        }
+      );
+      if (res.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+      if (!res.ok) throw new Error(await parseApiError(res));
+      const doc = await res.json();
       await loadProject(selectedId);
-      setStatus(`Uploaded ${file.name}`);
+      showStatus(
+        `Uploaded ${file.name} — ${doc.char_count?.toLocaleString() ?? 0} characters extracted`
+      );
     } catch (e) {
-      setStatus(`Upload failed: ${e}`);
+      showStatus(`Upload failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -205,15 +272,15 @@ export default function ResearchPage() {
     if (!selectedId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API_BASE}/research/projects/${selectedId}/documents/${docId}/summarize`,
-        { method: "POST", headers: headers() }
+      const res = await apiFetch(
+        `/research/projects/${selectedId}/documents/${docId}/summarize`,
+        { method: "POST" }
       );
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       await loadProject(selectedId);
-      setStatus("Summary generated");
+      showStatus("Summary generated");
     } catch (e) {
-      setStatus(`Summarize failed: ${e}`);
+      showStatus(`Summarize failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -223,13 +290,9 @@ export default function ResearchPage() {
     if (!selectedId || !noteTitle.trim()) return;
     setLoading(true);
     try {
-      const tags = noteTags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
-      const res = await fetch(`${API_BASE}/research/projects/${selectedId}/notes`, {
+      const tags = noteTags.split(",").map((t) => t.trim()).filter(Boolean);
+      const res = await apiFetch(`/research/projects/${selectedId}/notes`, {
         method: "POST",
-        headers: headers(),
         body: JSON.stringify({
           title: noteTitle,
           body: noteBody,
@@ -237,14 +300,14 @@ export default function ResearchPage() {
           document_id: selectedDocId || undefined,
         }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       setNoteTitle("");
       setNoteBody("");
       setNoteTags("");
       await loadProject(selectedId);
-      setStatus("Note saved");
+      showStatus("Note saved");
     } catch (e) {
-      setStatus(`Note failed: ${e}`);
+      showStatus(`Note failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -253,15 +316,14 @@ export default function ResearchPage() {
   const deleteNote = async (noteId: string) => {
     if (!selectedId) return;
     try {
-      const res = await fetch(
-        `${API_BASE}/research/projects/${selectedId}/notes/${noteId}`,
-        { method: "DELETE", headers: headers() }
-      );
-      if (!res.ok) throw new Error(await res.text());
+      const res = await apiFetch(`/research/projects/${selectedId}/notes/${noteId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error(await parseApiError(res));
       await loadProject(selectedId);
-      setStatus("Note deleted");
+      showStatus("Note deleted");
     } catch (e) {
-      setStatus(`Delete failed: ${e}`);
+      showStatus(`Delete failed: ${e instanceof Error ? e.message : e}`);
     }
   };
 
@@ -269,21 +331,20 @@ export default function ResearchPage() {
     if (!selectedId || !chatQuestion.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/research/projects/${selectedId}/ask`, {
+      const res = await apiFetch(`/research/projects/${selectedId}/ask`, {
         method: "POST",
-        headers: headers(),
         body: JSON.stringify({
           question: chatQuestion,
           document_id: selectedDocId || undefined,
           conversation_id: conversationId,
         }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       setChatQuestion("");
       await loadProject(selectedId);
-      setStatus("Question answered");
+      showStatus("Question answered");
     } catch (e) {
-      setStatus(`Q&A failed: ${e}`);
+      showStatus(`Q&A failed: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -293,14 +354,14 @@ export default function ResearchPage() {
     if (!selectedId) return;
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API_BASE}/research/projects/${selectedId}/conversations/${conversationId}`,
-        { headers: headers() }
+      const res = await apiFetch(
+        `/research/projects/${selectedId}/conversations/${conversationId}`
       );
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) throw new Error(await parseApiError(res));
       await loadProject(selectedId);
+      showStatus("Conversation loaded");
     } catch (e) {
-      setStatus(`Failed to load conversation: ${e}`);
+      showStatus(`Failed to load conversation: ${e instanceof Error ? e.message : e}`);
     } finally {
       setLoading(false);
     }
@@ -308,96 +369,157 @@ export default function ResearchPage() {
 
   const runSearch = async () => {
     if (!searchQuery.trim()) return;
+    setSearchLoading(true);
+    setSearchResults(null);
     try {
       const params = new URLSearchParams({ q: searchQuery });
       if (selectedId) params.set("project_id", selectedId);
-      const res = await fetch(`${API_BASE}/research/search?${params}`, { headers: headers() });
-      if (!res.ok) throw new Error(await res.text());
+      const res = await apiFetch(`/research/search?${params}`);
+      if (!res.ok) throw new Error(await parseApiError(res));
       setSearchResults(await res.json());
     } catch (e) {
-      setStatus(`Search failed: ${e}`);
+      showStatus(`Search failed: ${e instanceof Error ? e.message : e}`);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
     }
   };
+
+  if (!authChecked) {
+    return (
+      <div className="research-loading-screen" aria-live="polite">
+        <p>Loading…</p>
+        <style jsx>{`
+          .research-loading-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0f;
+            color: #8888a0;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   const messages = detail?.active_conversation?.messages ?? [];
 
   return (
-    <div className="research-app">
+    <div className="research-app" aria-busy={loading}>
+      <OperationModeBanner mode="research" disclaimer={modeContract.disclaimer} />
+      {loading && (
+        <div className="research-overlay" aria-hidden="true">
+          <div className="research-spinner" />
+        </div>
+      )}
+
       <header className="research-header">
         <div>
-          <a href="/" className="research-back">← AXIOM</a>
+          <Link href="/" className="research-back">
+            ← AXIOM
+          </Link>
           <h1>Research Workspace</h1>
-          <p>Projects · PDFs · Notes · Q&amp;A · Search · Sessions</p>
+          <p>Research Mode · Live PDFs · Real models · Uncertain results possible</p>
         </div>
-        <div className="research-token">
-          <label htmlFor="api-token">API Token</label>
-          <input
-            id="api-token"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            type="password"
-          />
+        <div className="research-user">
+          <Link href="/research/runs" className="research-runs-link">
+            Research Runs
+          </Link>
+          {user && (
+            <span className="research-user-name" title={user.email}>
+              {user.name}
+            </span>
+          )}
+          <button type="button" className="research-logout" onClick={logout}>
+            Sign out
+          </button>
         </div>
       </header>
 
-      {status && <div className="research-status">{status}</div>}
+      {status && (
+        <div className="research-status" role="status" aria-live="polite">
+          {status}
+          <button
+            type="button"
+            className="research-status-close"
+            onClick={() => setStatus(null)}
+            aria-label="Dismiss notification"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="research-grid">
-        <aside className="research-sidebar">
+        <aside className="research-sidebar" aria-label="Projects sidebar">
           <h2>Projects</h2>
           <div className="research-new-project">
             <input
               placeholder="Project name"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
+              aria-label="New project name"
+              disabled={loading}
             />
             <textarea
               placeholder="Description (optional)"
               value={newProjectDesc}
               onChange={(e) => setNewProjectDesc(e.target.value)}
               rows={2}
+              aria-label="New project description"
+              disabled={loading}
             />
-            <button type="button" onClick={createProject} disabled={loading}>
+            <button type="button" onClick={createProject} disabled={loading || !newProjectName.trim()}>
               Create Project
             </button>
           </div>
-          <ul className="research-project-list">
-            {projects.map((p) => (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  className={selectedId === p.id ? "active" : ""}
-                  onClick={() => loadProject(p.id)}
-                >
-                  <strong>{p.name}</strong>
-                  <span>
-                    {p.document_count} docs · {p.note_count} notes
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          {projects.length === 0 ? (
+            <p className="research-empty-sidebar">No projects yet. Create one to get started.</p>
+          ) : (
+            <ul className="research-project-list" role="list">
+              {projects.map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    className={selectedId === p.id ? "active" : ""}
+                    onClick={() => loadProject(p.id)}
+                    aria-current={selectedId === p.id ? "page" : undefined}
+                  >
+                    <strong>{p.name}</strong>
+                    <span>
+                      {p.document_count} docs · {p.note_count} notes
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </aside>
 
-        <main className="research-main">
+        <main className="research-main" id="main-content">
           {!detail ? (
-            <div className="research-empty">
-              <p>Create or select a research project to begin.</p>
+            <div className="research-empty" role="status">
+              <p>Select a project from the sidebar, or create a new one to begin your research.</p>
             </div>
           ) : (
             <>
-              <section>
-                <h2>Organize Project</h2>
+              <section aria-labelledby="organize-heading">
+                <h2 id="organize-heading">Organize Project</h2>
                 <input
                   value={editProjectName}
                   onChange={(e) => setEditProjectName(e.target.value)}
                   placeholder="Project name"
+                  aria-label="Project name"
+                  disabled={loading}
                 />
                 <textarea
                   value={editProjectDesc}
                   onChange={(e) => setEditProjectDesc(e.target.value)}
                   placeholder="Description"
                   rows={2}
+                  aria-label="Project description"
+                  disabled={loading}
                 />
                 <button type="button" onClick={saveProject} disabled={loading}>
                   Save Project
@@ -410,59 +532,71 @@ export default function ResearchPage() {
                 )}
               </section>
 
-              <section>
-                <h3>Upload PDF</h3>
+              <section aria-labelledby="upload-heading">
+                <h3 id="upload-heading">Upload PDF</h3>
+                <p className="research-muted">
+                  PDF text is extracted automatically on upload. Scanned or image-only PDFs are not supported.
+                </p>
                 <input
                   type="file"
                   accept="application/pdf"
+                  aria-label="Upload PDF file"
+                  disabled={loading}
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     if (f) uploadPdf(f);
+                    e.target.value = "";
                   }}
                 />
               </section>
 
-              <section>
-                <h3>Documents ({detail.documents.length})</h3>
-                <select
-                  value={selectedDocId}
-                  onChange={(e) => setSelectedDocId(e.target.value)}
-                  className="research-select"
-                >
-                  <option value="">All documents (Q&amp;A scope)</option>
-                  {detail.documents.map((doc) => (
-                    <option key={doc.id} value={doc.id}>
-                      {doc.filename}
-                    </option>
-                  ))}
-                </select>
-                {detail.documents.map((doc) => (
-                  <article key={doc.id} className="research-card">
-                    <header>
-                      <strong>{doc.filename}</strong>
-                      <span>
-                        {doc.page_count} pages · {doc.char_count.toLocaleString()} chars
-                      </span>
-                      <button type="button" onClick={() => summarize(doc.id)} disabled={loading}>
-                        Generate Summary
-                      </button>
-                    </header>
-                    {doc.summary ? (
-                      <p className="research-summary">{doc.summary}</p>
-                    ) : (
-                      <p className="research-muted">No summary yet.</p>
-                    )}
-                  </article>
-                ))}
+              <section aria-labelledby="docs-heading">
+                <h3 id="docs-heading">Documents ({detail.documents.length})</h3>
+                {detail.documents.length === 0 ? (
+                  <p className="research-muted">No documents yet. Upload a PDF to extract text and enable Q&amp;A.</p>
+                ) : (
+                  <>
+                    <select
+                      value={selectedDocId}
+                      onChange={(e) => setSelectedDocId(e.target.value)}
+                      className="research-select"
+                      aria-label="Document scope for Q&A"
+                    >
+                      <option value="">All documents (Q&amp;A scope)</option>
+                      {detail.documents.map((doc) => (
+                        <option key={doc.id} value={doc.id}>
+                          {doc.filename}
+                        </option>
+                      ))}
+                    </select>
+                    {detail.documents.map((doc) => (
+                      <article key={doc.id} className="research-card">
+                        <header>
+                          <strong>{doc.filename}</strong>
+                          <span>
+                            {doc.page_count} pages · {doc.char_count.toLocaleString()} chars extracted
+                          </span>
+                          <button type="button" onClick={() => summarize(doc.id)} disabled={loading}>
+                            Generate Summary
+                          </button>
+                        </header>
+                        {doc.summary ? (
+                          <p className="research-summary">{doc.summary}</p>
+                        ) : (
+                          <p className="research-muted">No summary yet — click Generate Summary.</p>
+                        )}
+                      </article>
+                    ))}
+                  </>
+                )}
               </section>
 
-              <section>
-                <h3>Ask About Papers</h3>
-                <div className="research-chat">
+              <section aria-labelledby="qa-heading">
+                <h3 id="qa-heading">Ask About Papers</h3>
+                <div className="research-chat" role="log" aria-live="polite" aria-label="Q&A conversation">
                   {messages.length === 0 && (
                     <p className="research-muted">
-                      Ask a question about your uploaded papers. Conversations are saved
-                      automatically.
+                      Ask a question about your uploaded papers. Conversations are saved automatically.
                     </p>
                   )}
                   {messages.map((msg) => (
@@ -480,6 +614,8 @@ export default function ResearchPage() {
                   value={chatQuestion}
                   onChange={(e) => setChatQuestion(e.target.value)}
                   rows={3}
+                  aria-label="Your question"
+                  disabled={loading || detail.documents.length === 0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -490,14 +626,17 @@ export default function ResearchPage() {
                 <button
                   type="button"
                   onClick={() => askQuestion(detail.session?.active_conversation_id)}
-                  disabled={loading || !chatQuestion.trim()}
+                  disabled={loading || !chatQuestion.trim() || detail.documents.length === 0}
                 >
                   Ask
                 </button>
+                {detail.documents.length === 0 && (
+                  <p className="research-muted">Upload a PDF before asking questions.</p>
+                )}
                 {detail.conversations.length > 0 && (
                   <div className="research-conversations">
                     <h4>Previous Conversations</h4>
-                    <ul>
+                    <ul role="list">
                       {detail.conversations.map((c) => (
                         <li key={c.id}>
                           <button type="button" onClick={() => loadConversation(c.id)}>
@@ -510,74 +649,96 @@ export default function ResearchPage() {
                 )}
               </section>
 
-              <section>
-                <h3>Structured Notes</h3>
+              <section aria-labelledby="notes-heading">
+                <h3 id="notes-heading">Structured Notes</h3>
                 <input
                   placeholder="Note title"
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
+                  aria-label="Note title"
+                  disabled={loading}
                 />
                 <input
                   placeholder="Tags (comma-separated)"
                   value={noteTags}
                   onChange={(e) => setNoteTags(e.target.value)}
+                  aria-label="Note tags"
+                  disabled={loading}
                 />
                 <textarea
                   placeholder="Note body — insights, questions, citations..."
                   value={noteBody}
                   onChange={(e) => setNoteBody(e.target.value)}
                   rows={4}
+                  aria-label="Note body"
+                  disabled={loading}
                 />
-                <button type="button" onClick={saveNote} disabled={loading}>
+                <button type="button" onClick={saveNote} disabled={loading || !noteTitle.trim()}>
                   Save Note
                 </button>
-                <ul className="research-notes">
-                  {detail.notes.map((note) => (
-                    <li key={note.id}>
-                      <strong>{note.title}</strong>
-                      {note.tags.length > 0 && (
-                        <span className="research-tags">
-                          {note.tags.map((t) => (
-                            <span key={t} className="research-tag">
-                              {t}
-                            </span>
-                          ))}
-                        </span>
-                      )}
-                      <p>{note.body}</p>
-                      <div className="research-note-actions">
-                        <small>{new Date(note.updated_at).toLocaleString()}</small>
-                        <button type="button" onClick={() => deleteNote(note.id)}>
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                {detail.notes.length === 0 ? (
+                  <p className="research-muted">No notes yet. Save insights as you read.</p>
+                ) : (
+                  <ul className="research-notes" role="list">
+                    {detail.notes.map((note) => (
+                      <li key={note.id}>
+                        <strong>{note.title}</strong>
+                        {note.tags.length > 0 && (
+                          <span className="research-tags">
+                            {note.tags.map((t) => (
+                              <span key={t} className="research-tag">
+                                {t}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                        <p>{note.body}</p>
+                        <div className="research-note-actions">
+                          <small>{new Date(note.updated_at).toLocaleString()}</small>
+                          <button type="button" onClick={() => deleteNote(note.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </section>
 
-              <section>
-                <h3>Search Papers &amp; Notes</h3>
+              <section aria-labelledby="search-heading">
+                <h3 id="search-heading">Search Papers &amp; Notes</h3>
+                <p className="research-muted">
+                  Full-text search across uploaded PDFs and saved notes (keyword matching, not vector semantic search).
+                  Results reflect actual document content — verify important claims manually.
+                </p>
                 <div className="research-search">
                   <input
                     placeholder="Search across uploaded content..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && runSearch()}
+                    aria-label="Search query"
+                    disabled={searchLoading}
                   />
-                  <button type="button" onClick={runSearch}>
-                    Search
+                  <button type="button" onClick={runSearch} disabled={searchLoading || !searchQuery.trim()}>
+                    {searchLoading ? "Searching…" : "Search"}
                   </button>
                 </div>
-                <ul className="research-search-results">
-                  {searchResults.map((r) => (
-                    <li key={`${r.result_type}-${r.id}`}>
-                      <span className="research-badge">{r.result_type}</span>
-                      <strong>{r.title}</strong>
-                      <p>{r.snippet}</p>
-                    </li>
-                  ))}
-                </ul>
+                {searchResults !== null && (
+                  searchResults.length === 0 ? (
+                    <p className="research-muted" role="status">No results found for &ldquo;{searchQuery}&rdquo;.</p>
+                  ) : (
+                    <ul className="research-search-results" role="list">
+                      {searchResults.map((r) => (
+                        <li key={`${r.result_type}-${r.id}`}>
+                          <span className="research-badge">{r.result_type}</span>
+                          <strong>{r.title}</strong>
+                          <p>{r.snippet}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )
+                )}
               </section>
             </>
           )}
@@ -590,6 +751,27 @@ export default function ResearchPage() {
           background: #0a0a0f;
           color: #e8e8ef;
           font-family: Inter, system-ui, sans-serif;
+          position: relative;
+        }
+        .research-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(10, 10, 15, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 100;
+        }
+        .research-spinner {
+          width: 36px;
+          height: 36px;
+          border: 3px solid #2a2a3a;
+          border-top-color: #4f5dff;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
         .research-header {
           display: flex;
@@ -612,19 +794,32 @@ export default function ResearchPage() {
           color: #8888a0;
           font-size: 0.9rem;
         }
-        .research-token label {
-          display: block;
-          font-size: 0.75rem;
-          color: #8888a0;
-          margin-bottom: 0.25rem;
+        .research-user {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
         }
-        .research-token input {
-          background: #12121a;
+        .research-runs-link {
+          color: #7c8cff;
+          text-decoration: none;
+          font-size: 0.85rem;
+        }
+        .research-user-name {
+          font-size: 0.85rem;
+          color: #b8b8d0;
+        }
+        .research-logout {
+          background: transparent;
           border: 1px solid #2a2a3a;
-          color: #e8e8ef;
-          padding: 0.5rem;
+          color: #8888a0;
+          padding: 0.4rem 0.75rem;
           border-radius: 6px;
-          width: 200px;
+          cursor: pointer;
+          font-size: 0.8rem;
+        }
+        .research-logout:hover {
+          border-color: #4a4a5a;
+          color: #e8e8ef;
         }
         .research-status {
           margin: 1rem 2rem;
@@ -633,12 +828,28 @@ export default function ResearchPage() {
           border: 1px solid #2a2a3a;
           border-radius: 8px;
           font-size: 0.9rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .research-status-close {
+          background: none;
+          border: none;
+          color: #8888a0;
+          cursor: pointer;
+          font-size: 1.2rem;
+          line-height: 1;
         }
         .research-grid {
           display: grid;
           grid-template-columns: 280px 1fr;
           gap: 0;
           min-height: calc(100vh - 120px);
+        }
+        @media (max-width: 768px) {
+          .research-grid {
+            grid-template-columns: 1fr;
+          }
         }
         .research-sidebar {
           border-right: 1px solid #1e1e2e;
@@ -650,6 +861,11 @@ export default function ResearchPage() {
           letter-spacing: 0.05em;
           color: #8888a0;
           margin: 0 0 1rem;
+        }
+        .research-empty-sidebar {
+          color: #666680;
+          font-size: 0.85rem;
+          margin-top: 1rem;
         }
         .research-new-project input,
         .research-new-project textarea,
@@ -723,7 +939,7 @@ export default function ResearchPage() {
         }
         .research-main h3 {
           font-size: 1rem;
-          margin: 0 0 1rem;
+          margin: 0 0 0.5rem;
           color: #b8b8d0;
         }
         .research-main h4 {
@@ -762,6 +978,7 @@ export default function ResearchPage() {
         .research-muted {
           color: #666680;
           font-size: 0.85rem;
+          margin: 0 0 0.75rem;
         }
         .research-chat {
           background: #12121a;
