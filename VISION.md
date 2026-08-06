@@ -6,9 +6,21 @@ AXIOM builds systems that measurably increase humanity's ability to solve hard p
 
 Scientific discovery, mathematics, engineering, and software are candidate domains—not permanent constraints. The company discovers the most valuable direction through evidence, customer learning, and reproducible technical progress.
 
+## Execution model
+
+AXIOM progresses on three connected tracks. None waits for the others to be “finished.”
+
+| Track | Objective | Near-term evidence |
+|---|---|---|
+| Research | Build the artificial-scientist capability stack. | Reproducible benchmarks, trustworthy verification, and research workflows. |
+| Product | Build an AI workspace researchers actively use. | A clear MVP, observed user workflow value, and early research users. |
+| Company | Make the work legible and reachable. | Honest website, documentation, pilots, user learning, and a credible operating cadence. |
+
+The tracks share evidence and capabilities: product use exposes research needs, research advances create defensible product value, and company work tests whether the organization can sustain both.
+
 ## Product thesis
 
-AXIOM begins as a research and engineering service. Services put the team close to real problems, create accountable outcomes, and expose repeatable workflows. Repeated workflows may become software products; physical products are pursued only when evidence makes them the best vehicle for impact.
+AXIOM's first public product is an AI workspace for frontier mathematical and scientific research. It begins close to real research and engineering work—through early-user workflows and, where useful, services—so that the team can create accountable outcomes and expose repeatable patterns. Repeated workflows may become software products; physical products are pursued only when evidence makes them the best vehicle for impact.
 
 ## Engineering thesis
 

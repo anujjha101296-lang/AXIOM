@@ -3,7 +3,7 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-05
-**Active horizon:** Horizon 0 — Trustworthy baseline
+**Active horizon:** Three-track foundation — research, product, and company
 
 ## Where we are today
 
@@ -13,6 +13,7 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 
 - Operating contract committed as `6dca714` (`VISION.md`, root engineering/architecture contract, and Sprint 0 roadmap).
 - AXIOM Operating System initialized under `.axiom/`.
+- Three-track execution initiated: Research capability, researcher-workspace product, and company/PMO foundation now progress in parallel.
 
 ## Blocked
 
@@ -21,7 +22,7 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 
 ## Highest priority
 
-**S0-E2: establish and document a Python 3.10+ supported runtime, then rerun the full test suite.** See `TASK_QUEUE.md` and root `roadmap.md`.
+**S0-E2: establish and document a Python 3.10+ supported runtime, then rerun the full test suite.** This remains the technical baseline blocker; independent Product, Research, and PMO work is active in parallel. See `TASK_QUEUE.md` and root `roadmap.md`.
 
 ## Worktree integrity
 

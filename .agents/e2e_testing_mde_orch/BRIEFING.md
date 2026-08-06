@@ -52,15 +52,21 @@ Design and build an opaque-box, requirement-driven E2E test suite for MDE based 
 | explorer_e2e_survey_2 | teamwork_preview_explorer | E2E Test Architecture Design | completed | ddc36ced-a462-4a80-b3ff-60066c731506 |
 | spec_miner_e2e_survey_1 | teamwork_preview_spec_miner | Feature Spec Mining | completed | 48449779-be78-4ce9-8801-27c0020b025c |
 | worker_test_infra_1 | teamwork_preview_worker | Create TEST_INFRA.md at project root | completed | a118c75c-4bd7-4ddd-b3af-4bc296fc1978 |
-| test_writer_m1_m3 | teamwork_preview_test_writer | Create tests/e2e/test_m1_m3_e2e.py | in-progress | 4fe711ef-2ffc-494a-af25-a5283eaf0b35 |
-| test_writer_m4_m5 | teamwork_preview_test_writer | Create tests/e2e/test_m4_m5_e2e.py | in-progress | 2b29edb7-10f6-487b-b424-90c28a72a02c |
-| test_writer_m6_m7 | teamwork_preview_test_writer | Create tests/e2e/test_m6_m7_e2e.py | in-progress | d6581fa0-4490-45cb-8bc5-878e47537969 |
-| test_writer_tier3_tier4 | teamwork_preview_test_writer | Create tests/e2e/test_tier3_tier4_e2e.py | in-progress | ac3879bd-ffe3-4636-9385-f63e1e22f5db |
+| test_writer_m1_m3 | teamwork_preview_test_writer | Create tests/e2e/test_m1_m3_e2e.py | failed (429) | 4fe711ef-2ffc-494a-af25-a5283eaf0b35 |
+| test_writer_m4_m5 | teamwork_preview_test_writer | Create tests/e2e/test_m4_m5_e2e.py | failed (429) | 2b29edb7-10f6-487b-b424-90c28a72a02c |
+| test_writer_m6_m7 | teamwork_preview_test_writer | Create tests/e2e/test_m6_m7_e2e.py | failed (429) | d6581fa0-4490-45cb-8bc5-878e47537969 |
+| test_writer_tier3_tier4 | teamwork_preview_test_writer | Create tests/e2e/test_tier3_tier4_e2e.py | failed (429) | ac3879bd-ffe3-4636-9385-f63e1e22f5db |
+| test_writer_m1_m3_v3 | teamwork_preview_test_writer | Create tests/e2e/test_m1_m3_e2e.py | completed | 899e5a90-4f1c-476a-80ec-477247471fdf |
+| test_writer_m4_m5_v3 | teamwork_preview_test_writer | Create tests/e2e/test_m4_m5_e2e.py | completed | 9c3a8a24-a54e-4995-ba0a-47395b8aaf3a |
+| test_writer_m6_m7_v3 | teamwork_preview_test_writer | Create tests/e2e/test_m6_m7_e2e.py | completed | 781e6ce9-a211-4eb1-b4bf-31af862d072a |
+| test_writer_tier3_tier4_v3 | teamwork_preview_test_writer | Create tests/e2e/test_tier3_tier4_e2e.py | failed (429) | a70eebb3-7584-4102-a494-6aa76cfa550f |
+| test_writer_tier3_tier4_v4 | teamwork_preview_test_writer | Create tests/e2e/test_tier3_tier4_e2e.py | completed | 71c95e53-2756-4664-9ab2-244480c5c63f |
+| worker_publish_test_ready_1 | teamwork_preview_worker | Run pytest suite & publish TEST_READY.md | in-progress | ca8a10d0-cbec-4139-98bd-42a1d05e40e3 |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 8 / 20
-- Pending subagents: 4fe711ef-2ffc-494a-af25-a5283eaf0b35, 2b29edb7-10f6-487b-b424-90c28a72a02c, d6581fa0-4490-45cb-8bc5-878e47537969, ac3879bd-ffe3-4636-9385-f63e1e22f5db
+- Spawn count: 18 / 20
+- Pending subagents: ca8a10d0-cbec-4139-98bd-42a1d05e40e3
 - Predecessor: none
 - Successor: not yet spawned
 

@@ -32,7 +32,10 @@ from axiom.evaluation.benchmarks.suite import (
     run_proof_verification_benchmarks,
     run_conjecture_benchmarks,
     run_knowledge_quality_benchmarks,
+    run_counterexample_benchmarks,
     run_research_planning_benchmarks,
+    run_literature_synthesis_benchmarks,
+    run_research_productivity_benchmarks,
 )
 
 
@@ -58,6 +61,18 @@ def init_db(db_path: str):
         score REAL NOT NULL,
         json_data TEXT NOT NULL,
         PRIMARY KEY (run_id, problem_id)
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS eval_results (
+        run_id TEXT NOT NULL,
+        case_id TEXT NOT NULL,
+        score REAL NOT NULL,
+        passed INTEGER NOT NULL,
+        time_ms REAL NOT NULL,
+        notes TEXT,
+        PRIMARY KEY (run_id, case_id)
     )
     """)
     
@@ -100,8 +115,8 @@ def get_latest_run(db_path: str) -> tuple[Optional[dict], Optional[list]]:
         return None, None
 
 
-def save_run(db_path: str, snapshot: CapabilitySnapshot, readiness_scores: list):
-    """Persist the run and readiness results in SQLite."""
+def save_run(db_path: str, snapshot: CapabilitySnapshot, readiness_scores: list, benchmark_results: list | None = None):
+    """Persist the run, readiness results, and benchmark case results in SQLite."""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
@@ -127,6 +142,21 @@ def save_run(db_path: str, snapshot: CapabilitySnapshot, readiness_scores: list)
                 json.dumps(score.to_dict()),
             )
         )
+
+    # Save benchmark case results if provided
+    if benchmark_results:
+        for res in benchmark_results:
+            cursor.execute(
+                "INSERT INTO eval_results (run_id, case_id, score, passed, time_ms, notes) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    snapshot.run_id,
+                    res.case_id,
+                    res.score,
+                    1 if res.passed else 0,
+                    res.time_ms,
+                    getattr(res, "notes", ""),
+                )
+            )
         
     conn.commit()
     conn.close()
@@ -144,32 +174,39 @@ def main():
     
     init_db(args.db)
     
-    # Run the 5 benchmark suites
-    print("\n[1/5] Executing Mathematical Reasoning benchmarks...")
+    # Run the 8 benchmark suites
+    print("\n[1/8] Executing Mathematical Reasoning benchmarks...")
     mr_results, mr_score = run_math_reasoning_benchmarks()
     print(f"      Passed {sum(1 for r in mr_results if r.passed)}/{len(mr_results)} - Score: {mr_score:.4f}")
     
-    print("\n[2/5] Executing Proof Verification benchmarks...")
+    print("\n[2/8] Executing Proof Verification benchmarks...")
     pv_results, pv_score = run_proof_verification_benchmarks()
     print(f"      Passed {sum(1 for r in pv_results if r.passed)}/{len(pv_results)} - Score: {pv_score:.4f}")
     
-    print("\n[3/5] Executing Conjecture Generation benchmarks...")
+    print("\n[3/8] Executing Conjecture Generation benchmarks...")
     cg_results, cg_score = run_conjecture_benchmarks(args.db)
     print(f"      Passed {sum(1 for r in cg_results if r.passed)}/{len(cg_results)} - Score: {cg_score:.4f}")
     
-    print("\n[4/5] Executing Knowledge Quality benchmarks...")
+    print("\n[4/8] Executing Knowledge Quality benchmarks...")
     kq_results, kq_score = run_knowledge_quality_benchmarks(args.db)
     print(f"      Passed {sum(1 for r in kq_results if r.passed)}/{len(kq_results)} - Score: {kq_score:.4f}")
     
-    print("\n[5/5] Executing Research Planning benchmarks...")
+    print("\n[5/8] Executing Counterexample Search benchmarks...")
+    ce_results, ce_score = run_counterexample_benchmarks(args.db)
+    print(f"      Passed {sum(1 for r in ce_results if r.passed)}/{len(ce_results)} - Score: {ce_score:.4f}")
+
+    print("\n[6/8] Executing Research Planning benchmarks...")
     rp_results, rp_score = run_research_planning_benchmarks()
     print(f"      Passed {sum(1 for r in rp_results if r.passed)}/{len(rp_results)} - Score: {rp_score:.4f}")
-    
-    # Other dimensions are estimated or simulated in the absence of more complex tools
-    ce_score = 0.35  # Counterexample: basic SMT sweep
-    ls_score = 0.40  # Literature: arXiv parsing
-    rd_score = 0.50  # Productivity: autonomous loop iterations
-    
+
+    print("\n[7/8] Executing Literature Synthesis benchmarks...")
+    ls_results, ls_score = run_literature_synthesis_benchmarks(args.db)
+    print(f"      Passed {sum(1 for r in ls_results if r.passed)}/{len(ls_results)} - Score: {ls_score:.4f}")
+
+    print("\n[8/8] Executing Research Productivity benchmarks...")
+    rd_results, rd_score = run_research_productivity_benchmarks(args.db)
+    print(f"      Passed {sum(1 for r in rd_results if r.passed)}/{len(rd_results)} - Score: {rd_score:.4f}")
+
     # Build Snapshot
     run_id = str(uuid.uuid4())[:8]
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -180,10 +217,10 @@ def main():
         make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
         make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
         make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, 5, estimated=True),
+        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
         make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, 10, estimated=True),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, 3, estimated=True),
+        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
+        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
     ]
     snapshot.compute_composite()
     
@@ -195,8 +232,9 @@ def main():
     # Check for previous run to compare
     prev_run, prev_readiness = get_latest_run(args.db)
     
-    # Save current run
-    save_run(args.db, snapshot, readiness_scores)
+    # Save current run with benchmark results
+    all_results = mr_results + pv_results + cg_results + kq_results + ce_results + rp_results + ls_results + rd_results
+    save_run(args.db, snapshot, readiness_scores, all_results)
     print(f"\n✓ Saved run snapshot {run_id} in {args.db} (Composite Score: {snapshot.composite_score:.4f})")
     
     # Generate delta report

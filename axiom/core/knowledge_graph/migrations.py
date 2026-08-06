@@ -12,6 +12,7 @@ Usage:
 from __future__ import annotations
 
 import sqlite3
+import time
 from typing import Callable, List, Tuple
 
 from axiom.observability.logger import get_logger
@@ -183,7 +184,11 @@ def _v4_mathematical_ontology(conn: sqlite3.Connection) -> None:
     cursor = conn.execute("PRAGMA table_info(memory_snapshots);")
     columns = {row[1] for row in cursor.fetchall()}
     if "domain" not in columns:
-        conn.execute("ALTER TABLE memory_snapshots ADD COLUMN domain TEXT;")
+        try:
+            conn.execute("ALTER TABLE memory_snapshots ADD COLUMN domain TEXT;")
+        except sqlite3.OperationalError as e:
+            if "duplicate column" not in str(e).lower():
+                raise
 
     # 5. failed_proof_attempts table
     conn.execute("""
@@ -216,31 +221,117 @@ MIGRATIONS: List[Migration] = [
 ]
 
 
+def _ensure_migration_table(conn: sqlite3.Connection) -> None:
+    max_retries = 10
+    for attempt in range(max_retries):
+        try:
+            _create_migration_table(conn)
+            return
+        except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
+            err_msg = str(e).lower()
+            if "locked" in err_msg or "busy" in err_msg:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            if "already exists" in err_msg:
+                return
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(0.05 * (attempt + 1))
+
+
+def _apply_migration_safely(
+    conn: sqlite3.Connection,
+    version: int,
+    description: str,
+    migrate_fn: Callable[[sqlite3.Connection], None],
+) -> None:
+    max_retries = 10
+    for attempt in range(max_retries):
+        # Initial check
+        try:
+            if version in _applied_versions(conn):
+                return
+        except (sqlite3.OperationalError, sqlite3.IntegrityError):
+            pass
+
+        transaction_started = False
+        try:
+            if not conn.in_transaction:
+                conn.execute("BEGIN IMMEDIATE")
+                transaction_started = True
+        except (sqlite3.OperationalError, sqlite3.IntegrityError) as e:
+            err_msg = str(e).lower()
+            if "locked" in err_msg or "busy" in err_msg:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+
+        try:
+            # Re-check under lock
+            if version in _applied_versions(conn):
+                if transaction_started and conn.in_transaction:
+                    conn.rollback()
+                return
+
+            logger.info(f"Applying migration v{version}: {description}")
+            migrate_fn(conn)
+            conn.execute(
+                "INSERT INTO _schema_migrations (version, description) VALUES (?, ?);",
+                (version, description),
+            )
+            conn.commit()
+            logger.info(f"Migration v{version} applied successfully.")
+            return
+        except (sqlite3.IntegrityError, sqlite3.OperationalError) as e:
+            if conn.in_transaction:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+            err_msg = str(e).lower()
+
+            try:
+                if version in _applied_versions(conn):
+                    return
+            except Exception:
+                pass
+
+            if "locked" in err_msg or "busy" in err_msg:
+                time.sleep(0.05 * (attempt + 1))
+                continue
+
+            if "unique" in err_msg or "already exists" in err_msg:
+                try:
+                    if version in _applied_versions(conn):
+                        return
+                except Exception:
+                    pass
+
+            if attempt == max_retries - 1:
+                try:
+                    if version in _applied_versions(conn):
+                        return
+                except Exception:
+                    pass
+                raise
+            time.sleep(0.05 * (attempt + 1))
+
+
 def run_migrations(conn: sqlite3.Connection) -> None:
     """
     Run all pending migrations in order.
     Idempotent — already-applied migrations are skipped.
+    Handles concurrent execution cleanly across multiple threads/connections.
     """
     conn.execute("PRAGMA foreign_keys = ON;")
-    _create_migration_table(conn)
-    applied = _applied_versions(conn)
+    _ensure_migration_table(conn)
 
     for version, description, migrate_fn in MIGRATIONS:
-        if version in applied:
-            continue
-        logger.info(f"Applying migration v{version}: {description}")
-        migrate_fn(conn)
-        conn.execute(
-            "INSERT INTO _schema_migrations (version, description) VALUES (?, ?);",
-            (version, description),
-        )
-        conn.commit()
-        logger.info(f"Migration v{version} applied successfully.")
+        _apply_migration_safely(conn, version, description, migrate_fn)
 
 
 def migration_status(conn: sqlite3.Connection) -> List[dict]:
     """Return the current migration status for all known migrations."""
-    _create_migration_table(conn)
+    _ensure_migration_table(conn)
     applied = _applied_versions(conn)
     return [
         {
@@ -250,3 +341,4 @@ def migration_status(conn: sqlite3.Connection) -> List[dict]:
         }
         for v, desc, _ in MIGRATIONS
     ]
+

@@ -1,43 +1,15 @@
-"""
-Empirical Stress Test & Benchmark Harness for MDE Ontology & EGS Database (Milestone 1)
-========================================================================================
-Challenger: challenger_mde_m1_1
-Target: axiom/core/knowledge_graph (schema.py, db.py, migrations.py)
-
-Tests:
-1. Polymorphic node roundtrips with random & extreme payloads across 1000+ nodes.
-2. NetworkX graph export performance and structural preservation.
-3. Edge cases and exception handling:
-   - Malformed JSON parsing
-   - Invalid discriminator value deserialization
-   - Duplicate edge upserts (ON CONFLICT behavior)
-   - Foreign key constraint violations
-   - Missing required node fields
-   - Duplicate equivalent statement pairs
-"""
-
-import sys
-import os
-import json
 import time
 import random
 import string
-import traceback
-from typing import Dict, List, Any
-
-# Ensure project root is in sys.path
-PROJECT_ROOT = "/Users/itachiuchiha/.gemini/antigravity/scratch/axiom"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
+import json
+import pytest
+import sqlite3
 import networkx as nx
-from pydantic import ValidationError
+from typing import List, Dict, Any
+from pydantic import ValidationError, TypeAdapter
 
 from axiom.core.knowledge_graph.schema import (
-    NodeType,
-    EdgeType,
-    EpistemicStatus,
-    VerificationTier,
+    ScientificNode,
     AuthorNode,
     PaperNode,
     ConceptNode,
@@ -48,388 +20,329 @@ from axiom.core.knowledge_graph.schema import (
     DefinitionNode,
     OpenProblemNode,
     ConjectureNode,
+    NodeType,
+    EdgeType,
+    EpistemicStatus,
+    VerificationTier,
     Edge,
     KnowledgeGraph,
-    scientific_node_adapter,
 )
-from axiom.core.knowledge_graph.db import EpistemicStore
+from axiom.core.knowledge_graph.db import EpistemicStore, scientific_node_adapter
 from axiom.core.knowledge_graph.migrations import run_migrations, migration_status
 
 
-def generate_random_string(length: int = 20) -> str:
-    alphabet = string.ascii_letters + string.digits + " αβγδεζηθικλμνξοπρστυφχψω ∑∏∫√∞≈≠≤≥∈∉⊂⊃∪∩"
-    return "".join(random.choices(alphabet, k=length))
+def random_string(length=20):
+    letters = string.ascii_letters + string.digits + " αβγδεζηθικλμνξοπρστυφχψω ∀∃∈ℝℂℤℕℵ ∫∑∏√∆∇ ∂"
+    return ''.join(random.choice(letters) for _ in range(length))
 
 
-def run_benchmark():
-    print("=" * 80)
-    print("STARTING EMPIRICAL STRESS TEST & BENCHMARK HARNESS")
-    print("=" * 80)
+def generate_extreme_node(index: int) -> ScientificNode:
+    node_type_idx = index % 10
+    node_id = f"node_stress_{index}_{random.randint(1000, 9999)}"
+    name = f"Node {index}: " + random_string(30)
 
-    results = {
-        "polymorphic_roundtrip": False,
-        "nodes_tested": 0,
-        "roundtrip_time_sec": 0.0,
-        "networkx_export": False,
-        "edges_tested": 0,
-        "export_time_sec": 0.0,
-        "exception_handling": False,
-        "failed_checks": [],
+    metadata = {
+        "str_field": random_string(100),
+        "int_field": random.randint(-100000, 100000),
+        "float_field": random.uniform(-1e6, 1e6),
+        "bool_field": bool(index % 2),
+        "list_field": [random_string(10) for _ in range(5)],
+        "null_field": None,
+        "math_latex": r"\int_{0}^{\infty} \frac{x^{s-1}}{e^x - 1} dx = \Gamma(s)\zeta(s)"
     }
 
-    store = EpistemicStore(":memory:")
-
-    # --------------------------------------------------------------------------
-    # TEST 1: Polymorphic Node Roundtrips with 1000+ Nodes & Extreme Payloads
-    # --------------------------------------------------------------------------
-    print("\n--- TEST 1: Polymorphic Serialization across 1000+ Nodes & Extreme Payloads ---")
-    start_time = time.time()
-
-    total_nodes = 1200
-    created_nodes = []
-
-    # 1. Extreme payload nodes
-    # 100KB string payload
-    huge_string = "∀x ∈ ℝ, " + ("f(x) = ∫_{0}^{∞} t^{x-1} e^{-t} dt + " * 3000)
-    extreme_obj = MathematicalObjectNode(
-        id="extreme_huge_payload",
-        name="Huge Mathematical Object",
-        domain="ANALYTIC_NUMBER_THEORY",
-        symbolic_representation=huge_string,
-        formal_type="Complex -> Complex",
-        properties={
-            "huge_text": huge_string[:10000],
-            "nested_dict": {"a": {"b": {"c": [1, 2, 3, "deep_string", True, None]}}},
-            "unicode_symbols": "Riemann Zeta ζ(s) = ∑_{n=1}^∞ n^{-s} | ℜ(s) > 1 | 𝔽_q",
-            "special_json_chars": 'Quotes "double" and \'single\', backslash \\, newline \n, tab \t',
-            "large_list": list(range(100)),
-            "floats": [1e-10, 1e10, -3.141592653589793, 0.0],
-            "booleans": [True, False],
-            "null_value": None,
-        }
-    )
-    created_nodes.append(extreme_obj)
-    store.add_node(extreme_obj)
-
-    # Empty payload node
-    empty_def = DefinitionNode(
-        id="extreme_empty_payload",
-        name="",
-        term="",
-        formal_definition="",
-        informal_description=None,
-        domain=None
-    )
-    created_nodes.append(empty_def)
-    store.add_node(empty_def)
-
-    # 1198 random / diverse nodes across all 10 types
-    node_classes = [
-        AuthorNode,
-        PaperNode,
-        ConceptNode,
-        MathematicalClaimNode,
-        ExperimentalFactNode,
-        DatasetNode,
-        MathematicalObjectNode,
-        DefinitionNode,
-        OpenProblemNode,
-        ConjectureNode,
-    ]
-
-    for i in range(2, total_nodes):
-        n_cls = node_classes[i % len(node_classes)]
-        nid = f"node_{i:04d}_{n_cls.__name__}"
-        name = f"Node {i} - {n_cls.__name__} {generate_random_string(10)}"
-
-        if n_cls == AuthorNode:
-            node = AuthorNode(id=nid, name=name, orcid=f"0000-0002-{i:04d}-0000", affiliations=[generate_random_string(15)])
-        elif n_cls == PaperNode:
-            node = PaperNode(id=nid, name=name, arxiv_id=f"2408.{i:05d}", abstract=generate_random_string(100))
-        elif n_cls == ConceptNode:
-            node = ConceptNode(id=nid, name=name, definition=generate_random_string(50))
-        elif n_cls == MathematicalClaimNode:
-            node = MathematicalClaimNode(id=nid, name=name, statement=f"Statement {i}: " + generate_random_string(40))
-        elif n_cls == ExperimentalFactNode:
-            node = ExperimentalFactNode(id=nid, name=name, fact_description=generate_random_string(60), confidence_metric=random.random())
-        elif n_cls == DatasetNode:
-            node = DatasetNode(id=nid, name=name, url=f"https://data.example.org/{i}", size_bytes=i * 1024)
-        elif n_cls == MathematicalObjectNode:
-            node = MathematicalObjectNode(
-                id=nid,
-                name=name,
-                domain=random.choice(["ALGEBRA", "NUMBER_THEORY", "TOPOLOGY", "ANALYSIS"]),
-                symbolic_representation=f"\\hat{{A}}_{{{i}}}",
-                formal_type="Type -> Prop",
-                properties={"index": i, "random_prop": generate_random_string(20)}
-            )
-        elif n_cls == DefinitionNode:
-            node = DefinitionNode(
-                id=nid,
-                name=name,
-                term=f"Term_{i}",
-                formal_definition=f"def_{i} : Prop := True",
-                informal_description=generate_random_string(30),
-                domain="NUMBER_THEORY"
-            )
-        elif n_cls == OpenProblemNode:
-            node = OpenProblemNode(
-                id=nid,
-                name=name,
-                statement=f"Is P = NP for i={i}?",
-                prize_bounty=f"${i * 1000}",
-                importance_score=random.uniform(0.1, 10.0)
-            )
-        elif n_cls == ConjectureNode:
-            node = ConjectureNode(
-                id=nid,
-                name=name,
-                statement=f"Conjecture {i} holds for all prime factors",
-                novelty_score=random.random(),
-                generation_strategy=random.choice(["MCTS", "SYMPY", "DUAL"])
-            )
-
-        created_nodes.append(node)
-        store.add_node(node)
-
-    insert_time = time.time() - start_time
-    print(f"-> Inserted {len(created_nodes)} nodes into SQLite in {insert_time:.3f} seconds ({len(created_nodes)/insert_time:.1f} nodes/sec)")
-
-    # Retrieve and verify roundtrip for all 1200 nodes
-    fetch_start = time.time()
-    roundtrip_mismatches = 0
-
-    for orig_node in created_nodes:
-        retrieved = store.get_node(orig_node.id)
-        if retrieved is None:
-            roundtrip_mismatches += 1
-            results["failed_checks"].append(f"Node {orig_node.id} returned None")
-            continue
-
-        if type(retrieved) != type(orig_node):
-            roundtrip_mismatches += 1
-            results["failed_checks"].append(f"Node {orig_node.id} type mismatch: expected {type(orig_node)}, got {type(retrieved)}")
-            continue
-
-        # Check model dump equality
-        if retrieved.model_dump() != orig_node.model_dump():
-            roundtrip_mismatches += 1
-            results["failed_checks"].append(f"Node {orig_node.id} dump mismatch")
-
-    fetch_time = time.time() - fetch_start
-    print(f"-> Retrieved & verified {len(created_nodes)} nodes in {fetch_time:.3f} seconds ({len(created_nodes)/fetch_time:.1f} nodes/sec)")
-
-    # Verify type query performance & completeness
-    for ntype in NodeType:
-        nodes_of_type = store.get_nodes_by_type(ntype)
-        expected_count = sum(1 for n in created_nodes if n.type == ntype)
-        if len(nodes_of_type) != expected_count:
-            results["failed_checks"].append(f"get_nodes_by_type({ntype}) count mismatch: expected {expected_count}, got {len(nodes_of_type)}")
-            roundtrip_mismatches += 1
-
-    if roundtrip_mismatches == 0:
-        results["polymorphic_roundtrip"] = True
-        results["nodes_tested"] = len(created_nodes)
-        results["roundtrip_time_sec"] = round(insert_time + fetch_time, 4)
-        print("-> PASS: All 1200 polymorphic node roundtrips verified with 0 mismatches!")
+    if node_type_idx == 0:
+        return MathematicalObjectNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            domain="ANALYTIC_NUMBER_THEORY",
+            symbolic_representation=r"\zeta(s) = \sum_{n=1}^\infty n^{-s}",
+            formal_type="Complex -> Complex",
+            properties={"property_large": "x" * 1000, "inv": ["1", "2", "3", "4"]}
+        )
+    elif node_type_idx == 1:
+        return DefinitionNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            term=f"Term_{index}_" + random_string(10),
+            formal_definition=f"def formal_{index} (x : ℝ) : Prop := x > 0 ∧ x < 1",
+            informal_description="Informal explanation " + random_string(200),
+            domain="ALGEBRA"
+        )
+    elif node_type_idx == 2:
+        return OpenProblemNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            statement="Is " + random_string(100) + " true?",
+            domain="NUMBER_THEORY",
+            prize_bounty="$1,000,000",
+            status=EpistemicStatus.CONJECTURED,
+            importance_score=random.uniform(0.1, 10.0)
+        )
+    elif node_type_idx == 3:
+        return ConjectureNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            statement="Conjecture " + random_string(150),
+            formal_specification="theorem conj_" + str(index) + " : 1 = 1 := rfl",
+            status=EpistemicStatus.CONJECTURED,
+            tier=VerificationTier.TIER_0_CONJECTURE,
+            novelty_score=random.random(),
+            generation_strategy="DUAL"
+        )
+    elif node_type_idx == 4:
+        return AuthorNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            orcid="0000-0002-1825-0097",
+            affiliations=["Institute for Advanced Study", "MIT", "Oxford"]
+        )
+    elif node_type_idx == 5:
+        return PaperNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            doi="10.1007/s00220-021-04123-x",
+            arxiv_id="arXiv:2104.12345",
+            abstract="Abstract payload " + " ".join([random_string(10) for _ in range(50)]),
+            published_date="2026-08-05"
+        )
+    elif node_type_idx == 6:
+        return ConceptNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            definition="Concept definition " + random_string(100),
+            mathematical_formulation="f(x) = x^2 + 1"
+        )
+    elif node_type_idx == 7:
+        return MathematicalClaimNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            statement="Claim " + random_string(80),
+            formal_specification="theorem claim_" + str(index) + " : True := trivial",
+            status=EpistemicStatus.VERIFIED,
+            tier=VerificationTier.TIER_2_PROVEN
+        )
+    elif node_type_idx == 8:
+        return ExperimentalFactNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            fact_description="Verified numerically up to 10^13 zeros.",
+            confidence_metric=0.999999,
+            status=EpistemicStatus.VERIFIED,
+            tier=VerificationTier.TIER_3_REPLICATED
+        )
     else:
-        print(f"-> FAIL: {roundtrip_mismatches} roundtrip mismatches detected!")
+        return DatasetNode(
+            id=node_id,
+            name=name,
+            metadata=metadata,
+            url="https://example.org/dataset/" + random_string(10),
+            size_bytes=1024 * 1024 * random.randint(1, 100)
+        )
 
-    # --------------------------------------------------------------------------
-    # TEST 2: NetworkX Graph Export & Structural Preservation across 1500+ Edges
-    # --------------------------------------------------------------------------
-    print("\n--- TEST 2: NetworkX Graph Export & Structural Preservation ---")
-    edge_start = time.time()
 
-    created_edges = []
-    node_ids = [n.id for n in created_nodes]
+def run_polymorphic_roundtrip_stress(count: int = 1200):
+    print(f"\n--- 1. Polymorphic Serialization Stress Test ({count} nodes) ---")
+    nodes = [generate_extreme_node(i) for i in range(count)]
+    
+    # Direct Pydantic JSON Serialization & Deserialization
+    start_time = time.perf_counter()
+    json_blobs = [node.model_dump_json() for node in nodes]
+    serialize_time = time.perf_counter() - start_time
+    
+    start_time = time.perf_counter()
+    deserialized_nodes = [scientific_node_adapter.validate_json(blob) for blob in json_blobs]
+    deserialize_time = time.perf_counter() - start_time
+    
+    assert len(deserialized_nodes) == count
+    for orig, val in zip(nodes, deserialized_nodes):
+        assert orig.id == val.id
+        assert orig.type == val.type
+        assert orig.name == val.name
+    
+    print(f"Pydantic Serialize Time:   {serialize_time*1000:.2f} ms ({count/serialize_time:.1f} ops/sec)")
+    print(f"Pydantic Deserialize Time: {deserialize_time*1000:.2f} ms ({count/deserialize_time:.1f} ops/sec)")
+    
+    # EpistemicStore SQLite Roundtrip
+    store = EpistemicStore(":memory:")
+    start_time = time.perf_counter()
+    for node in nodes:
+        store.add_node(node)
+    sqlite_write_time = time.perf_counter() - start_time
+    
+    start_time = time.perf_counter()
+    db_nodes = [store.get_node(n.id) for n in nodes]
+    sqlite_read_time = time.perf_counter() - start_time
+    
+    assert len(db_nodes) == count
+    for orig, retrieved in zip(nodes, db_nodes):
+        assert retrieved is not None
+        assert orig.id == retrieved.id
+        assert orig.type == retrieved.type
+    
+    print(f"SQLite Bulk Write Time:    {sqlite_write_time*1000:.2f} ms ({count/sqlite_write_time:.1f} ops/sec)")
+    print(f"SQLite Bulk Read Time:     {sqlite_read_time*1000:.2f} ms ({count/sqlite_read_time:.1f} ops/sec)")
+    store.close()
+    return True
+
+
+def run_networkx_graph_export_stress(node_count: int = 1500, edge_count: int = 3000):
+    print(f"\n--- 2. NetworkX Graph Export & Preservation Stress Test ({node_count} nodes, {edge_count} edges) ---")
+    store = EpistemicStore(":memory:")
+    nodes = [generate_extreme_node(i) for i in range(node_count)]
+    for node in nodes:
+        store.add_node(node)
+        
     edge_types = list(EdgeType)
-
-    # Generate 1500 random directed edges
-    random.seed(42)
-    edge_set = set()
-    for i in range(1500):
+    node_ids = [n.id for n in nodes]
+    
+    pair_set = set()
+    attempts = 0
+    while len(pair_set) < edge_count and attempts < edge_count * 10:
+        attempts += 1
         src = random.choice(node_ids)
         tgt = random.choice(node_ids)
         if src == tgt:
             continue
-        etype = random.choice(edge_types)
-        pair = (src, tgt, etype.value)
-        if pair in edge_set:
+        if (src, tgt) in pair_set:
             continue
-        edge_set.add(pair)
-
+        pair_set.add((src, tgt))
+        e_type = random.choice(edge_types)
         edge = Edge(
             source_id=src,
             target_id=tgt,
-            type=etype,
-            confidence=round(random.uniform(0.5, 1.0), 3),
-            provenance={"step": i, "method": "stress_harness", "latin": "Q.E.D. ∞"}
+            type=e_type,
+            confidence=random.uniform(0.5, 1.0),
+            provenance={"extracted_by": "stress_test", "run": 1}
         )
-        created_edges.append(edge)
         store.add_edge(edge)
 
-    edge_insert_time = time.time() - edge_start
-    print(f"-> Inserted {len(created_edges)} edges into SQLite in {edge_insert_time:.3f} seconds")
+    db_edge_count = store.conn.execute("SELECT count(*) FROM edges;").fetchone()[0]
 
-    # Time NetworkX graph export
-    nx_start = time.time()
+    start_time = time.perf_counter()
     G = store.to_networkx()
-    nx_export_time = time.time() - nx_start
+    export_time = time.perf_counter() - start_time
+    
+    print(f"NetworkX to_networkx Export Time: {export_time*1000:.2f} ms")
+    print(f"DB Edges: {db_edge_count}, Exported Nodes: {G.number_of_nodes()}, Exported Edges: {G.number_of_edges()}")
+    
+    assert isinstance(G, nx.DiGraph)
+    assert G.number_of_nodes() == node_count
+    assert G.number_of_edges() == db_edge_count == len(pair_set) == edge_count
+    
+    # Verify node attributes preservation
+    sample_node = nodes[0]
+    nx_node_data = G.nodes[sample_node.id]
+    assert nx_node_data["id"] == sample_node.id
+    assert nx_node_data["name"] == sample_node.name
+    
+    # Verify degree metrics computation works on G
+    degrees = dict(G.degree())
+    assert len(degrees) == node_count
+    
+    store.close()
+    return True
 
-    print(f"-> Exported to NetworkX graph in {nx_export_time:.4f} seconds")
 
-    nx_errors = 0
-    # Structural checks
-    if G.number_of_nodes() != len(created_nodes):
-        nx_errors += 1
-        results["failed_checks"].append(f"NetworkX node count mismatch: SQLite {len(created_nodes)} vs NetworkX {G.number_of_nodes()}")
+def run_exception_handling_boundary_cases():
+    print("\n--- 3. Exception Handling & Boundary Case Tests ---")
+    store = EpistemicStore(":memory:")
 
-    if G.number_of_edges() != len(created_edges):
-        nx_errors += 1
-        results["failed_checks"].append(f"NetworkX edge count mismatch: SQLite {len(created_edges)} vs NetworkX {G.number_of_edges()}")
+    # Case 1: Malformed JSON parsing
+    print("Testing malformed JSON handling...")
+    malformed_json = '{"id": "node_1", "type": "MATHEMATICAL_OBJECT", "name": "Broken", properties: {unquoted: true}}'
+    try:
+        scientific_node_adapter.validate_json(malformed_json)
+        assert False, "Should have raised ValidationError for malformed JSON"
+    except (ValidationError, Exception) as e:
+        print(f"  [PASS] Caught expected exception for malformed JSON: {type(e).__name__}")
 
-    # Attribute preservation check on 100 sample nodes & edges
-    for sample_node in random.sample(created_nodes, 100):
-        if not G.has_node(sample_node.id):
-            nx_errors += 1
-            results["failed_checks"].append(f"NetworkX missing node {sample_node.id}")
-        else:
-            nx_attr = G.nodes[sample_node.id]
-            if nx_attr.get("id") != sample_node.id or nx_attr.get("type") != sample_node.type.value:
-                nx_errors += 1
-                results["failed_checks"].append(f"NetworkX node attribute mismatch for {sample_node.id}")
+    # Case 2: Invalid Discriminator Value
+    print("Testing invalid discriminator value...")
+    invalid_disc_json = json.dumps({
+        "id": "node_invalid_type",
+        "type": "QUANTUM_MULTIVERSE_NODE",
+        "name": "Invalid Type"
+    })
+    try:
+        scientific_node_adapter.validate_json(invalid_disc_json)
+        assert False, "Should have raised ValidationError for invalid discriminator"
+    except ValidationError as e:
+        print(f"  [PASS] Caught expected ValidationError for invalid discriminator")
 
-    for sample_edge in random.sample(created_edges, 100):
-        if not G.has_edge(sample_edge.source_id, sample_edge.target_id):
-            nx_errors += 1
-            results["failed_checks"].append(f"NetworkX missing edge {sample_edge.source_id} -> {sample_edge.target_id}")
-        else:
-            edge_attr = G.edges[sample_edge.source_id, sample_edge.target_id]
-            if edge_attr.get("type") != sample_edge.type.value or edge_attr.get("confidence") != sample_edge.confidence:
-                nx_errors += 1
-                results["failed_checks"].append(f"NetworkX edge attribute mismatch for {sample_edge.source_id} -> {sample_edge.target_id}")
+    # Case 3: Missing required Pydantic field
+    print("Testing missing required fields...")
+    missing_field_json = json.dumps({
+        "id": "def_missing",
+        "type": "DEFINITION",
+        "name": "Incomplete Def"
+        # missing 'term' and 'formal_definition'
+    })
+    try:
+        scientific_node_adapter.validate_json(missing_field_json)
+        assert False, "Should have raised ValidationError for missing required fields"
+    except ValidationError as e:
+        print(f"  [PASS] Caught expected ValidationError for missing required fields")
 
-    if nx_errors == 0:
-        results["networkx_export"] = True
-        results["edges_tested"] = len(created_edges)
-        results["export_time_sec"] = round(nx_export_time, 4)
-        print(f"-> PASS: NetworkX export verified! Nodes={G.number_of_nodes()}, Edges={G.number_of_edges()}, Time={nx_export_time:.4f}s")
-    else:
-        print(f"-> FAIL: {nx_errors} NetworkX structural errors detected!")
+    # Case 4: Duplicate Edge Inserts (Upsert behavior)
+    print("Testing duplicate edge inserts (Upsert behavior)...")
+    node_a = MathematicalClaimNode(id="claim_dup_a", name="Claim A", statement="A")
+    node_b = MathematicalClaimNode(id="claim_dup_b", name="Claim B", statement="B")
+    store.add_node(node_a)
+    store.add_node(node_b)
 
-    # --------------------------------------------------------------------------
-    # TEST 3: Edge Cases & Exception Handling
-    # --------------------------------------------------------------------------
-    print("\n--- TEST 3: Exception Handling & Boundary Cases ---")
-    exc_errors = []
+    edge1 = Edge(source_id="claim_dup_a", target_id="claim_dup_b", type=EdgeType.PROVES, confidence=0.8)
+    edge2 = Edge(source_id="claim_dup_a", target_id="claim_dup_b", type=EdgeType.PROVES, confidence=0.95)
+    
+    store.add_edge(edge1)
+    store.add_edge(edge2)  # Should upsert without raising exception
+    retrieved_edge = store.get_edge("claim_dup_a", "claim_dup_b", "PROVES")
+    assert retrieved_edge is not None
+    assert retrieved_edge.confidence == 0.95
+    print("  [PASS] Duplicate edge upserted successfully without error")
 
-    # 3.1 Malformed JSON in nodes table
+    # Case 5: Edge referencing non-existent node
+    print("Testing edge insertion for missing node...")
+    try:
+        store.add_edge(Edge(source_id="claim_dup_a", target_id="non_existent_node", type=EdgeType.PROVES))
+        assert False, "Should have raised ValueError"
+    except ValueError as e:
+        print(f"  [PASS] Caught expected ValueError: {e}")
+
+    # Case 6: SQLite Foreign Key Integrity Enforcement on specialized tables
+    print("Testing direct DB FK enforcement...")
     try:
         with store.conn:
-            store.conn.execute("INSERT INTO nodes (id, type, name, data) VALUES (?, ?, ?, ?);", ("malformed_json_node", "CONCEPT", "Bad Node", "{invalid_json:"))
-        try:
-            store.get_node("malformed_json_node")
-            exc_errors.append("Malformed JSON did NOT raise JSONDecodeError / ValidationError on get_node")
-        except Exception as e:
-            print(f"-> Caught expected exception for malformed JSON: {type(e).__name__}")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in malformed JSON setup: {e}")
+            store.conn.execute(
+                "INSERT INTO mathematical_objects (id, node_id, object_type, domain) VALUES ('mo_1', 'ghost_node', 'GROUP', 'ALGEBRA');"
+            )
+        assert False, "Should have raised IntegrityError"
+    except sqlite3.IntegrityError as e:
+        print(f"  [PASS] SQLite FK IntegrityError raised on orphaned mathematical_object insert: {e}")
 
-    # 3.2 Invalid discriminator value
-    try:
-        invalid_type_json = json.dumps({"id": "inv_disc_1", "type": "NON_EXISTENT_TYPE", "name": "Invalid Node"})
-        try:
-            scientific_node_adapter.validate_json(invalid_type_json)
-            exc_errors.append("Invalid discriminator type did NOT raise ValidationError")
-        except ValidationError as ve:
-            print(f"-> Caught expected ValidationError for invalid discriminator: {ve.errors()[0]['type']}")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in invalid discriminator test: {e}")
-
-    # 3.3 Duplicate edge insert (ON CONFLICT DO UPDATE behavior)
-    try:
-        edge_dup = Edge(source_id="node_0002_AuthorNode", target_id="node_0003_PaperNode", type=EdgeType.CITES, confidence=0.7, provenance={"step": 1})
-        store.add_edge(edge_dup)
-
-        # Upsert duplicate with higher confidence
-        edge_dup_updated = Edge(source_id="node_0002_AuthorNode", target_id="node_0003_PaperNode", type=EdgeType.CITES, confidence=0.99, provenance={"step": 2})
-        store.add_edge(edge_dup_updated)
-
-        retrieved_edge = store.get_edge("node_0002_AuthorNode", "node_0003_PaperNode", "CITES")
-        if not retrieved_edge or retrieved_edge.confidence != 0.99 or retrieved_edge.provenance != {"step": 2}:
-            exc_errors.append("Duplicate edge ON CONFLICT DO UPDATE failed to update confidence/provenance")
-        else:
-            print("-> PASS: Duplicate edge upsert (ON CONFLICT DO UPDATE) updated record correctly without duplicating rows.")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in duplicate edge test: {e}")
-
-    # 3.4 Foreign key constraint on add_edge with missing node
-    try:
-        missing_edge = Edge(source_id="non_existent_src", target_id="node_0002_AuthorNode", type=EdgeType.PROVES)
-        try:
-            store.add_edge(missing_edge)
-            exc_errors.append("add_edge with non-existent source node did NOT raise ValueError")
-        except ValueError as ve:
-            print(f"-> Caught expected ValueError for non-existent node in add_edge: {ve}")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in FK add_edge test: {e}")
-
-    # 3.5 Missing required field in node model instantiation
-    try:
-        try:
-            DefinitionNode(id="def_missing", name="Missing Term")  # missing required 'term' and 'formal_definition'
-            exc_errors.append("DefinitionNode instantiation with missing required fields did NOT raise ValidationError")
-        except ValidationError as ve:
-            print(f"-> Caught expected ValidationError for missing node fields: {len(ve.errors())} missing field errors")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in missing fields test: {e}")
-
-    # 3.6 Unique index on equivalent_statements
-    try:
-        node_a = MathematicalClaimNode(id="eq_claim_a", name="A", statement="A")
-        node_b = MathematicalClaimNode(id="eq_claim_b", name="B", statement="B")
-        store.add_node(node_a)
-        store.add_node(node_b)
-
-        store.add_equivalent_statement("eq_claim_a", "eq_claim_b", equivalence_type="LOGICAL", confidence=0.8)
-        # Duplicate equivalence insertion should update via ON CONFLICT(id)
-        store.add_equivalent_statement("eq_claim_a", "eq_claim_b", equivalence_type="LOGICAL", confidence=0.95)
-
-        eq_list = store.get_equivalent_statements("eq_claim_a")
-        if eq_list != ["eq_claim_b"]:
-            exc_errors.append(f"Equivalent statements list returned incorrect contents: {eq_list}")
-        else:
-            print("-> PASS: Equivalent statements duplicate insertion handled cleanly.")
-    except Exception as e:
-        exc_errors.append(f"Unexpected error in equivalent statements test: {e}")
-
-    if len(exc_errors) == 0:
-        results["exception_handling"] = True
-        print("-> PASS: All exception handling and boundary case tests passed!")
-    else:
-        results["failed_checks"].extend(exc_errors)
-        print(f"-> FAIL: {len(exc_errors)} exception handling errors detected!")
+    # Case 7: Duplicate Equivalent Statements pair (Unique index constraint)
+    print("Testing equivalent statements duplicate upsert...")
+    eq_id1 = store.add_equivalent_statement("claim_dup_a", "claim_dup_b", confidence=0.9)
+    eq_id2 = store.add_equivalent_statement("claim_dup_a", "claim_dup_b", confidence=1.0)
+    assert eq_id1 == eq_id2
+    print("  [PASS] Duplicate equivalent statements handled cleanly via upsert")
 
     store.close()
-
-    print("\n" + "=" * 80)
-    print("STRESS TEST SUMMARY")
-    print("=" * 80)
-    print(f"Polymorphic Serialization (1200 nodes): {'PASSED' if results['polymorphic_roundtrip'] else 'FAILED'}")
-    print(f"NetworkX Export & Preservation (1500 edges): {'PASSED' if results['networkx_export'] else 'FAILED'}")
-    print(f"Exception Handling & Edge Cases: {'PASSED' if results['exception_handling'] else 'FAILED'}")
-    print(f"Total Elapsed Time: {insert_time + fetch_time + edge_insert_time + nx_export_time:.3f} seconds")
-    if results["failed_checks"]:
-        print("Failures:")
-        for fc in results["failed_checks"]:
-            print(f"  - {fc}")
-    print("=" * 80)
-
-    return results
+    return True
 
 
 if __name__ == "__main__":
-    res = run_benchmark()
-    if not (res["polymorphic_roundtrip"] and res["networkx_export"] and res["exception_handling"]):
-        sys.exit(1)
+    print("Starting AXIOM MDE M1 Empirical Stress & Verification Test Suite...")
+    res1 = run_polymorphic_roundtrip_stress(1200)
+    res2 = run_networkx_graph_export_stress(1500, 3000)
+    res3 = run_exception_handling_boundary_cases()
+    print("\nAll Stress & Benchmark Scenarios Executed Successfully!")

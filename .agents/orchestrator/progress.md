@@ -1,26 +1,32 @@
-# Orchestrator Progress
+# Progress — EPIC-002 Scientific Capability Evaluation Platform (SCEP)
 
 ## Current Status
-Last visited: 2026-08-05T18:50:15Z
+Last visited: 2026-08-06T16:24:40+05:30
 
 ## Iteration Status
 Current iteration: 1 / 32
 
 ## Checklist
-- [x] Initialized MDE orchestrator workspace metadata (`DISPATCH.md`, `BRIEFING.md`)
-- [x] Step 0: MDE Survey Phase
-  - [x] Explorer 1 (`f82fae05-0f4c-47cf-869d-b1af5fdb2610`): Codebase & Infrastructure Survey — Completed
-  - [x] Explorer 2 (`6d674d2b-a6d2-4ca8-8faa-2765688fa477`): Ontology, Retrieval & Formal Proof Survey — Completed
-  - [x] Explorer 3 (`dfdcf137-ce96-42e2-a5fb-89776f046de9`): Conjecture, Counterexample, Memory & Strategy Survey — Completed
-- [x] Step 1: Synthesize Explorer findings into `PROJECT.md` & decompose MDE into 7 milestones
-- [/] Step 2: Spawn Dual Track (E2E Testing Track + MDE Implementation Milestones)
-  - [/] E2E Testing Sub-Orchestrator (`63891ac4-26f7-449d-97f7-3cf1381872d5`): Running (Iteration 1: Specifying test infra)
-  - [/] Milestone 1 Sub-Orchestrator (`8960daf5-1a01-4235-8638-38555f6cbbfa`): Running (Iteration 1: Worker implementation in-progress)
-  - [ ] Milestone 2 Sub-Orchestrator (Pending M1 completion)
-  - [ ] Milestone 3 Sub-Orchestrator (Pending M1 completion)
-  - [ ] Milestone 4 Sub-Orchestrator (Pending M2 completion)
-  - [ ] Milestone 5 Sub-Orchestrator (Pending M2, M3 completion)
-  - [ ] Milestone 6 Sub-Orchestrator (Pending M3, M4, M5 completion)
-  - [ ] Milestone 7 Sub-Orchestrator (Pending M6 completion)
-- [ ] Step 3: Monitor execution, gate verification, adversarial testing, and integration
-- [ ] Step 4: Final Verification and claim completion to Sentinel
+- [x] Re-initialized briefing, plan, progress, context, and dispatch log for EPIC-002
+- [x] Phase 0: Survey Phase (3 parallel Explorers / Spec Miners: `7e56025c`, `c3e8590b`, `b13bc0bd`)
+- [x] Phase 1: PROJECT.md decomposition (6 milestones, feature inventory, code layout)
+- [x] Phase 2: Implementation & Dual-Track E2E Testing
+  - [x] E2E Test Suite Creation (`test_writer_scep_e2e` `61d1e4c6` -> `TEST_READY.md`)
+  - [x] M1: Scientific Capability Framework (`worker_scep_m1_m2` `be695891`)
+  - [x] M2: Benchmark Suite (`worker_scep_m1_m2` `be695891`)
+  - [x] M3: Prize Readiness Engine (`worker_scep_m3_m4` `b941e581`)
+  - [x] M4: Capability Delta Report Generator (`worker_scep_m3_m4` `b941e581`)
+  - [x] M5: Evaluation API & CLI Runner (`worker_scep_m5_m6` `4ce48f68`)
+  - [x] M6: Independent Audit Layer (`worker_scep_m5_m6` `4ce48f68`)
+- [x] Phase 3: Final Verification & Audit Gate Pass (`auditor_scep` `ade678f8` -> CLEAN verdict)
+- [x] Report Completion to Sentinel
+
+## Key Milestones & Outputs
+- `docs/scientific_capability_framework.md` (R1)
+- `axiom/evaluation/benchmarks/suite.py` (R2)
+- `axiom/evaluation/frameworks/prize_readiness.py` (R3)
+- `axiom/evaluation/reporting/delta_report.py` (R4)
+- `axiom/services/api_gateway/routes/eval_api.py` & `axiom/evaluation/run_benchmarks.py` (R5)
+- `docs/audit/EPIC_002_audit.md` (R6)
+- `TEST_READY.md` (17/17 tests passing)
+- `GATE_STATUS.md` (PASS, Forensic Auditor CLEAN)

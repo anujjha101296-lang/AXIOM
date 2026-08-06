@@ -60,6 +60,12 @@ class PrizeReadinessScore:
         }
 
 
+from axiom.evaluation.frameworks.capability import (
+    CapabilityDimension,
+    classify_level,
+)
+
+
 # ═══════════════════════════════════════════════════════
 # BASELINE READINESS MODELS — Evidence from EPIC-001
 # ═══════════════════════════════════════════════════════
@@ -74,6 +80,11 @@ def _make_riemann_readiness(benchmark_scores: dict[str, float]) -> PrizeReadines
     raw = 0.35 * mr_score + 0.30 * pv_score + 0.20 * ls_score + 0.15 * ce_score
     score = round(raw, 4)
     ci = (round(score * 0.85, 4), round(min(1.0, score * 1.15), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification", "literature_synthesis", "counterexample_search"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
+    ce_level = classify_level(ce_score, CapabilityDimension.COUNTEREXAMPLE_SEARCH)
 
     return PrizeReadinessScore(
         problem_id="riemann_hypothesis",
@@ -81,13 +92,13 @@ def _make_riemann_readiness(benchmark_scores: dict[str, float]) -> PrizeReadines
         domain="number_theory",
         score=score,
         confidence_interval=ci,
-        estimated=True,  # Until Lean4 compiler validates proofs
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="Analytic Number Theory — Zeta Function",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=2,
+                current_level=mr_level,
                 weight=0.35,
                 evidence=f"MR benchmark: {mr_score:.3f}",
                 gap_description="Need graduate-level analytic NT capability",
@@ -96,7 +107,7 @@ def _make_riemann_readiness(benchmark_scores: dict[str, float]) -> PrizeReadines
                 capability="Complex Proof Verification",
                 dimension="proof_verification",
                 required_level=5,
-                current_level=2,
+                current_level=pv_level,
                 weight=0.30,
                 evidence=f"PV benchmark: {pv_score:.3f}",
                 gap_description="Lean4 compilation not yet operational",
@@ -105,7 +116,7 @@ def _make_riemann_readiness(benchmark_scores: dict[str, float]) -> PrizeReadines
                 capability="Zeta Zero Tracking",
                 dimension="counterexample_search",
                 required_level=4,
-                current_level=1,
+                current_level=ce_level,
                 weight=0.15,
                 evidence=f"CE benchmark: {ce_score:.3f}",
                 gap_description="Need mpmath-based zero tracker",
@@ -133,6 +144,10 @@ def _make_pvsnp_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessS
     raw = 0.40 * mr_score + 0.35 * pv_score + 0.25 * rp_score
     score = round(raw, 4)
     ci = (round(score * 0.80, 4), round(min(1.0, score * 1.20), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification", "research_planning"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
 
     return PrizeReadinessScore(
         problem_id="p_vs_np",
@@ -140,13 +155,13 @@ def _make_pvsnp_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessS
         domain="computational_complexity",
         score=score,
         confidence_interval=ci,
-        estimated=True,
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="Circuit Complexity Lower Bounds",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=1,
+                current_level=mr_level,
                 weight=0.40,
                 evidence=f"MR benchmark: {mr_score:.3f}",
                 gap_description="Need formal circuit complexity framework",
@@ -155,7 +170,7 @@ def _make_pvsnp_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessS
                 capability="SAT Proof Complexity",
                 dimension="proof_verification",
                 required_level=5,
-                current_level=1,
+                current_level=pv_level,
                 weight=0.35,
                 evidence=f"PV benchmark: {pv_score:.3f}",
                 gap_description="Need Coq/Lean complexity theory library",
@@ -178,6 +193,10 @@ def _make_yang_mills_readiness(benchmark_scores: dict[str, float]) -> PrizeReadi
     raw = 0.50 * mr_score + 0.50 * pv_score
     score = round(raw * 0.45, 4)  # Yang-Mills requires very specialized physics math
     ci = (round(score * 0.70, 4), round(min(1.0, score * 1.30), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
 
     return PrizeReadinessScore(
         problem_id="yang_mills",
@@ -185,13 +204,13 @@ def _make_yang_mills_readiness(benchmark_scores: dict[str, float]) -> PrizeReadi
         domain="mathematical_physics",
         score=score,
         confidence_interval=ci,
-        estimated=True,
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="Gauge Field Algebra",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=1,
+                current_level=mr_level,
                 weight=0.50,
                 evidence=f"MR benchmark (physics domain): {mr_score * 0.3:.3f}",
                 gap_description="Need mathematical physics library integration",
@@ -214,6 +233,10 @@ def _make_bsd_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessSco
     raw = 0.45 * mr_score + 0.35 * pv_score
     score = round(raw * 0.50, 4)
     ci = (round(score * 0.75, 4), round(min(1.0, score * 1.25), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
 
     return PrizeReadinessScore(
         problem_id="birch_swinnerton_dyer",
@@ -221,13 +244,13 @@ def _make_bsd_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessSco
         domain="algebraic_geometry",
         score=score,
         confidence_interval=ci,
-        estimated=True,
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="Elliptic Curve Models",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=1,
+                current_level=mr_level,
                 weight=0.45,
                 evidence=f"MR benchmark (AG domain): {mr_score * 0.3:.3f}",
                 gap_description="Need elliptic curve arithmetic library",
@@ -250,6 +273,10 @@ def _make_navier_stokes_readiness(benchmark_scores: dict[str, float]) -> PrizeRe
     raw = 0.50 * mr_score + 0.50 * pv_score
     score = round(raw * 0.50, 4)
     ci = (round(score * 0.75, 4), round(min(1.0, score * 1.25), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
 
     return PrizeReadinessScore(
         problem_id="navier_stokes",
@@ -257,13 +284,13 @@ def _make_navier_stokes_readiness(benchmark_scores: dict[str, float]) -> PrizeRe
         domain="pde_analysis",
         score=score,
         confidence_interval=ci,
-        estimated=True,
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="PDE Symbolic Manipulation",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=1,
+                current_level=mr_level,
                 weight=0.50,
                 evidence=f"MR benchmark: {mr_score:.3f}",
                 gap_description="Need PDE analysis library integration",
@@ -286,6 +313,10 @@ def _make_hodge_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessS
     raw = 0.50 * mr_score + 0.50 * pv_score
     score = round(raw * 0.40, 4)
     ci = (round(score * 0.70, 4), round(min(1.0, score * 1.30), 4))
+    is_estimated = not bool(benchmark_scores and all(k in benchmark_scores for k in ["mathematical_reasoning", "proof_verification"]))
+
+    mr_level = classify_level(mr_score, CapabilityDimension.MATHEMATICAL_REASONING)
+    pv_level = classify_level(pv_score, CapabilityDimension.PROOF_VERIFICATION)
 
     return PrizeReadinessScore(
         problem_id="hodge_conjecture",
@@ -293,13 +324,13 @@ def _make_hodge_readiness(benchmark_scores: dict[str, float]) -> PrizeReadinessS
         domain="algebraic_geometry",
         score=score,
         confidence_interval=ci,
-        estimated=True,
+        estimated=is_estimated,
         prerequisites=[
             CapabilityPrerequisite(
                 capability="Hodge Decomposition Formalization",
                 dimension="mathematical_reasoning",
                 required_level=5,
-                current_level=1,
+                current_level=mr_level,
                 weight=0.50,
                 evidence=f"MR benchmark (AG domain): {mr_score * 0.25:.3f}",
                 gap_description="Need algebraic geometry formal library",

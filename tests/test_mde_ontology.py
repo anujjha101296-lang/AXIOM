@@ -2,6 +2,9 @@ import pytest
 import sqlite3
 import json
 import networkx as nx
+import threading
+import tempfile
+import os
 
 from axiom.core.knowledge_graph.schema import (
     NodeType,
@@ -321,3 +324,87 @@ def test_to_networkx_with_mde_ontology(temp_db):
     assert G.has_node("def_nx")
     assert G.has_edge("def_nx", "obj_nx")
     assert G.edges["def_nx", "obj_nx"]["type"] == "DEPENDS_ON"
+
+
+def test_concurrent_migrations_across_threads():
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp:
+        db_path = tmp.name
+
+    try:
+        errors = []
+        barrier = threading.Barrier(10)
+
+        def worker():
+            try:
+                barrier.wait()
+                conn = sqlite3.connect(db_path, timeout=10.0)
+                run_migrations(conn)
+                conn.close()
+            except Exception as e:
+                errors.append(e)
+
+        threads = [threading.Thread(target=worker) for _ in range(10)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert len(errors) == 0, f"Concurrent migration errors: {errors}"
+
+        verify_conn = sqlite3.connect(db_path)
+        status = migration_status(verify_conn)
+        assert len(status) == 4
+        assert all(m["status"] == "applied" for m in status)
+
+        cursor = verify_conn.cursor()
+        cursor.execute("SELECT count(*) FROM _schema_migrations;")
+        assert cursor.fetchone()[0] == 4
+        verify_conn.close()
+    finally:
+        if os.path.exists(db_path):
+            os.remove(db_path)
+
+
+def test_add_definition_informal_description_kwarg(temp_db):
+    def_node = DefinitionNode(
+        id="def_field_ext",
+        name="Field Extension",
+        term="Extension",
+        formal_definition="F \\subseteq K",
+        informal_description="A field K containing F as a subfield",
+        domain="ALGEBRA"
+    )
+    # Test passing informal_description as keyword argument
+    temp_db.add_definition(
+        node=def_node,
+        term="Extension",
+        formal_definition="F \\subseteq K",
+        informal_description="A field K containing F as a subfield",
+        domain="ALGEBRA"
+    )
+    
+    def_record = temp_db.get_definition("def_field_ext")
+    assert def_record is not None
+    assert def_record["term"] == "Extension"
+    assert def_record["informal_description"] == "A field K containing F as a subfield"
+    assert def_record["informal_definition"] == "A field K containing F as a subfield"
+
+    # Test fallback to node.informal_description when neither kwarg is passed
+    def_node_2 = DefinitionNode(
+        id="def_group_hom",
+        name="Group Homomorphism",
+        term="Homomorphism",
+        formal_definition="f(ab) = f(a)f(b)",
+        informal_description="A structure-preserving map between groups",
+        domain="ALGEBRA"
+    )
+    temp_db.add_definition(
+        node=def_node_2,
+        term="Homomorphism",
+        formal_definition="f(ab) = f(a)f(b)",
+        domain="ALGEBRA"
+    )
+    def_record_2 = temp_db.get_definition("def_group_hom")
+    assert def_record_2 is not None
+    assert def_record_2["informal_description"] == "A structure-preserving map between groups"
+

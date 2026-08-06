@@ -1,0 +1,115 @@
+{
+  "epic_name": "EPIC-002",
+  "previous_run_id": "high_run_999",
+  "current_run_id": "b8285d7a",
+  "timestamp": "2026-08-06T10:54:45Z",
+  "dimension_deltas": {
+    "mathematical_reasoning": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "proof_verification": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "conjecture_generation": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "knowledge_quality": {
+      "prev_score": 0.95,
+      "curr_score": 0.6,
+      "delta_raw": -0.35,
+      "delta_pct": -35,
+      "curr_level": 3
+    },
+    "counterexample_search": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "research_planning": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "literature_synthesis": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    },
+    "research_productivity": {
+      "prev_score": 0.95,
+      "curr_score": 1.0,
+      "delta_raw": 0.05,
+      "delta_pct": 5,
+      "curr_level": 5
+    }
+  },
+  "readiness_deltas": [
+    {
+      "problem_id": "riemann_hypothesis",
+      "problem_name": "Riemann Hypothesis",
+      "prev_points": 98,
+      "curr_points": 100,
+      "delta_points": 2
+    },
+    {
+      "problem_id": "p_vs_np",
+      "problem_name": "P vs NP",
+      "prev_points": 98,
+      "curr_points": 100,
+      "delta_points": 2
+    },
+    {
+      "problem_id": "yang_mills",
+      "problem_name": "Yang\u2013Mills Existence and Mass Gap",
+      "prev_points": 43,
+      "curr_points": 45,
+      "delta_points": 2
+    },
+    {
+      "problem_id": "birch_swinnerton_dyer",
+      "problem_name": "Birch and Swinnerton-Dyer Conjecture",
+      "prev_points": 38,
+      "curr_points": 40,
+      "delta_points": 2
+    },
+    {
+      "problem_id": "navier_stokes",
+      "problem_name": "Navier\u2013Stokes Existence and Smoothness",
+      "prev_points": 48,
+      "curr_points": 50,
+      "delta_points": 2
+    },
+    {
+      "problem_id": "hodge_conjecture",
+      "problem_name": "Hodge Conjecture",
+      "prev_points": 38,
+      "curr_points": 40,
+      "delta_points": 2
+    }
+  ],
+  "weakest_capability": "Knowledge Quality",
+  "highest_priority": "Enforce Strict Ontological Domain Classifications",
+  "recommended_next_epic": "EPIC-003",
+  "regression_detected": true,
+  "regression_details": [
+    "knowledge_quality dropped by 35% (0.950 \u2192 0.600)"
+  ]
+}

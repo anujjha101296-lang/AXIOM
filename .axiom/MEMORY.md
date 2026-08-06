@@ -27,3 +27,10 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 - **Summary:** `.axiom/` was created as the operating source of truth for sessions.
 - **Outcome:** durable contracts, current state, queue, roadmap governance, capability map, knowledge schema, and memory protocol now exist.
 - **Next review:** after Sprint 0 E2 test baseline is available.
+
+### 2026-08-05 — Strategy decision — three parallel tracks
+
+- **Summary:** AXIOM will advance Research, Product, and Company tracks together instead of waiting for a finished artificial scientist before validating product and company assumptions.
+- **Product position:** the initial public offering is an AI workspace for frontier mathematical and scientific research, with explicit limits and evidence-backed claims.
+- **Rationale:** early user learning improves product clarity and informs the research-capability roadmap; research rigor remains a non-negotiable foundation.
+- **Current action:** start a landing experience, an initial researcher-workflow/benchmark plan, and a PMO cadence alongside the Python 3.10+ baseline task.

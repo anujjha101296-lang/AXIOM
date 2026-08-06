@@ -24,7 +24,10 @@ from axiom.evaluation.benchmarks.suite import (
     run_proof_verification_benchmarks,
     run_conjecture_benchmarks,
     run_knowledge_quality_benchmarks,
+    run_counterexample_benchmarks,
     run_research_planning_benchmarks,
+    run_literature_synthesis_benchmarks,
+    run_research_productivity_benchmarks,
 )
 
 router = APIRouter(prefix="/eval", tags=["evaluation"])
@@ -126,16 +129,15 @@ def trigger_benchmark():
     """Run all capability benchmarks synchronously and return current scores & delta report."""
     db_path = settings.db_path
     
-    # Run the suites
+    # Run all 8 suites
     mr_results, mr_score = run_math_reasoning_benchmarks()
     pv_results, pv_score = run_proof_verification_benchmarks()
     cg_results, cg_score = run_conjecture_benchmarks(db_path)
     kq_results, kq_score = run_knowledge_quality_benchmarks(db_path)
+    ce_results, ce_score = run_counterexample_benchmarks(db_path)
     rp_results, rp_score = run_research_planning_benchmarks()
-    
-    ce_score = 0.35
-    ls_score = 0.40
-    rd_score = 0.50
+    ls_results, ls_score = run_literature_synthesis_benchmarks(db_path)
+    rd_results, rd_score = run_research_productivity_benchmarks(db_path)
     
     import uuid
     run_id = str(uuid.uuid4())[:8]
@@ -147,10 +149,10 @@ def trigger_benchmark():
         make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
         make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
         make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, 5, estimated=True),
+        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
         make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, 10, estimated=True),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, 3, estimated=True),
+        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
+        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
     ]
     snapshot.compute_composite()
     
@@ -200,6 +202,17 @@ def trigger_benchmark():
         PRIMARY KEY (run_id, problem_id)
     )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS eval_results (
+        run_id TEXT NOT NULL,
+        case_id TEXT NOT NULL,
+        score REAL NOT NULL,
+        passed INTEGER NOT NULL,
+        time_ms REAL NOT NULL,
+        notes TEXT,
+        PRIMARY KEY (run_id, case_id)
+    )
+    """)
     
     # Save current run
     cursor.execute(
@@ -211,6 +224,13 @@ def trigger_benchmark():
         cursor.execute(
             "INSERT INTO eval_readiness (run_id, problem_id, score, json_data) VALUES (?, ?, ?, ?)",
             (snapshot.run_id, score.problem_id, score.score, json.dumps(score.to_dict()))
+        )
+
+    all_results = mr_results + pv_results + cg_results + kq_results + ce_results + rp_results + ls_results + rd_results
+    for res in all_results:
+        cursor.execute(
+            "INSERT INTO eval_results (run_id, case_id, score, passed, time_ms, notes) VALUES (?, ?, ?, ?, ?, ?)",
+            (snapshot.run_id, res.case_id, res.score, 1 if res.passed else 0, res.time_ms, getattr(res, "notes", ""))
         )
         
     conn.commit()

@@ -155,7 +155,7 @@ The Scientific Capability Framework is the **objective source of truth** for eva
 
 ## 3. Composite Score Formula
 
-$$S_{composite} = \frac{1}{8} \sum_{d=1}^{8} w_d \cdot S_d$$
+$$S_{\text{composite}} = \sum_{d=1}^{8} w_d \cdot S_d$$
 
 Where:
 - $S_d$ = normalized score for dimension $d$ ∈ [0, 1]

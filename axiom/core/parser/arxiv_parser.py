@@ -4,7 +4,10 @@ import tarfile
 import tempfile
 from typing import Dict, List, Tuple, Optional
 import hashlib
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
 
 from axiom.core.knowledge_graph.schema import (
     PaperNode,

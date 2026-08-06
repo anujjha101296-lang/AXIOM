@@ -121,7 +121,7 @@ def generate_delta_report(
         timestamp=curr_snapshot.timestamp,
     )
 
-    prev_dims = prev_snapshot["dimensions"] if prev_snapshot else {}
+    prev_dims = prev_snapshot.get("dimensions", {}) if prev_snapshot and isinstance(prev_snapshot, dict) else {}
     curr_dims = {s.dimension.value: s for s in curr_snapshot.dimension_scores}
 
     # Track weakest capability
@@ -130,7 +130,19 @@ def generate_delta_report(
 
     for dim_key, s_obj in curr_dims.items():
         curr_val = s_obj.raw_score
-        prev_val = prev_dims.get(dim_key, {}).get("score", max(0.0, curr_val - 0.05)) if prev_snapshot else max(0.0, curr_val - 0.08)
+        
+        if prev_snapshot and dim_key in prev_dims:
+            dim_data = prev_dims[dim_key]
+            if isinstance(dim_data, dict):
+                prev_val = dim_data.get("score", dim_data.get("raw_score", curr_val))
+            elif isinstance(dim_data, (int, float)):
+                prev_val = float(dim_data)
+            else:
+                prev_val = curr_val
+        elif prev_snapshot:
+            prev_val = max(0.0, curr_val - 0.05)
+        else:
+            prev_val = max(0.0, curr_val - 0.08)
 
         # Compute percentage difference
         diff = curr_val - prev_val
@@ -171,7 +183,16 @@ def generate_delta_report(
     report.highest_priority = priority_map.get(weakest_dim, "Build Formal Proof & Lemma Discovery Platform")
 
     # Compute Readiness Deltas (scaled 0-100 integer points as per user example: e.g. 31 -> 34)
-    prev_read_map = {r["problem_id"]: r["score"] for r in prev_readiness} if prev_readiness else {}
+    prev_read_map = {}
+    if prev_readiness:
+        for r in prev_readiness:
+            if isinstance(r, dict):
+                pid = r.get("problem_id")
+                score = r.get("score", r.get("curr_points", 0) / 100.0 if "curr_points" in r else 0.0)
+                if pid:
+                    prev_read_map[pid] = score
+            elif hasattr(r, "problem_id") and hasattr(r, "score"):
+                prev_read_map[r.problem_id] = r.score
 
     for score_obj in curr_readiness:
         pid = score_obj.problem_id

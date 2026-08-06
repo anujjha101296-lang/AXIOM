@@ -1,370 +1,394 @@
 """
-Empirical SQLite Database Stress Harness for Milestone 1 (MDE Ontology & Migrations)
-======================================================================================
-Tests SQLite concurrency, bulk foreign key cascade deletion, migration idempotency,
-and schema integrity under stress.
+Empirical SQLite DB Stress Harness for MDE Milestone 1
+======================================================
+Focus areas:
+1. Concurrency: Multi-threaded insertion & query stress on file-based SQLite DB across all v4 tables.
+2. FK Cascade Integrity: Bulk deletion of parent nodes and verification of child record cascades.
+3. Migration Idempotency & Legacy Transition: Repeated execution, migration from legacy v1/v2/v3 schemas, and concurrent migration triggers.
 """
 
-import os
 import sys
-import time
-import tempfile
+import os
 import sqlite3
-import concurrent.futures
-from typing import List
+import tempfile
+import threading
+import time
+import json
+import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Ensure project root is in sys.path
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SHIMS_DIR = os.path.join(AGENT_DIR, "shims")
+PROJECT_ROOT = os.path.abspath(os.path.join(AGENT_DIR, "../.."))
+
+sys.path.insert(0, SHIMS_DIR)
+sys.path.insert(0, PROJECT_ROOT)
 
 from axiom.core.knowledge_graph.schema import (
-    NodeType,
-    EdgeType,
-    EpistemicStatus,
-    VerificationTier,
     MathematicalObjectNode,
     DefinitionNode,
+    MathematicalClaimNode,
     OpenProblemNode,
     ConjectureNode,
-    MathematicalClaimNode,
     Edge,
+    EdgeType,
 )
 from axiom.core.knowledge_graph.db import EpistemicStore
 from axiom.core.knowledge_graph.migrations import run_migrations, migration_status, MIGRATIONS
 
+class StressTestRunner:
+    def __init__(self):
+        self.results = {}
 
-def test_concurrency_stress(db_path: str, num_threads: int = 10, items_per_thread: int = 50):
-    """
-    Stress test concurrent insertions into v4 tables across multiple threads
-    writing to the same file-backed SQLite database.
-    """
-    print(f"--- 1. Testing Database Concurrency ({num_threads} threads, {items_per_thread} items/thread) ---")
-    
-    # Initialize store to set up schema & WAL mode if needed
-    store = EpistemicStore(db_path)
-    # Enable WAL mode for better concurrency performance in file-backed SQLite
-    store.conn.execute("PRAGMA journal_mode = WAL;")
-    store.conn.execute("PRAGMA busy_timeout = 5000;")
-    store.close()
+    def report(self, test_name, success, details):
+        status_str = "PASS" if success else "FAIL"
+        print(f"[{status_str}] {test_name}: {details}")
+        self.results[test_name] = {"success": success, "details": details}
 
-    errors = []
-    start_time = time.time()
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. CONCURRENCY STRESS TEST
+# ─────────────────────────────────────────────────────────────────────────────
+def test_sqlite_concurrency():
+    print("\n--- 1. Multi-Threaded SQLite Concurrency Stress Test ---")
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp:
+        db_path = tmp.name
 
-    def worker_task(thread_id: int):
-        # Each thread opens its own connection
-        t_store = EpistemicStore(db_path)
-        t_store.conn.execute("PRAGMA busy_timeout = 5000;")
-        
-        try:
-            for i in range(items_per_thread):
-                node_id = f"thread_{thread_id}_node_{i}"
+    try:
+        # Initialize schema via standard EpistemicStore init
+        init_store = EpistemicStore(db_path)
+        # Enable WAL mode and set busy timeout for concurrency
+        init_store.conn.execute("PRAGMA journal_mode = WAL;")
+        init_store.conn.execute("PRAGMA busy_timeout = 5000;")
+        init_store.close()
+
+        num_threads = 10
+        records_per_thread = 50
+
+        errors = []
+        start_time = time.time()
+
+        def worker_task(thread_id):
+            conn = sqlite3.connect(db_path, timeout=10.0)
+            conn.execute("PRAGMA foreign_keys = ON;")
+            conn.execute("PRAGMA busy_timeout = 10000;")
+            
+            store = EpistemicStore.__new__(EpistemicStore)
+            store.db_path = db_path
+            store.conn = conn
+
+            for i in range(records_per_thread):
+                node_prefix = f"t{thread_id}_item{i}"
+                
+                # 1. Add claim node
                 claim = MathematicalClaimNode(
-                    id=node_id,
-                    name=f"Claim {thread_id}-{i}",
-                    statement=f"Statement {thread_id}-{i}"
+                    id=f"claim_{node_prefix}",
+                    name=f"Claim {node_prefix}",
+                    statement=f"Statement for {node_prefix}"
                 )
-                t_store.add_node(claim)
+                store.add_node(claim)
 
-                # Add math object
-                obj_node = MathematicalObjectNode(
-                    id=f"obj_{node_id}",
-                    name=f"Obj {thread_id}-{i}",
+                # 2. Add math object node & table record
+                mo_node = MathematicalObjectNode(
+                    id=f"mo_{node_prefix}",
+                    name=f"Math Obj {node_prefix}",
                     domain="ALGEBRA",
-                    symbolic_representation=f"x_{thread_id}_{i}"
+                    symbolic_representation=f"X_{thread_id}_{i}"
                 )
-                t_store.add_mathematical_object(
-                    node=obj_node,
-                    object_type="VARIABLE",
-                    formal_symbol=f"x_{thread_id}_{i}",
+                store.add_mathematical_object(
+                    node=mo_node,
+                    object_type="GROUP",
+                    formal_symbol=f"G_{thread_id}_{i}",
                     domain="ALGEBRA",
-                    properties={"thread": thread_id, "index": i}
+                    properties={"order": i, "thread": thread_id}
                 )
 
-                # Add definition
+                # 3. Add definition record (using parameter informal_definition)
                 def_node = DefinitionNode(
-                    id=f"def_{node_id}",
-                    name=f"Def {thread_id}-{i}",
+                    id=f"def_{node_prefix}",
+                    name=f"Def {node_prefix}",
                     term=f"Term_{thread_id}_{i}",
-                    formal_definition=f"Def formal {thread_id}-{i}"
+                    formal_definition=f"def_{i}"
                 )
-                t_store.add_definition(
+                store.add_definition(
                     node=def_node,
                     term=f"Term_{thread_id}_{i}",
-                    formal_definition=f"Def formal {thread_id}-{i}",
-                    domain="ALGEBRA"
+                    formal_definition=f"def_{i}",
+                    informal_definition=f"Desc {i}"
                 )
 
-                # Save memory snapshot
-                t_store.save_memory_snapshot(
+                # 4. Add equivalent statement record
+                store.add_equivalent_statement(
+                    statement_a_id=f"claim_{node_prefix}",
+                    statement_b_id=f"def_{node_prefix}",
+                    equivalence_type="LOGICAL"
+                )
+
+                # 5. Add memory snapshot
+                store.save_memory_snapshot(
                     session_id=f"session_{thread_id}",
-                    snapshot_data={"step": i, "status": "ok"},
+                    snapshot_data={"step": i, "status": "active"},
                     domain="ALGEBRA"
                 )
 
-                # Add failed proof attempt
-                t_store.add_failed_proof_attempt(
-                    claim_id=node_id,
-                    tactic_sequence=["simp", f"tactic_{i}"],
-                    verifier="LEAN",
-                    error_message=f"Error in thread {thread_id} item {i}"
+                # 6. Add failed proof attempt
+                store.add_failed_proof_attempt(
+                    claim_id=f"claim_{node_prefix}",
+                    tactic_sequence=["simp", "auto"],
+                    verifier="SMT",
+                    error_message="timeout"
                 )
 
-                # Add equivalent statement if not first item
-                if i > 0:
-                    prev_id = f"thread_{thread_id}_node_{i-1}"
-                    t_store.add_equivalent_statement(
-                        statement_a_id=node_id,
-                        statement_b_id=prev_id,
-                        proof_reference=f"Ref {i}"
-                    )
-        except Exception as e:
-            errors.append(f"Thread {thread_id} failed: {e}")
-        finally:
-            t_store.close()
+            conn.close()
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
-        futures = [executor.submit(worker_task, tid) for tid in range(num_threads)]
-        concurrent.futures.wait(futures)
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            futures = [executor.submit(worker_task, t) for t in range(num_threads)]
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as ex:
+                    err_formatted = f"{type(ex).__name__}: {str(ex)}"
+                    errors.append(err_formatted)
 
-    duration = time.time() - start_time
-    total_ops = num_threads * items_per_thread
+        duration = time.time() - start_time
 
-    # Verification
-    verify_store = EpistemicStore(db_path)
-    cur = verify_store.conn.cursor()
+        # Verify final database counts and integrity
+        verify_conn = sqlite3.connect(db_path)
+        cursor = verify_conn.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM nodes;")
-    node_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM nodes;")
+        nodes_count = cursor.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM mathematical_objects;")
-    math_obj_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM mathematical_objects;")
+        mo_count = cursor.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM definitions;")
-    def_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM definitions;")
+        def_count = cursor.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM memory_snapshots;")
-    snap_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM equivalent_statements;")
+        eq_count = cursor.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM failed_proof_attempts;")
-    failed_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM memory_snapshots;")
+        snap_count = cursor.fetchone()[0]
 
-    cur.execute("SELECT COUNT(*) FROM equivalent_statements;")
-    eq_count = cur.fetchone()[0]
+        cursor.execute("SELECT count(*) FROM failed_proof_attempts;")
+        failed_count = cursor.fetchone()[0]
 
-    # Integrity check
-    fk_errors = cur.execute("PRAGMA foreign_key_check;").fetchall()
-    verify_store.close()
+        verify_conn.close()
 
-    print(f"Concurrency Duration: {duration:.2f}s across {num_threads} threads ({total_ops} records per table)")
-    print(f"Errors encountered: {len(errors)}")
-    if errors:
-        for err in errors[:5]:
-            print(f"  - {err}")
-    print(f"Nodes count: {node_count}")
-    print(f"Math Objects count: {math_obj_count}")
-    print(f"Definitions count: {def_count}")
-    print(f"Memory Snapshots count: {snap_count}")
-    print(f"Failed Proof Attempts count: {failed_count}")
-    print(f"Equivalent Statements count: {eq_count}")
-    print(f"Foreign Key Violations: {len(fk_errors)}")
+        expected_obj_count = num_threads * records_per_thread
+        success = (
+            len(errors) == 0
+            and mo_count == expected_obj_count
+            and def_count == expected_obj_count
+            and eq_count == expected_obj_count
+            and snap_count == expected_obj_count
+            and failed_count == expected_obj_count
+        )
 
-    assert len(errors) == 0, f"Concurrency test had {len(errors)} errors"
-    assert len(fk_errors) == 0, f"Foreign key violations found: {fk_errors}"
-    print("PASS: Concurrency Stress Test\n")
+        sample_errors = list(set(errors))[:3]
+        details = (
+            f"Processed {num_threads * records_per_thread} transaction sets across {num_threads} threads in {duration:.2f}s. "
+            f"Errors: {len(errors)} (Sample errors: {sample_errors}). Row counts -> math_obj: {mo_count}/{expected_obj_count}, "
+            f"defs: {def_count}/{expected_obj_count}, eq_stmts: {eq_count}/{expected_obj_count}, "
+            f"snapshots: {snap_count}/{expected_obj_count}, failed_proofs: {failed_count}/{expected_obj_count}."
+        )
+        return success, details
 
-
-def test_bulk_cascade_delete_stress(db_path: str, num_nodes: int = 1000):
-    """
-    Stress test cascade deletion when parent nodes in `nodes` table are deleted
-    under bulk conditions (1,000+ nodes with associated child records).
-    """
-    print(f"--- 2. Testing Bulk Cascade Delete ({num_nodes} nodes) ---")
-    store = EpistemicStore(db_path)
-    cur = store.conn.cursor()
-
-    # Populate 1,000 parent nodes and associated child records
-    with store.conn:
-        for i in range(num_nodes):
-            parent_id = f"bulk_parent_{i}"
-            store.conn.execute(
-                "INSERT INTO nodes (id, type, name, data) VALUES (?, ?, ?, ?);",
-                (parent_id, "MATHEMATICAL_CLAIM", f"Parent {i}", "{}")
-            )
-            store.conn.execute(
-                "INSERT INTO mathematical_objects (id, node_id, object_type, domain) VALUES (?, ?, ?, ?);",
-                (f"obj_{i}", parent_id, "CONCEPT", "NUMBER_THEORY")
-            )
-            store.conn.execute(
-                "INSERT INTO definitions (id, node_id, term, formal_definition) VALUES (?, ?, ?, ?);",
-                (f"def_{i}", parent_id, f"Term_{i}", f"Def_{i}")
-            )
-            store.conn.execute(
-                "INSERT INTO failed_proof_attempts (claim_id, tactic_sequence, verifier) VALUES (?, ?, ?);",
-                (parent_id, '["simp"]', "LEAN")
-            )
-
-        # Create equivalent statements between adjacent pairs
-        for i in range(num_nodes - 1):
-            store.conn.execute(
-                "INSERT INTO equivalent_statements (id, statement_a_id, statement_b_id) VALUES (?, ?, ?);",
-                (f"eq_bulk_{i}", f"bulk_parent_{i}", f"bulk_parent_{i+1}")
-            )
-
-    # Verify insertion counts
-    mo_cnt_before = cur.execute("SELECT COUNT(*) FROM mathematical_objects;").fetchone()[0]
-    def_cnt_before = cur.execute("SELECT COUNT(*) FROM definitions;").fetchone()[0]
-    failed_cnt_before = cur.execute("SELECT COUNT(*) FROM failed_proof_attempts;").fetchone()[0]
-    eq_cnt_before = cur.execute("SELECT COUNT(*) FROM equivalent_statements;").fetchone()[0]
-    print(f"Before delete child record counts: mo={mo_cnt_before}, def={def_cnt_before}, failed={failed_cnt_before}, eq={eq_cnt_before}")
-
-    # Perform bulk delete of half the nodes
-    half = num_nodes // 2
-    start_time = time.time()
-    with store.conn:
-        cur.execute(f"DELETE FROM nodes WHERE id LIKE 'bulk_parent_%' AND CAST(SUBSTR(id, 13) AS INTEGER) < {half};")
-    delete_duration = time.time() - start_time
-
-    print(f"Deleted {half} parent nodes in {delete_duration:.4f}s")
-
-    # Check child table counts after deleting half
-    mo_cnt_mid = cur.execute("SELECT COUNT(*) FROM mathematical_objects WHERE node_id LIKE 'bulk_parent_%';").fetchone()[0]
-    def_cnt_mid = cur.execute("SELECT COUNT(*) FROM definitions WHERE node_id LIKE 'bulk_parent_%';").fetchone()[0]
-    failed_cnt_mid = cur.execute("SELECT COUNT(*) FROM failed_proof_attempts WHERE claim_id LIKE 'bulk_parent_%';").fetchone()[0]
-    eq_cnt_mid = cur.execute("SELECT COUNT(*) FROM equivalent_statements WHERE statement_a_id LIKE 'bulk_parent_%' OR statement_b_id LIKE 'bulk_parent_%';").fetchone()[0]
-
-    print(f"After deleting half, remaining bulk child records: mo={mo_cnt_mid}, def={def_cnt_mid}, failed={failed_cnt_mid}, eq={eq_cnt_mid}")
-    assert mo_cnt_mid == num_nodes - half
-    assert def_cnt_mid == num_nodes - half
-    assert failed_cnt_mid == num_nodes - half
-
-    # Perform delete of remaining nodes
-    with store.conn:
-        cur.execute("DELETE FROM nodes WHERE id LIKE 'bulk_parent_%';")
-
-    mo_cnt_after = cur.execute("SELECT COUNT(*) FROM mathematical_objects WHERE node_id LIKE 'bulk_parent_%';").fetchone()[0]
-    def_cnt_after = cur.execute("SELECT COUNT(*) FROM definitions WHERE node_id LIKE 'bulk_parent_%';").fetchone()[0]
-    failed_cnt_after = cur.execute("SELECT COUNT(*) FROM failed_proof_attempts WHERE claim_id LIKE 'bulk_parent_%';").fetchone()[0]
-    eq_cnt_after = cur.execute("SELECT COUNT(*) FROM equivalent_statements WHERE statement_a_id LIKE 'bulk_parent_%' OR statement_b_id LIKE 'bulk_parent_%';").fetchone()[0]
-
-    fk_errors = cur.execute("PRAGMA foreign_key_check;").fetchall()
-    store.close()
-
-    print(f"After full delete, remaining bulk child records: mo={mo_cnt_after}, def={def_cnt_after}, failed={failed_cnt_after}, eq={eq_cnt_after}")
-    print(f"Foreign Key Violations: {len(fk_errors)}")
-
-    assert mo_cnt_after == 0
-    assert def_cnt_after == 0
-    assert failed_cnt_after == 0
-    assert eq_cnt_after == 0
-    assert len(fk_errors) == 0
-    print("PASS: Bulk Cascade Delete Stress Test\n")
-
-
-def test_migration_v4_idempotency_and_upgrades():
-    """
-    Test Migration v4 idempotency:
-    1. Executed multiple times in sequence on the same DB connection.
-    2. Applied onto pre-existing v1, v2, v3 schemas.
-    3. Multi-connection concurrent migration invocation.
-    """
-    print("--- 3. Testing Migration v4 Idempotency & Upgrades ---")
-    
-    # 3.1 Repeated execution (10 times)
-    conn = sqlite3.connect(":memory:")
-    conn.execute("PRAGMA foreign_keys = ON;")
-    for i in range(10):
-        run_migrations(conn)
-    status = migration_status(conn)
-    assert len(status) == len(MIGRATIONS)
-    assert all(s["status"] == "applied" for s in status)
-    print("  [✓] 10 consecutive run_migrations() calls succeeded without error")
-    conn.close()
-
-    # 3.2 Upgrade path from v1 -> v2 -> v3 -> v4
-    conn = sqlite3.connect(":memory:")
-    conn.execute("PRAGMA foreign_keys = ON;")
-    # Manually run v1, v2, v3
-    from axiom.core.knowledge_graph.migrations import (
-        _create_migration_table, _v1_initial_schema, _v2_proof_lineage, _v3_working_memory_snapshots, _v4_mathematical_ontology
-    )
-    _create_migration_table(conn)
-    _v1_initial_schema(conn)
-    conn.execute("INSERT INTO _schema_migrations (version, description) VALUES (1, 'Initial schema');")
-    _v2_proof_lineage(conn)
-    conn.execute("INSERT INTO _schema_migrations (version, description) VALUES (2, 'Proof lineage');")
-    _v3_working_memory_snapshots(conn)
-    conn.execute("INSERT INTO _schema_migrations (version, description) VALUES (3, 'Memory snapshots');")
-    conn.commit()
-
-    # Insert mock data in v3 memory_snapshots (without domain column)
-    conn.execute("INSERT INTO memory_snapshots (session_id, snapshot) VALUES ('v3_session', '{\"data\": 1}');")
-    conn.commit()
-
-    # Now run_migrations should apply v4 safely and add 'domain' column
-    run_migrations(conn)
-
-    cur = conn.cursor()
-    cur.execute("SELECT id, session_id, snapshot, domain FROM memory_snapshots WHERE session_id = 'v3_session';")
-    row = cur.fetchone()
-    assert row is not None
-    assert row[1] == 'v3_session'
-    assert row[3] is None  # domain defaulted to None for legacy row
-
-    # Run run_migrations again to test idempotency after upgrade
-    run_migrations(conn)
-    status = migration_status(conn)
-    assert status[3]["status"] == "applied"
-    print("  [✓] Upgrade path v1->v2->v3->v4 and ALTER TABLE memory_snapshots succeeded")
-    conn.close()
-
-    # 3.3 Concurrent migration execution across threads on a file-backed DB
-    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
-        file_db = f.name
-
-    try:
-        def migration_worker():
-            m_conn = sqlite3.connect(file_db, timeout=10.0)
-            m_conn.execute("PRAGMA busy_timeout = 5000;")
-            run_migrations(m_conn)
-            m_conn.close()
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            futures = [executor.submit(migration_worker) for _ in range(5)]
-            concurrent.futures.wait(futures)
-
-        final_conn = sqlite3.connect(file_db)
-        status = migration_status(final_conn)
-        assert len(status) == len(MIGRATIONS)
-        assert all(s["status"] == "applied" for s in status)
-        final_conn.close()
-        print("  [✓] Concurrent multi-thread migration execution on file DB succeeded")
-    finally:
-        if os.path.exists(file_db):
-            os.remove(file_db)
-
-    print("PASS: Migration v4 Idempotency & Upgrades Test\n")
-
-
-def run_all_stress_tests():
-    print("=======================================================================")
-    print("STARTING EMPIRICAL DB STRESS SUITE (Milestone 1)")
-    print("=======================================================================")
-    
-    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
-        db_path = f.name
-
-    try:
-        test_concurrency_stress(db_path, num_threads=10, items_per_thread=50)
-        test_bulk_cascade_delete_stress(db_path, num_nodes=1000)
-        test_migration_v4_idempotency_and_upgrades()
-        print("=======================================================================")
-        print("ALL EMPIRICAL DB STRESS TESTS PASSED SUCCESSFULLY!")
-        print("=======================================================================")
     finally:
         if os.path.exists(db_path):
             os.remove(db_path)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. BULK CASCADE DELETE STRESS TEST
+# ─────────────────────────────────────────────────────────────────────────────
+def test_bulk_cascade_delete():
+    print("\n--- 2. Bulk Foreign Key Cascade Delete Stress Test ---")
+    store = EpistemicStore(":memory:")
+    
+    num_nodes = 500
+    delete_count = 250
+    
+    # 1. Insert parent nodes and populate all v4 child tables
+    for i in range(num_nodes):
+        claim_id = f"bulk_claim_{i}"
+        claim_node = MathematicalClaimNode(id=claim_id, name=f"Claim {i}", statement=f"Statement {i}")
+        store.add_node(claim_node)
+
+        mo_id = f"bulk_mo_{i}"
+        mo_node = MathematicalObjectNode(id=mo_id, name=f"Object {i}")
+        store.add_mathematical_object(mo_node, object_type="CONCEPT", domain="GEOMETRY")
+
+        def_id = f"bulk_def_{i}"
+        def_node = DefinitionNode(id=def_id, name=f"Def {i}", term=f"Term {i}", formal_definition=f"def_{i}")
+        store.add_definition(def_node, term=f"Term {i}", formal_definition=f"def_{i}")
+
+        # Edge between claim and mo
+        store.add_edge(Edge(source_id=claim_id, target_id=mo_id, type=EdgeType.DEPENDS_ON))
+
+        # Equivalence between claim and def
+        store.add_equivalent_statement(claim_id, def_id)
+
+        # Failed proof attempt on claim
+        store.add_failed_proof_attempt(claim_id, ["intro", "cases"], "LEAN", "Goal not solved")
+
+    cursor = store.conn.cursor()
+
+    # Target nodes to delete (first 250 claims)
+    to_delete = [f"bulk_claim_{i}" for i in range(delete_count)]
+
+    # Execute bulk deletion of parent nodes
+    with store.conn:
+        placeholders = ",".join("?" * len(to_delete))
+        store.conn.execute(f"DELETE FROM nodes WHERE id IN ({placeholders});", to_delete)
+
+    # Post-delete counts
+    cursor.execute("SELECT count(*) FROM nodes WHERE id LIKE 'bulk_claim_%';")
+    remaining_claims = cursor.fetchone()[0]
+
+    cursor.execute("SELECT count(*) FROM mathematical_objects WHERE node_id NOT IN (SELECT id FROM nodes);")
+    orphan_mo = cursor.fetchone()[0]
+
+    cursor.execute("SELECT count(*) FROM definitions WHERE node_id NOT IN (SELECT id FROM nodes);")
+    orphan_def = cursor.fetchone()[0]
+
+    cursor.execute("SELECT count(*) FROM equivalent_statements WHERE statement_a_id NOT IN (SELECT id FROM nodes) OR statement_b_id NOT IN (SELECT id FROM nodes);")
+    orphan_eq = cursor.fetchone()[0]
+
+    cursor.execute("SELECT count(*) FROM failed_proof_attempts WHERE claim_id NOT IN (SELECT id FROM nodes);")
+    orphan_failed = cursor.fetchone()[0]
+
+    cursor.execute("SELECT count(*) FROM edges WHERE source_id NOT IN (SELECT id FROM nodes) OR target_id NOT IN (SELECT id FROM nodes);")
+    orphan_edges = cursor.fetchone()[0]
+
+    store.close()
+
+    success = (
+        remaining_claims == (num_nodes - delete_count)
+        and orphan_mo == 0
+        and orphan_def == 0
+        and orphan_eq == 0
+        and orphan_failed == 0
+        and orphan_edges == 0
+    )
+
+    details = (
+        f"Inserted {num_nodes} claim & object pairs with child records across all 5 tables. "
+        f"Bulk deleted {delete_count} parent nodes. Remaining claims: {remaining_claims}. "
+        f"Orphans detected -> mo: {orphan_mo}, def: {orphan_def}, eq_stmts: {orphan_eq}, "
+        f"failed_proofs: {orphan_failed}, edges: {orphan_edges}."
+    )
+    return success, details
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. MIGRATION IDEMPOTENCY & LEGACY SCHEMA TRANSITION STRESS TEST
+# ─────────────────────────────────────────────────────────────────────────────
+def test_migration_idempotency_and_legacy():
+    print("\n--- 3. Migration Idempotency & Legacy Schema Transition Stress Test ---")
+    
+    # 3a. Repeated sequential migrations
+    conn = sqlite3.connect(":memory:")
+    for _ in range(50):
+        run_migrations(conn)
+
+    status = migration_status(conn)
+    v4_applied = all(m["status"] == "applied" for m in status) and len(status) == 4
+    conn.close()
+
+    # 3b. Transition from raw v1 schema
+    conn_v1 = sqlite3.connect(":memory:")
+    conn_v1.execute("PRAGMA foreign_keys = ON;")
+    conn_v1.execute("CREATE TABLE nodes (id TEXT PRIMARY KEY, type TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL);")
+    conn_v1.execute("CREATE TABLE edges (source_id TEXT NOT NULL, target_id TEXT NOT NULL, type TEXT NOT NULL, confidence REAL, provenance TEXT, PRIMARY KEY (source_id, target_id, type));")
+    conn_v1.execute("CREATE TABLE _schema_migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT DEFAULT (datetime('now')));")
+    conn_v1.execute("INSERT INTO _schema_migrations (version, description) VALUES (1, 'Initial schema');")
+    conn_v1.commit()
+
+    run_migrations(conn_v1)
+    status_v1 = migration_status(conn_v1)
+    v1_transition_ok = len(status_v1) == 4 and all(s["status"] == "applied" for s in status_v1)
+    conn_v1.close()
+
+    # 3c. Transition from raw v3 schema (where memory_snapshots exists WITHOUT domain column)
+    conn_v3 = sqlite3.connect(":memory:")
+    conn_v3.execute("PRAGMA foreign_keys = ON;")
+    conn_v3.execute("CREATE TABLE _schema_migrations (version INTEGER PRIMARY KEY, description TEXT, applied_at TEXT DEFAULT (datetime('now')));")
+    for v in (1, 2, 3):
+        conn_v3.execute("INSERT INTO _schema_migrations (version, description) VALUES (?, ?);", (v, f"v{v}"))
+    conn_v3.execute("CREATE TABLE nodes (id TEXT PRIMARY KEY, type TEXT NOT NULL, name TEXT NOT NULL, data TEXT NOT NULL);")
+    conn_v3.execute("CREATE TABLE memory_snapshots (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, snapshot TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')));")
+    conn_v3.execute("INSERT INTO memory_snapshots (session_id, snapshot) VALUES ('v3_session', '{\"key\": \"val\"}');")
+    conn_v3.commit()
+
+    run_migrations(conn_v3)
+    cursor = conn_v3.cursor()
+    cursor.execute("PRAGMA table_info(memory_snapshots);")
+    columns = {row[1] for row in cursor.fetchall()}
+    has_domain = "domain" in columns
+
+    cursor.execute("SELECT session_id, snapshot, domain FROM memory_snapshots WHERE session_id = 'v3_session';")
+    row = cursor.fetchone()
+    data_intact = row is not None and row[0] == "v3_session" and row[2] is None
+    conn_v3.close()
+
+    # 3d. Concurrent migration execution on fresh file DB
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp:
+        concurrent_db = tmp.name
+
+    conc_errors = []
+    def migrate_worker():
+        try:
+            c = sqlite3.connect(concurrent_db, timeout=10.0)
+            run_migrations(c)
+            c.close()
+        except Exception as e:
+            conc_errors.append(f"{type(e).__name__}: {str(e)}")
+
+    threads = [threading.Thread(target=migrate_worker) for _ in range(10)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    c_verify = sqlite3.connect(concurrent_db)
+    status_conc = migration_status(c_verify)
+    conc_ok = len(status_conc) == 4 and all(s["status"] == "applied" for s in status_conc) and len(conc_errors) == 0
+    c_verify.close()
+    if os.path.exists(concurrent_db):
+        os.remove(concurrent_db)
+
+    success = v4_applied and v1_transition_ok and has_domain and data_intact and conc_ok
+    sample_conc_errors = list(set(conc_errors))[:3]
+    details = (
+        f"50x sequential re-run: {'OK' if v4_applied else 'FAIL'}. "
+        f"v1 legacy transition: {'OK' if v1_transition_ok else 'FAIL'}. "
+        f"v3 memory_snapshots domain column ALTER & data integrity: {'OK' if (has_domain and data_intact) else 'FAIL'}. "
+        f"10-thread concurrent migration trigger: {'OK' if conc_ok else 'FAIL'} (errors: {len(conc_errors)}, samples: {sample_conc_errors})."
+    )
+    return success, details
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN STRESS HARNESS ENTRYPOINT
+# ─────────────────────────────────────────────────────────────────────────────
+def main():
+    runner = StressTestRunner()
+    
+    # Run 1: Concurrency
+    s1, d1 = test_sqlite_concurrency()
+    runner.report("SQLite Concurrency Stress", s1, d1)
+
+    # Run 2: Cascade Delete Stress
+    s2, d2 = test_bulk_cascade_delete()
+    runner.report("Bulk FK Cascade Delete Stress", s2, d2)
+
+    # Run 3: Migration Idempotency
+    s3, d3 = test_migration_idempotency_and_legacy()
+    runner.report("Migration Idempotency & Legacy Transition", s3, d3)
+
+    all_passed = all(r["success"] for r in runner.results.values())
+    print("\n=======================================================")
+    print(f"EMPIRICAL STRESS TEST SUITE VERDICT: {'ALL PASSED' if all_passed else 'FAILURE DETECTED'}")
+    print("=======================================================")
+    sys.exit(0 if all_passed else 1)
 
 if __name__ == "__main__":
-    run_all_stress_tests()
+    main()

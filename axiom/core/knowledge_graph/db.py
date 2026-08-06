@@ -2,7 +2,10 @@ import json
 import sqlite3
 from enum import Enum
 from typing import List, Optional, Tuple, Dict, Any, Union
-import networkx as nx
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
 from pydantic import TypeAdapter
 
 from axiom.core.knowledge_graph.schema import (
@@ -224,12 +227,18 @@ class EpistemicStore:
         node: DefinitionNode,
         term: str,
         formal_definition: str,
-        informal_definition: Optional[str] = None,
+        informal_description: Optional[str] = None,
         domain: Optional[str] = None,
+        informal_definition: Optional[str] = None,
     ) -> None:
         self.add_node(node)
         assert self.conn is not None
         domain_val = domain or node.domain
+        inf_desc = (
+            informal_description
+            if informal_description is not None
+            else (informal_definition if informal_definition is not None else getattr(node, "informal_description", None))
+        )
         with self.conn:
             self.conn.execute(
                 """
@@ -241,7 +250,7 @@ class EpistemicStore:
                     informal_definition = excluded.informal_definition,
                     domain = excluded.domain;
                 """,
-                (node.id, node.id, term, formal_definition, informal_definition, domain_val)
+                (node.id, node.id, term, formal_definition, inf_desc, domain_val)
             )
 
     def get_definition(self, node_id: str) -> Optional[Dict[str, Any]]:
@@ -265,6 +274,7 @@ class EpistemicStore:
             "term": row[2],
             "formal_definition": row[3],
             "informal_definition": row[4],
+            "informal_description": row[4],
             "domain": row[5],
             "node": scientific_node_adapter.validate_json(row[6]),
         }

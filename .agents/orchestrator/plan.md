@@ -1,25 +1,26 @@
-# High-Level Orchestration Plan for AXIOM
+# Plan — EPIC-002 Scientific Capability Evaluation Platform (SCEP)
 
-## Objectives
-Deliver AXIOM (AI Scientific Discovery Platform) fulfilling all requirements:
-- R1. Epistemic Ingest & Parser (EIE): arXiv LaTeX ingestion, math environments, citation extraction -> JSON graph format (>95% extraction rate).
-- R2. Logical Reasoning & Proof Exporter (LRK): Translate LaTeX claims into compilable Lean 4 theorem declarations (0 syntax errors).
-- R3. Verification & SMT Gateway (AVT): Z3/SMT counterexample sweeps (<60s detection), local Lean 4 compiler proof checking.
-- R4. Graph Store & Storage (EGS): SQLite graph database storing entities, dependency edges, circular reference checks.
-- R5. Autonomous Discovery Loop & MCTS Proof Search (DRSP): MCTS exploring Lean proof tactics to auto-generate valid proofs for simple algebra lemmas.
-- R6. Spatial Canvas Dashboard (UI): Next.js/React spatial canvas visualizing graph, nodes, citations, verification statuses.
+## Objective
+Drive complete end-to-end design, implementation, benchmark evaluation, verification, and audit of EPIC-002 SCEP for AXIOM.
 
-## Phases
-1. **Phase 0: Survey & Infrastructure Setup**
-   - 3 Explorers map codebase, existing tools/dependencies, environment state.
-   - Project Orchestrator creates `PROJECT.md` and `TEST_INFRA.md`.
-2. **Phase 1: Dual Track Launch**
-   - E2E Testing Orchestrator builds 4-tier requirement-driven opaque-box test suite (`TEST_READY.md`).
-   - Implementation Sub-orchestrators execute milestone implementation loops.
-3. **Phase 2: Milestone Iterations & Gating**
-   - Explorer -> Worker -> Reviewer -> Challenger -> Auditor per milestone.
-4. **Phase 3: Integration & Tier 5 Adversarial Testing**
-   - End-to-end integration verification (Tiers 1-4 passing 100%).
-   - Tier 5 white-box adversarial testing (Challenger-driven gap analysis).
-5. **Phase 4: Completion Attestation**
-   - Final audit and handoff to Sentinel.
+## Roadmap & Milestones
+
+### Phase 0: Survey & Codebase Mapping
+- Dispatch 3 parallel Explorers / Spec Miners to analyze existing codebase (`axiom/mip/`, `axiom/evaluation/`, `axiom/services/api_gateway/`, `tests/`) and extract detailed specifications for requirements R1–R6.
+
+### Phase 1: Milestone Decomposition & Project Blueprint
+- Formulate `PROJECT.md` at `.agents/orchestrator/PROJECT.md` specifying architecture, feature inventory, milestone breakdown (M1–M6), interface contracts, and code layout.
+
+### Phase 2: Dual Track Execution
+- **Track 1: E2E Testing Suite (E2E Testing Orchestrator)**: Build requirement-driven opaque-box test suite for `/eval/*` endpoints, `run_benchmarks.py`, delta reports, regression exits, and DB storage.
+- **Track 2: Implementation Track**:
+  - **M1: Scientific Capability Framework (SCF)**: Taxonomy L0–L5 for ≥8 dimensions, evaluation rubrics, composite score formula (`docs/scientific_capability_framework.md`).
+  - **M2: Runnable Benchmark Suite**: ≥5 categories with ≥3 test cases each (algebra/calculus, theorem reproduction, proof verification, conjecture novelty, open problem decomposition), complete in < 2 mins, score in [0,1].
+  - **M3: Prize Readiness Engine**: Scored readiness models for all 6 Clay Millennium Prize Problems with prerequisite map, milestones, confidence intervals, grounded in benchmarks (`GET /eval/prize-readiness`).
+  - **M4: Capability Delta Report Generator**: JSON & Markdown reports showing % change per dimension, prize readiness delta, regression flags, weakest capability, recommended next epic (`docs/capability_delta_TIMESTAMP.md`).
+  - **M5: Evaluation REST API & CLI Runner**: `/eval/*` API endpoints, SQLite `eval_results` integration, `run_benchmarks.py --compare-previous` with exit codes 0 and 1.
+  - **M6: Independent Audit Layer**: Chief Skeptic (Dept J) & Audit (Dept I) report (`docs/audit/EPIC_002_audit.md`).
+
+### Phase 3: Hardening & Final Gate Verification
+- Run full test suite, verify CLI exit codes (0 for pass/no regression, 1 for regression > 5%), run forensic auditor, verify all acceptance criteria and document formatting.
+- Report completion to Sentinel parent.
