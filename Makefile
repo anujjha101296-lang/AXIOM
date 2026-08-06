@@ -5,7 +5,7 @@
 
 .PHONY: help setup dev test test-coverage lint lint-fix type-check \
         docker-build docker-up docker-down docker-logs \
-        prize-readiness self-improve clean format
+        prize-readiness self-improve engineering-health clean format
 
 PYTHON := python3
 PYTEST := $(PYTHON) -m pytest
@@ -112,6 +112,11 @@ self-improve: ## Trigger self-improvement audit and regenerate roadmap.md
 		 path = loop.run(); \
 		 print(f'Roadmap written to: {path}')"
 	@echo "$(GREEN)✓ roadmap.md updated.$(RESET)"
+
+engineering-health: ## Run engineering governance review and generate health reports
+	@echo "$(BOLD)Running AXIOM Engineering Governance Review...$(RESET)"
+	PYTHONPATH=. $(PYTHON) scripts/run_engineering_review.py
+	@echo "$(GREEN)✓ Reports: ENGINEERING_HEALTH.md, PRODUCT_HEALTH.md, RESEARCH_HEALTH.md, TECH_DEBT_BOARD.md, TOP_25_PRIORITIES.md$(RESET)"
 
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
