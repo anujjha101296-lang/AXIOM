@@ -18,6 +18,10 @@ Make ingest, knowledge representation, bounded hypothesis generation, counterexa
 
 Deliver one end-to-end workflow that a mathematical/scientific researcher can understand, try, and evaluate. Its value proposition, limits, and supporting documentation must be honest and testable. Target learning signal: 10–20 early users or equivalent structured research-user conversations; no user count is claimed until measured.
 
+### Milestone 005 — Autonomous Research Loop v1 (complete)
+
+Closed-loop bounded research orchestration: problem decomposition → evidence retrieval → hypothesis generation → criticism → verification → failure memory → replanning → report. Historical benchmarks with hidden solutions. Research Run UI at `/research/runs`. **Not a claim of autonomous scientific discovery** — workflow executes with explicit claim classification and provenance.
+
 ### Milestone 2 — Public alpha and pilots (3–6 months)
 
 Operate a public alpha with feedback instrumentation, a strong technical demo, and narrowly scoped institutional/research pilots if humans authorize outreach. Target learning signal: repeat use, measured time saved or insight quality, and a credible case for an accelerator/funding application.
