@@ -249,7 +249,7 @@ def verify_conjecture(payload: SmtConjectureRequest, token: str = Depends(verify
             variables=payload.variables
         )
         
-        from axiom.core.knowledge_graph.schema import MathematicalClaimNode, EpistemicStatus, VerificationTier
+        from axiom.core.knowledge_graph.schema import MathematicalClaimNode
         from axiom.core.verification.truthfulness import assign_from_smt_modular
         import hashlib
         
@@ -331,7 +331,7 @@ def verify_proof(payload: ProofRequest, token: str = Depends(verify_token)):
                 compiler_status = "simulated compile success (local Lean bin missing)"
 
         # Save Theorem claim node to SQLite EGS
-        from axiom.core.knowledge_graph.schema import MathematicalClaimNode, EpistemicStatus, VerificationTier
+        from axiom.core.knowledge_graph.schema import MathematicalClaimNode
         from axiom.core.verification.truthfulness import assign_from_proof_search
         import hashlib
         
