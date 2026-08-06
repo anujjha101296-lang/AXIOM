@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-06T17:52:19Z",
+  "timestamp": "2026-08-06T18:29:46Z",
   "scores": {
     "engineering_health": 70.2,
-    "product_health": 27.6,
-    "research_capability": 20.4,
+    "product_health": 31.1,
+    "research_capability": 42.0,
     "technical_debt": 95,
     "security": 26.0,
     "performance": 70.0,
@@ -21,12 +21,12 @@
         },
         {
           "name": "documented_debt_items",
-          "value": 8,
+          "value": 7,
           "unit": "count",
           "status": "warn"
         }
       ],
-      "finding_count": 18
+      "finding_count": 17
     },
     "dependencies": {
       "metrics": [
@@ -61,31 +61,31 @@
       "metrics": [
         {
           "name": "python_modules",
-          "value": 104,
+          "value": 105,
           "unit": "files",
           "status": "ok"
         },
         {
           "name": "test_files",
-          "value": 20,
+          "value": 21,
           "unit": "files",
           "status": "ok"
         },
         {
           "name": "test_file_ratio",
-          "value": 0.19,
+          "value": 0.2,
           "unit": "",
           "status": "ok"
         },
         {
           "name": "ruff_violations",
-          "value": 1502,
+          "value": 1463,
           "unit": "count",
           "status": "fail"
         },
         {
           "name": "mypy_errors",
-          "value": 37,
+          "value": 38,
           "unit": "count",
           "status": "fail"
         },
@@ -131,13 +131,13 @@
       "metrics": [
         {
           "name": "cold_import_ms",
-          "value": 563.6,
+          "value": 574.9,
           "unit": "ms",
           "status": "ok"
         },
         {
           "name": "import_regression_pct",
-          "value": -77.5,
+          "value": -77.0,
           "unit": "%",
           "status": "ok"
         },
@@ -177,7 +177,7 @@
       "metrics": [
         {
           "name": "markdown_files",
-          "value": 1159,
+          "value": 1314,
           "unit": "count",
           "status": "ok"
         },
@@ -189,7 +189,7 @@
         },
         {
           "name": "module_docstring_coverage_pct",
-          "value": 87.2,
+          "value": 87.3,
           "unit": "%",
           "status": "ok"
         }
@@ -200,7 +200,7 @@
       "metrics": [
         {
           "name": "tests_collected",
-          "value": 165,
+          "value": 170,
           "unit": "count",
           "status": "ok"
         },
@@ -235,23 +235,23 @@
         },
         {
           "name": "benchmark_regressions",
-          "value": 2,
+          "value": 0,
           "unit": "",
-          "status": "fail"
+          "status": "ok"
         },
         {
           "name": "benchmark_improvements",
-          "value": 0,
+          "value": 8,
           "unit": "count",
           "status": "ok"
         }
       ],
-      "finding_count": 2
+      "finding_count": 0
     }
   },
   "finding_summary": {
     "critical": 3,
-    "high": 11,
+    "high": 8,
     "medium": 12,
     "low": 13,
     "info": 0

@@ -34,6 +34,7 @@ class PrizeReadinessScore:
     capability_gaps: list[str] = field(default_factory=list)
     estimated: bool = True     # True if any score lacks benchmark evidence
     evidence_sources: list[str] = field(default_factory=list)
+    limitations: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -43,9 +44,13 @@ class PrizeReadinessScore:
             "score": self.score,
             "confidence_interval": list(self.confidence_interval),
             "estimated": self.estimated,
+            "evidence_state": "estimated" if self.estimated else "measured",
             "milestones_achieved": self.milestones_achieved,
             "capability_gaps": self.capability_gaps,
             "evidence_sources": self.evidence_sources,
+            "limitations": self.limitations or [
+                "Prize readiness is derived from capability benchmark scores, not independent verification.",
+            ],
             "prerequisites": [
                 {
                     "capability": p.capability,

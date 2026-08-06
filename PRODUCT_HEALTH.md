@@ -1,13 +1,12 @@
 # Product Health Report
 
-**Generated:** 2026-08-06T17:52:19Z
-**Product Health Score:** **28/100**
+**Generated:** 2026-08-06T18:29:46Z
+**Product Health Score:** **31/100**
 
 ## What is broken?
 
 - **No per-user data isolation** — Add user_id scoping to research store queries and migrations.
 - **Shared SQLite store (no tenancy)** — Partition research data by authenticated user_id.
-- **S0-E4 EPIC-002 evidence gate open** — Implement evidence_state, benchmark_count, limitations on all capability scores.
 - **MDE API surface gap (26 e2e failures)** — Mount remaining MDE routes or narrow e2e scope with honest docs.
 - **E2E test gap: MDE API surface** — Mount MDE routes or mark e2e as xfail with honest tracking
 

@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-06T17:52:19Z",
+  "timestamp": "2026-08-06T18:29:46Z",
   "scores": {
     "engineering_health": 70.2,
-    "product_health": 27.6,
-    "research_capability": 20.4,
+    "product_health": 31.1,
+    "research_capability": 42.0,
     "technical_debt": 95,
     "security": 26.0,
     "performance": 70.0,

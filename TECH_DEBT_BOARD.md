@@ -1,6 +1,6 @@
 # Technical Debt Board
 
-**Generated:** 2026-08-06T17:52:19Z
+**Generated:** 2026-08-06T18:29:46Z
 **Technical Debt Score:** **95/100** (higher = more debt)
 
 ## Active Debt Items
@@ -9,7 +9,6 @@
 |----------|------|--------|----------------|
 | critical | No per-user data isolation | MVP_READINESS.md P0 | Add user_id scoping to research store queries and migrations. |
 | critical | Shared SQLite store (no tenancy) | MVP_READINESS.md | Partition research data by authenticated user_id. |
-| high | S0-E4 EPIC-002 evidence gate open | TASK_QUEUE.md | Implement evidence_state, benchmark_count, limitations on all capability scores. |
 | high | MDE API surface gap (26 e2e failures) | MASTER_PROGRESS.md | Mount remaining MDE routes or narrow e2e scope with honest docs. |
 | medium | Workflow engine has no core tests | MASTER_PROGRESS.md | Add unit tests for workflow engine state transitions. |
 | medium | Mock LLM default for Q&A/summaries | MVP_READINESS.md | Document mock default; add integration path for production LLM. |

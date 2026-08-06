@@ -24,7 +24,6 @@ DEBT_DOC_FILES = (
 
 KNOWN_DEBT_ITEMS = [
     ("No per-user data isolation", "critical", "MVP_READINESS.md P0"),
-    ("S0-E4 EPIC-002 evidence gate open", "high", "TASK_QUEUE.md"),
     ("MDE API surface gap (26 e2e failures)", "high", "MASTER_PROGRESS.md"),
     ("Workflow engine has no core tests", "medium", "MASTER_PROGRESS.md"),
     ("Mock LLM default for Q&A/summaries", "medium", "MVP_READINESS.md"),
@@ -125,7 +124,6 @@ def collect_debt(workspace: Path) -> CollectorResult:
 def _debt_recommendation(title: str) -> str:
     mapping = {
         "No per-user data isolation": "Add user_id scoping to research store queries and migrations.",
-        "S0-E4 EPIC-002 evidence gate open": "Implement evidence_state, benchmark_count, limitations on all capability scores.",
         "MDE API surface gap (26 e2e failures)": "Mount remaining MDE routes or narrow e2e scope with honest docs.",
         "Workflow engine has no core tests": "Add unit tests for workflow engine state transitions.",
         "Mock LLM default for Q&A/summaries": "Document mock default; add integration path for production LLM.",

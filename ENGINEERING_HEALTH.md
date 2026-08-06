@@ -1,6 +1,6 @@
 # Engineering Health Report
 
-**Generated:** 2026-08-06T17:52:19Z
+**Generated:** 2026-08-06T18:29:46Z
 **Workspace:** `/workspace`
 
 ## Cycle Scores
@@ -8,8 +8,8 @@
 | Score | Value | Interpretation |
 |-------|------:|----------------|
 | Engineering Health | **70** | Code, architecture, testing discipline |
-| Product Health | **28** | MVP wedge readiness and UX honesty |
-| Research Capability | **20** | Scientific benchmarks and AI depth |
+| Product Health | **31** | MVP wedge readiness and UX honesty |
+| Research Capability | **42** | Scientific benchmarks and AI depth |
 | Technical Debt | **95** | Higher = more debt (inverse health) |
 | Security | **26** | Auth, tenancy, dependency risk |
 | Performance | **70** | Import time and benchmark regressions |
@@ -66,14 +66,14 @@
 
 **Recommendation:** Wire ModelClient to research loop workers; gate eval scores with evidence_state per S0-E4.
 
-**Rationale:** Benchmark regressions: 2.0; loop workers remain heuristic without LLM path.
+**Rationale:** Benchmark regressions: 0.0; loop workers remain heuristic without LLM path.
 
 ### Infrastructure Lead
 *CI/CD, containers, observability, and deploy*
 
 **Recommendation:** Complete Grafana provisioning; add governance CI job; lazy-import heavy scientific libs.
 
-**Rationale:** Cold import 564ms; compose stack incomplete for full observability.
+**Rationale:** Cold import 575ms; compose stack incomplete for full observability.
 
 ### Security Lead
 *Auth, tenancy, secrets, and dependency risk*
@@ -87,7 +87,7 @@
 
 **Recommendation:** Maintain 70% coverage gate; add workflow tests; track e2e gap separately in governance reports.
 
-**Rationale:** 165.0 core tests collected; e2e documents platform surface debt honestly.
+**Rationale:** 170.0 core tests collected; e2e documents platform surface debt honestly.
 
 ### Product Engineering Lead
 *Research workspace wedge and MVP readiness*

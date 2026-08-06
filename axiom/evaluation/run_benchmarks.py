@@ -20,23 +20,9 @@ import uuid
 # Set up path to include workspace root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from axiom.evaluation.frameworks.capability import (
-    CapabilitySnapshot,
-    CapabilityDimension,
-    make_dimension_score,
-)
+from axiom.evaluation.frameworks.evidence import run_all_capability_benchmarks
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
-from axiom.evaluation.benchmarks.suite import (
-    run_math_reasoning_benchmarks,
-    run_proof_verification_benchmarks,
-    run_conjecture_benchmarks,
-    run_knowledge_quality_benchmarks,
-    run_counterexample_benchmarks,
-    run_research_planning_benchmarks,
-    run_literature_synthesis_benchmarks,
-    run_research_productivity_benchmarks,
-)
 
 
 def init_db(db_path: str):
@@ -173,68 +159,26 @@ def main():
     print("======================================================================")
     
     init_db(args.db)
-    
-    # Run the 8 benchmark suites
-    print("\n[1/8] Executing Mathematical Reasoning benchmarks...")
-    mr_results, mr_score = run_math_reasoning_benchmarks()
-    print(f"      Passed {sum(1 for r in mr_results if r.passed)}/{len(mr_results)} - Score: {mr_score:.4f}")
-    
-    print("\n[2/8] Executing Proof Verification benchmarks...")
-    pv_results, pv_score = run_proof_verification_benchmarks()
-    print(f"      Passed {sum(1 for r in pv_results if r.passed)}/{len(pv_results)} - Score: {pv_score:.4f}")
-    
-    print("\n[3/8] Executing Conjecture Generation benchmarks...")
-    cg_results, cg_score = run_conjecture_benchmarks(args.db)
-    print(f"      Passed {sum(1 for r in cg_results if r.passed)}/{len(cg_results)} - Score: {cg_score:.4f}")
-    
-    print("\n[4/8] Executing Knowledge Quality benchmarks...")
-    kq_results, kq_score = run_knowledge_quality_benchmarks(args.db)
-    print(f"      Passed {sum(1 for r in kq_results if r.passed)}/{len(kq_results)} - Score: {kq_score:.4f}")
-    
-    print("\n[5/8] Executing Counterexample Search benchmarks...")
-    ce_results, ce_score = run_counterexample_benchmarks(args.db)
-    print(f"      Passed {sum(1 for r in ce_results if r.passed)}/{len(ce_results)} - Score: {ce_score:.4f}")
 
-    print("\n[6/8] Executing Research Planning benchmarks...")
-    rp_results, rp_score = run_research_planning_benchmarks()
-    print(f"      Passed {sum(1 for r in rp_results if r.passed)}/{len(rp_results)} - Score: {rp_score:.4f}")
+    bundle = run_all_capability_benchmarks(args.db)
+    snapshot = bundle.snapshot
+    run_id = snapshot.run_id
 
-    print("\n[7/8] Executing Literature Synthesis benchmarks...")
-    ls_results, ls_score = run_literature_synthesis_benchmarks(args.db)
-    print(f"      Passed {sum(1 for r in ls_results if r.passed)}/{len(ls_results)} - Score: {ls_score:.4f}")
+    print("\n======================================================================")
+    print("  Benchmark suite complete (S0-E4 evidence-gated)")
+    print("======================================================================")
+    for score in snapshot.dimension_scores:
+        print(
+            f"  {score.dimension.value}: score={score.raw_score:.4f} "
+            f"evidence={score.evidence_state.value} cases={score.benchmark_count}"
+        )
 
-    print("\n[8/8] Executing Research Productivity benchmarks...")
-    rd_results, rd_score = run_research_productivity_benchmarks(args.db)
-    print(f"      Passed {sum(1 for r in rd_results if r.passed)}/{len(rd_results)} - Score: {rd_score:.4f}")
-
-    # Build Snapshot
-    run_id = str(uuid.uuid4())[:8]
-    timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    
-    snapshot = CapabilitySnapshot(run_id=run_id, timestamp=timestamp)
-    snapshot.dimension_scores = [
-        make_dimension_score(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
-        make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
-        make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
-        make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
-    ]
-    snapshot.compute_composite()
-    
-    # Compute Prize Readiness
-    scores_map = {s.dimension.value: s.raw_score for s in snapshot.dimension_scores}
     engine = PrizeReadinessEngine()
-    readiness_scores = engine.compute_all(scores_map)
-    
-    # Check for previous run to compare
+    readiness_scores = engine.compute_all(bundle.scores_map)
+
     prev_run, prev_readiness = get_latest_run(args.db)
-    
-    # Save current run with benchmark results
-    all_results = mr_results + pv_results + cg_results + kq_results + ce_results + rp_results + ls_results + rd_results
-    save_run(args.db, snapshot, readiness_scores, all_results)
+
+    save_run(args.db, snapshot, readiness_scores, bundle.all_results)
     print(f"\n✓ Saved run snapshot {run_id} in {args.db} (Composite Score: {snapshot.composite_score:.4f})")
     
     # Generate delta report

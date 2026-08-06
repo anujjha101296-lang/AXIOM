@@ -1,18 +1,13 @@
 # Research Health Report
 
-**Generated:** 2026-08-06T17:52:19Z
-**Research Capability Score:** **20/100**
+**Generated:** 2026-08-06T18:29:46Z
+**Research Capability Score:** **42/100**
 
 ## Benchmark Status
 
 - **benchmark_snapshot:** 1
-- **benchmark_regressions:** 2
-- **benchmark_improvements:** 0count
-
-### Regressions
-
-- Benchmark regression: knowledge_quality: Score dropped 15% (0.95 → 0.8)
-- Benchmark regression: literature_synthesis: Score dropped 35% (0.95 → 0.6)
+- **benchmark_regressions:** 0
+- **benchmark_improvements:** 8count
 
 ## What should be benchmarked?
 
@@ -31,7 +26,7 @@
 
 **Wire ModelClient to research loop workers; gate eval scores with evidence_state per S0-E4.**
 
-Benchmark regressions: 2.0; loop workers remain heuristic without LLM path.
+Benchmark regressions: 0.0; loop workers remain heuristic without LLM path.
 
 ---
 *Research health measures scientific capability evidence, not demo polish.*

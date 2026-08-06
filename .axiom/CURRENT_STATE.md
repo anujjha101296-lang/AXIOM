@@ -3,20 +3,21 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-06
-**Active horizon:** Self-Evolving Engineering Organization — governance system live
+**Active horizon:** Continuous Engineering — H1-OBS provenance records
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research platform. **Engineering Governance System** is now operational: automated collectors, Engineering Council reviews, health scores, and five cycle reports. Run `make engineering-health` or see `ENGINEERING_COUNCIL.md`.
+AXIOM is a Python/FastAPI and Next.js research platform. **S0-E4 EPIC-002 Evidence Integration Gate** is complete: all capability scores expose `evidence_state`, `benchmark_count`, and `limitations`. Engineering Governance System operational (`make engineering-health`).
 
 ## Completed
 
 - Operating contract committed as `6dca714` (`VISION.md`, root engineering/architecture contract, and Sprint 0 roadmap).
 - AXIOM Operating System initialized under `.axiom/`.
-- **S0-E2 (core):** Test toolchain restored — **159/159** core tests pass (`pytest tests/ --ignore=tests/e2e`).
+- **S0-E2 (core):** Test toolchain restored — **171/171** core tests pass (`pytest tests/ --ignore=tests/e2e`).
 - **S0-E3:** Verification truthfulness audit — `axiom/core/verification/truthfulness.py`.
 - **Research Workspace v1:** End-to-end vertical slice at `/research`.
-- **Engineering Governance System:** `axiom/governance/` — 9 collectors, council review, scoring, dashboard; reports `ENGINEERING_HEALTH.md`, `PRODUCT_HEALTH.md`, `RESEARCH_HEALTH.md`, `TECH_DEBT_BOARD.md`, `TOP_25_PRIORITIES.md`; CI workflow `.github/workflows/governance.yml`.
+- **Engineering Governance System:** `axiom/governance/` — collectors, council, health reports, CI workflow.
+- **S0-E4:** EPIC-002 evidence gate — `axiom/evaluation/frameworks/evidence.py`, gated `/eval/*` API, `docs/S0-E4_evidence_gate.md`.
 
 ## Latest Engineering Health Scores (2026-08-06)
 
@@ -37,9 +38,7 @@ AXIOM is a Python/FastAPI and Next.js research platform. **Engineering Governanc
 
 ## Highest priority
 
-**S0-E4** — EPIC-002 integration gate: all capability scores must expose evidence state, benchmark count, and stated limitations (per `TASK_QUEUE.md` rank 6). **H1-OBS** (provenance records) follows immediately after S0-E4.
-
-**ONE initiative (governance recommendation):** S0-E4 — EPIC-002 Evidence Integration Gate. See `TOP_25_PRIORITIES.md`.
+**H1-OBS** — Add reproducible run/provenance records to scientific capability evaluations (per `TASK_QUEUE.md` rank 7). Depends on S0-E4 (complete).
 
 ## Worktree integrity
 
