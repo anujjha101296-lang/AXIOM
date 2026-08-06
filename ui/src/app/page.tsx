@@ -148,6 +148,7 @@ export default function Home() {
           <a href="#mission">Mission</a>
           <a className="nav-cta" href="/login">Sign in ↗</a>
           <a className="nav-link" href="/research">Research Workspace</a>
+          <a className="nav-link" href="/research/runs">Research Runs</a>
         </nav>
       </header>
 

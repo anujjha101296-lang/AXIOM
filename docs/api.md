@@ -255,6 +255,39 @@ Get the current session for a project (creates one if missing).
 
 ---
 
+## Autonomous Research Loop (Milestone 005)
+
+Base path: `/research-loop` — all endpoints require authentication.
+
+### `GET /research-loop/roles`
+List agent role specifications.
+
+### `GET /research-loop/benchmarks`
+List historical benchmark problems (solutions hidden during execution).
+
+### `POST /research-loop/runs`
+Create a research run.
+
+### `POST /research-loop/benchmarks/run`
+Start a benchmark run against a historical problem.
+
+### `POST /research-loop/runs/{run_id}/start`
+Start execution in background.
+
+### `GET /research-loop/runs/{run_id}`
+Full inspectable research state.
+
+### Human control
+- `POST /research-loop/runs/{id}/pause|resume|cancel`
+- `POST /research-loop/runs/{id}/approve`
+- `POST /research-loop/runs/{id}/hypotheses/{id}/reject`
+- `POST /research-loop/runs/{id}/evidence`
+- `PUT /research-loop/runs/{id}/objective`
+
+Claim statuses: `KNOWN`, `SUPPORTED`, `SPECULATIVE`, `DISPROVED`, `UNVERIFIED`, `FORMALLY_VERIFIED`.
+
+---
+
 ## System (Admin)
 
 ### `POST /self-improve`

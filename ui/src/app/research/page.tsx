@@ -412,6 +412,9 @@ export default function ResearchPage() {
           <p>Projects · PDFs · Notes · Q&amp;A · Search · Sessions</p>
         </div>
         <div className="research-user">
+          <Link href="/research/runs" className="research-runs-link">
+            Research Runs
+          </Link>
           {user && (
             <span className="research-user-name" title={user.email}>
               {user.name}
@@ -783,6 +786,11 @@ export default function ResearchPage() {
           display: flex;
           align-items: center;
           gap: 1rem;
+        }
+        .research-runs-link {
+          color: #7c8cff;
+          text-decoration: none;
+          font-size: 0.85rem;
         }
         .research-user-name {
           font-size: 0.85rem;
