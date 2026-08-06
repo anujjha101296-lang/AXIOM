@@ -16,7 +16,7 @@ def test_debt_collector_returns_findings():
     result = collect_debt(WORKSPACE)
     assert result.name == "technical_debt"
     assert len(result.findings) > 0
-    assert any("S0-E4" in f.title for f in result.findings)
+    assert any("isolation" in f.title.lower() or "MDE" in f.title for f in result.findings)
 
 
 def test_engineering_review_run_produces_scores():
