@@ -22,6 +22,19 @@ A researcher arrives with a **new topic** (GNN generalization for drug discovery
 
 **No technical documentation required** for a first-time viewer.
 
+**Important:** This page runs in **Demo Mode** — curated illustration only. It does **not** represent live AI or measured scientific capability. For real work, use **Research Mode** at `/research`. See `docs/MODES.md`.
+
+---
+
+## Operation Modes
+
+| Mode | URL | Capability claims? |
+|------|-----|------------------|
+| **Demo Mode** | `/demo` | **No** — presentation reliability |
+| **Research Mode** | `/research` | Yes — with uncertainty |
+
+A persistent banner on every page indicates the active mode.
+
 ---
 
 ## Quick Start
