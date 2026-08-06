@@ -10,7 +10,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -51,6 +51,7 @@ class AxiomSettings(BaseSettings):
     api_token: str = Field(
         default="axiom-dev-token",
         description="Static bearer token for simple single-tenant auth",
+        validation_alias=AliasChoices("AXIOM_API_TOKEN", "API_TOKEN"),
     )
 
     # ── Database ──────────────────────────────────────────────────────────────

@@ -11,11 +11,15 @@ import os
 import pytest
 
 # ── Ensure test environment uses in-memory DB ─────────────────────────────────
-os.environ.setdefault("DB_PATH", ":memory:")
-os.environ.setdefault("AXIOM_API_TOKEN", "test_token")
-os.environ.setdefault("JWT_SECRET_KEY", "test-secret")
-os.environ.setdefault("LOG_FORMAT", "console")
-os.environ.setdefault("LOG_LEVEL", "WARNING")
+os.environ["DB_PATH"] = os.environ.get("DB_PATH", ":memory:")
+os.environ["AXIOM_API_TOKEN"] = "test_token"
+os.environ["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "test-secret")
+os.environ["LOG_FORMAT"] = os.environ.get("LOG_FORMAT", "console")
+os.environ["LOG_LEVEL"] = os.environ.get("LOG_LEVEL", "WARNING")
+
+from axiom.config import get_settings
+
+get_settings.cache_clear()
 
 from axiom.core.knowledge_graph.db import EpistemicStore
 from axiom.core.knowledge_graph.schema import (
