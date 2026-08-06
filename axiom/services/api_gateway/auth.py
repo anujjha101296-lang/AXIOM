@@ -20,7 +20,6 @@ Usage:
 
 from __future__ import annotations
 
-import os
 import time
 from enum import Enum
 from typing import Optional
@@ -28,12 +27,23 @@ from typing import Optional
 from fastapi import Depends, Header, HTTPException, status
 from pydantic import BaseModel
 
+from axiom.config import settings
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-SECRET_TOKEN = os.getenv("AXIOM_API_TOKEN", "axiom-dev-token")
-JWT_SECRET   = os.getenv("JWT_SECRET_KEY",  "CHANGE-ME-IN-PRODUCTION")
-JWT_ALGO     = "HS256"
-JWT_EXPIRY   = int(os.getenv("JWT_EXPIRY_MINUTES", "60")) * 60  # seconds
+
+def _secret_token() -> str:
+    return settings.api_token
+
+
+def _jwt_secret() -> str:
+    return settings.jwt_secret_key
+
+
+def _jwt_algo() -> str:
+    return settings.jwt_algorithm
+
+
+def _jwt_expiry_seconds() -> int:
+    return settings.jwt_expiry_minutes * 60
 
 
 # ── Roles ─────────────────────────────────────────────────────────────────────
@@ -77,13 +87,41 @@ def verify_token(authorization: str = Header(None)) -> str:
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = parts[1]
-    if token != SECRET_TOKEN:
+    if token == _secret_token():
+        return token
+    try:
+        decode_jwt_token(token)
+        return token
+    except HTTPException:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token",
             headers={"WWW-Authenticate": "Bearer"},
+        ) from None
+
+
+def verify_user(authorization: str = Header(None)) -> TokenPayload:
+    """
+    FastAPI dependency: validates bearer token and returns decoded user payload.
+    Static dev token maps to a synthetic admin user.
+    """
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-    return token
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header must follow format: Bearer <token>",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = parts[1]
+    if token == _secret_token():
+        return TokenPayload(sub="dev", role=Role.ADMIN)
+    return decode_jwt_token(token)
 
 
 # ── JWT Utilities (production multi-user path) ────────────────────────────────
@@ -98,11 +136,11 @@ def _encode_jwt(payload: dict) -> str:
     def b64url(data: bytes) -> str:
         return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
-    header = b64url(json.dumps({"alg": JWT_ALGO, "typ": "JWT"}).encode())
+    header = b64url(json.dumps({"alg": _jwt_algo(), "typ": "JWT"}).encode())
     body   = b64url(json.dumps(payload).encode())
     signing_input = f"{header}.{body}".encode()
     signature = b64url(
-        hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+        hmac.new(_jwt_secret().encode(), signing_input, hashlib.sha256).digest()
     )
     return f"{header}.{body}.{signature}"
 
@@ -125,7 +163,7 @@ def _decode_jwt(token: str) -> dict:
     header_b64, body_b64, sig_b64 = parts
     signing_input = f"{header_b64}.{body_b64}".encode()
     expected_sig = base64.urlsafe_b64encode(
-        hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+        hmac.new(_jwt_secret().encode(), signing_input, hashlib.sha256).digest()
     ).rstrip(b"=").decode()
 
     if not hmac.compare_digest(sig_b64, expected_sig):
@@ -145,7 +183,7 @@ def create_jwt_token(user_id: str, role: Role = Role.RESEARCHER) -> str:
         "sub": user_id,
         "role": role.value,
         "iat": now,
-        "exp": now + JWT_EXPIRY,
+        "exp": now + _jwt_expiry_seconds(),
     })
 
 
@@ -186,7 +224,7 @@ def require_role(minimum_role: Role):
                 detail="Bearer token required",
             )
         # First try static token (dev mode) — grants ADMIN
-        if parts[1] == SECRET_TOKEN:
+        if parts[1] == _secret_token():
             return TokenPayload(sub="dev", role=Role.ADMIN)
         # Otherwise try JWT
         payload = decode_jwt_token(parts[1])

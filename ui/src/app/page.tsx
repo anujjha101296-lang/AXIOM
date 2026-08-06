@@ -146,8 +146,10 @@ export default function Home() {
           <a href="#platform">Platform</a>
           <a href="#roadmap">Roadmap</a>
           <a href="#mission">Mission</a>
-          <a className="nav-cta" href="/research">Research Workspace ↗</a>
-          <a className="nav-link" href="/workspace">Graph Workspace</a>
+          <a className="nav-cta" href="/demo">Watch Demo ↗</a>
+          <a className="nav-link" href="/login">Sign in</a>
+          <a className="nav-link" href="/research">Research Workspace</a>
+          <a className="nav-link" href="/research/runs">Research Runs</a>
         </nav>
       </header>
 
@@ -165,20 +167,24 @@ export default function Home() {
             world's hardest open problems — with every reasoning step made visible.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-primary" href="/research">
-              Start Research Project →
+            <a className="btn btn-primary" href="/demo">
+              Watch Golden Demo →
+            </a>
+            <a className="btn btn-secondary" href="/login">
+              Start Research Project
             </a>
             <a className="btn btn-secondary" href="/workspace">
               Open Graph Workspace
             </a>
-            <a className="btn btn-secondary" href="#platform">
-              Explore the Platform
-            </a>
           </div>
           <div className="status-badge">
             <span className="status-dot" aria-hidden="true" />
-            In active development · Milestone 1 in progress
+            Two modes: Demo (presentations) · Research (live work)
           </div>
+          <p style={{ marginTop: "16px", fontSize: "13px", color: "var(--text-muted)", maxWidth: "520px", lineHeight: 1.6 }}>
+            <strong style={{ color: "var(--text-secondary)" }}>Demo Mode</strong> (/demo) uses curated data for reliable presentations.
+            {" "}<strong style={{ color: "var(--text-secondary)" }}>Research Mode</strong> (/research) uses live PDFs and real models — results may be uncertain.
+          </p>
         </div>
 
         {/* Terminal visual */}
@@ -382,7 +388,7 @@ export default function Home() {
             Get early access to the research workspace, benchmark results,
             and our technical progress reports.
           </p>
-          <form className="waitlist-form" onSubmit={e => e.preventDefault()} style={{marginBottom: '24px'}}>
+          <form className="waitlist-form" action="#" style={{marginBottom: '24px'}}>
             <input
               id="waitlist-email"
               type="email"
@@ -390,7 +396,7 @@ export default function Home() {
               className="waitlist-input"
               autoComplete="email"
             />
-            <button type="submit" className="waitlist-btn">Join Waitlist</button>
+            <button type="button" className="waitlist-btn">Join Waitlist</button>
           </form>
           <div className="cta-actions">
             <a className="btn btn-primary" href="/workspace">

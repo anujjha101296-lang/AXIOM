@@ -10,7 +10,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -29,7 +29,7 @@ class AxiomSettings(BaseSettings):
 
     # ── Application ──────────────────────────────────────────────────────────
     app_name: str = Field(default="AXIOM", description="Application name")
-    app_version: str = Field(default="0.2.0", description="Semantic version")
+    app_version: str = Field(default="0.5.0", description="Semantic version")
     environment: Literal["development", "staging", "production"] = Field(
         default="development", description="Deployment environment"
     )
@@ -51,6 +51,7 @@ class AxiomSettings(BaseSettings):
     api_token: str = Field(
         default="axiom-dev-token",
         description="Static bearer token for simple single-tenant auth",
+        validation_alias=AliasChoices("AXIOM_API_TOKEN", "API_TOKEN"),
     )
 
     # ── Database ──────────────────────────────────────────────────────────────
