@@ -8,6 +8,14 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-06 — Engineering — S0-E3 verification truthfulness audit
+
+- **Summary:** Centralized evidence-mode labeling so simulated, SMT-bounded, heuristic, and compiler-backed verification cannot claim formal proof status.
+- **Artifacts:** `axiom/core/verification/truthfulness.py`; updated `/verify/*` and `/mip/formal/compile`, `/mip/verify/claim` responses; `tests/test_verification_truthfulness.py`.
+- **Evidence:** `pytest tests/ --ignore=tests/e2e` → 154 passed; regression tests assert `formally_proven: false` for simulated Lean and SMT modular paths.
+- **Limitation:** MIP consensus `final_verdict` may still be `VERIFIED` from heuristic checks; `formally_proven` flag distinguishes formal proof.
+- **Next:** S0-E4 EPIC-002 integration gate.
+
 ### 2026-08-06 — Product milestone — Research Workspace v1
 
 - **Summary:** Shipped first complete researcher vertical slice: projects, PDF upload/extraction, summaries, structured notes, FTS search, session resume.

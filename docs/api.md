@@ -82,6 +82,18 @@ Response:
 
 ## Verification
 
+All verification responses include `evidence_mode` and `formally_proven` (or `formally_verified` for compile endpoints) so simulated, heuristic, and compiler-backed outcomes are never conflated.
+
+| `evidence_mode` | Meaning |
+|---|---|
+| `formal_compiler` | Subprocess prover/compiler succeeded (exit code 0) |
+| `smt_finite` | Exhaustive/bounded SMT check over a finite domain |
+| `heuristic` | Pattern/sanity-based check |
+| `simulated` | Structural simulation when prover binary is absent |
+| `unverified` | Check failed or could not run |
+
+`formally_proven: true` is returned **only** when `evidence_mode` is `formal_compiler` and the check succeeded.
+
 ### `POST /verify/conjecture`
 Run a Z3 SMT counterexample sweep on a modular arithmetic conjecture.
 ```json
@@ -92,6 +104,7 @@ Run a Z3 SMT counterexample sweep on a modular arithmetic conjecture.
   "variables": ["x", "y", "z"]
 }
 ```
+Response includes `evidence_mode: "smt_finite"` and `formally_proven: false` even when `is_valid: true`.
 
 ### `POST /verify/proof`
 Run MCTS proof search and export Lean 4 file.
@@ -103,6 +116,7 @@ Run MCTS proof search and export Lean 4 file.
   "variables": {"x": "Nat"}
 }
 ```
+When the Lean compiler is unavailable, `compiler_status` contains `simulated`, `formally_proven` is `false`, and `verification_tier` is `1` (not `2`).
 
 ---
 

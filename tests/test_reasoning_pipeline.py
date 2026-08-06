@@ -74,7 +74,9 @@ def test_api_conjecture_endpoint():
     assert data["status"] == "success"
     assert data["is_valid"] is True
     assert data["epistemic_status"] == "VERIFIED"
-    assert data["verification_tier"] == 2
+    assert data["verification_tier"] == 1
+    assert data["formally_proven"] is False
+    assert data["evidence_mode"] == "smt_finite"
 
 def test_api_proof_endpoint():
     payload = {
@@ -90,6 +92,8 @@ def test_api_proof_endpoint():
     assert data["is_proven"] is True
     assert len(data["proof_steps"]) >= 1
     assert "lean_file" in data
+    assert data["formally_proven"] is False
+    assert data["verification_tier"] != 2
 
 def test_api_graph_export():
     # Make sure we can retrieve the graph from EGS store

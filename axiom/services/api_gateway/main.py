@@ -249,22 +249,26 @@ def verify_conjecture(payload: SmtConjectureRequest, token: str = Depends(verify
             variables=payload.variables
         )
         
-        # Map outcome to status
         from axiom.core.knowledge_graph.schema import MathematicalClaimNode, EpistemicStatus, VerificationTier
+        from axiom.core.verification.truthfulness import assign_from_smt_modular
         import hashlib
         
         claim_id = hashlib.sha256(f"smt_claim:{payload.conjecture_name}:{payload.equation}".encode()).hexdigest()
         
-        status_label = EpistemicStatus.VERIFIED if is_valid else EpistemicStatus.REFUTED
-        tier_label = VerificationTier.TIER_2_PROVEN if is_valid else VerificationTier.TIER_0_CONJECTURE
+        assignment = assign_from_smt_modular(is_valid)
         
         claim_node = MathematicalClaimNode(
             id=claim_id,
             name=payload.conjecture_name,
             statement=f"{payload.equation} mod {payload.modulus}",
-            status=status_label,
-            tier=tier_label,
-            metadata={"variables": payload.variables, "modulus": payload.modulus}
+            status=assignment.epistemic_status,
+            tier=assignment.verification_tier,
+            metadata={
+                "variables": payload.variables,
+                "modulus": payload.modulus,
+                "evidence_mode": assignment.evidence_mode.value,
+                "formally_proven": assignment.formally_proven,
+            }
         )
         store.add_node(claim_node)
         
@@ -274,8 +278,7 @@ def verify_conjecture(payload: SmtConjectureRequest, token: str = Depends(verify
             "is_valid": is_valid,
             "counterexample": counterexample,
             "node_id": claim_id,
-            "epistemic_status": status_label.value,
-            "verification_tier": tier_label.value
+            **assignment.as_api_fields(),
         }
     except Exception as e:
         logger.error(f"Conjecture verification failed: {str(e)}")
@@ -329,20 +332,26 @@ def verify_proof(payload: ProofRequest, token: str = Depends(verify_token)):
 
         # Save Theorem claim node to SQLite EGS
         from axiom.core.knowledge_graph.schema import MathematicalClaimNode, EpistemicStatus, VerificationTier
+        from axiom.core.verification.truthfulness import assign_from_proof_search
         import hashlib
         
         claim_id = hashlib.sha256(f"proof_claim:{payload.theorem_name}:{lean_statement}".encode()).hexdigest()
-        status_label = EpistemicStatus.VERIFIED if is_proven else EpistemicStatus.CONJECTURED
-        tier_label = VerificationTier.TIER_2_PROVEN if (is_proven and "error" not in compiler_status) else VerificationTier.TIER_0_CONJECTURE
+        assignment = assign_from_proof_search(is_proven, compiler_status)
         
         proof_path_str = [f"{rule}: {state}" for rule, state in proof_steps] if proof_steps else []
         claim_node = MathematicalClaimNode(
             id=claim_id,
             name=payload.theorem_name,
             statement=lean_statement,
-            status=status_label,
-            tier=tier_label,
-            metadata={"proof_path": proof_path_str, "lean_file": lean_file_path, "compiler_status": compiler_status}
+            status=assignment.epistemic_status,
+            tier=assignment.verification_tier,
+            metadata={
+                "proof_path": proof_path_str,
+                "lean_file": lean_file_path,
+                "compiler_status": compiler_status,
+                "evidence_mode": assignment.evidence_mode.value,
+                "formally_proven": assignment.formally_proven,
+            }
         )
         store.add_node(claim_node)
         
@@ -352,7 +361,8 @@ def verify_proof(payload: ProofRequest, token: str = Depends(verify_token)):
             "proof_steps": proof_steps,
             "compiler_status": compiler_status,
             "lean_file": lean_file_path,
-            "node_id": claim_id
+            "node_id": claim_id,
+            **assignment.as_api_fields(),
         }
     except Exception as e:
         logger.error(f"Proof search failed: {str(e)}")

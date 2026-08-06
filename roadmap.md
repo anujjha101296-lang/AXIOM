@@ -41,6 +41,8 @@ This is an evidence-led roadmap, not an automatic commitment. Re-rank work after
 
 **Acceptance criterion:** no API response can label a fallback/simulated verification as a formal proof.
 
+**Result:** `axiom/core/verification/truthfulness.py` centralizes evidence modes; `/verify/conjecture`, `/verify/proof`, `/mip/formal/compile`, and `/mip/verify/claim` expose `evidence_mode` and `formally_proven`. Core suite `154/154`.
+
 #### S0-E4: EPIC-002 integration gate
 
 - Review the uncommitted capability framework against its documented evidence rules.

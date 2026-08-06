@@ -199,6 +199,8 @@ async def formal_compile(
     timeout_seconds: int = 30,
 ) -> dict[str, Any]:
     """Compile a formal proof script and return compilation result."""
+    from axiom.core.verification.truthfulness import evidence_mode_from_compile_result, EvidenceMode
+
     system = system.lower()
     try:
         if system == "lean4":
@@ -212,7 +214,16 @@ async def formal_compile(
             success, output = compile_isabelle(script, timeout_seconds)
         else:
             raise HTTPException(status_code=400, detail=f"Unknown system: {system}")
-        return {"system": system, "success": success, "output": output}
+
+        evidence_mode = evidence_mode_from_compile_result(success, output)
+        formally_verified = success and evidence_mode == EvidenceMode.FORMAL_COMPILER
+        return {
+            "system": system,
+            "success": success,
+            "output": output,
+            "evidence_mode": evidence_mode.value,
+            "formally_verified": formally_verified,
+        }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
@@ -397,15 +408,40 @@ class VerifyPayload(BaseModel):
 @router.post("/verify/claim", summary="Run independent verification consensus on a claim")
 async def verify_claim(payload: VerifyPayload) -> dict[str, Any]:
     """Run multi-verifier consensus (SMT + Formal + Sanity) on a mathematical claim."""
+    from axiom.core.verification.truthfulness import EvidenceMode, is_simulated_compiler_output
     from axiom.mip.verification.consensus import VerificationConsensus
     engine = VerificationConsensus(timeout_seconds=payload.timeout_seconds)
     result = engine.verify(payload.claim, payload.proof_script)
+
+    formally_proven = any(
+        r.verifier_name == "Formal/Lean4"
+        and r.verdict.value == "VERIFIED"
+        and not is_simulated_compiler_output(r.evidence)
+        for r in result.verifier_results
+    )
+    evidence_modes = []
+    for r in result.verifier_results:
+        if r.verifier_name == "Formal/Lean4":
+            evidence_modes.append(
+                EvidenceMode.FORMAL_COMPILER.value
+                if formally_proven
+                else EvidenceMode.SIMULATED.value
+                if is_simulated_compiler_output(r.evidence)
+                else EvidenceMode.UNVERIFIED.value
+            )
+        elif r.verifier_name == "SMT/Z3":
+            evidence_modes.append(EvidenceMode.SMT_FINITE.value)
+        else:
+            evidence_modes.append(EvidenceMode.HEURISTIC.value)
+
     return {
         "claim": result.claim,
         "final_verdict": result.final_verdict,
         "agreement_ratio": result.agreement_ratio,
         "explanation": result.explanation,
         "total_execution_time_ms": result.total_execution_time_ms,
+        "formally_proven": formally_proven,
+        "evidence_modes": sorted(set(evidence_modes)),
         "verifier_results": [
             {
                 "verifier": r.verifier_name,
