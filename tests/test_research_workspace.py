@@ -91,6 +91,36 @@ class TestResearchStore:
     resumed = research_store.resume_session(project.id)
     assert resumed.project_id == project.id
 
+  def test_conversations_and_messages(self, research_store):
+    project = research_store.create_project("Conv Test")
+    research_store.add_document(
+      project.id,
+      "paper.pdf",
+      "The Riemann zeta function encodes prime distribution.",
+      page_count=1,
+    )
+    conv = research_store.create_conversation(project.id, "Q about zeta")
+    research_store.add_message(conv.id, "user", "What is the zeta function?")
+    research_store.add_message(
+      conv.id, "assistant", "It encodes prime distribution.", ["paper.pdf"]
+    )
+    detail = research_store.get_conversation_detail(conv.id)
+    assert len(detail.messages) == 2
+    session = research_store.set_active_conversation(project.id, conv.id)
+    assert session.active_conversation_id == conv.id
+
+  def test_update_project(self, research_store):
+    project = research_store.create_project("Old Name", "Old desc")
+    updated = research_store.update_project(project.id, name="New Name", description="New desc")
+    assert updated.name == "New Name"
+    assert updated.description == "New desc"
+
+  def test_delete_note(self, research_store):
+    project = research_store.create_project("Delete Note")
+    note = research_store.create_note(project.id, "Temp", "body", tags=["x"])
+    research_store.delete_note(note.id)
+    assert research_store.list_notes(project.id) == []
+
 
 class TestDocumentSummarizer:
   def test_summarize_nonempty_text(self):
@@ -100,6 +130,26 @@ class TestDocumentSummarizer:
       title="Prime Paper",
     )
     assert len(summary) >= 40
+
+
+class TestPaperQA:
+  def test_answer_with_documents(self):
+    from axiom.research.qa import PaperQA
+    from axiom.research.schema import ResearchDocument
+
+    qa = PaperQA()
+    docs = [
+      ResearchDocument(
+        id="d1",
+        project_id="p1",
+        filename="paper.pdf",
+        text_content="The Riemann zeta function connects primes to complex analysis.",
+        uploaded_at="2026-01-01T00:00:00+00:00",
+      )
+    ]
+    answer, sources = qa.answer("What does the paper discuss?", docs)
+    assert len(answer) >= 20
+    assert sources == ["paper.pdf"]
 
 
 class TestResearchAPI:
@@ -112,6 +162,7 @@ class TestResearchAPI:
 
     research_routes._store = None
     research_routes._summarizer = None
+    research_routes._qa = None
 
     def _mock_extract(_self, data: bytes) -> PdfExtractionResult:
       return PdfExtractionResult(
@@ -189,6 +240,30 @@ class TestResearchAPI:
     assert len(detail["notes"]) == 1
     assert detail["session"] is not None
 
+    # 9. Ask question about papers
+    res = client.post(
+      f"/research/projects/{project_id}/ask",
+      json={"question": "What does this paper say about Riemann zeta zeros?"},
+    )
+    assert res.status_code == 200, res.text
+    qa = res.json()
+    assert len(qa["answer"]) >= 20
+    assert qa["conversation_id"]
+    conv_id = qa["conversation_id"]
+
+    # 10. Resume conversation
+    res = client.get(f"/research/projects/{project_id}/conversations/{conv_id}")
+    assert res.status_code == 200
+    assert len(res.json()["messages"]) >= 2
+
+    # 11. Update project
+    res = client.put(
+      f"/research/projects/{project_id}",
+      json={"name": "Demo Project Updated"},
+    )
+    assert res.status_code == 200
+    assert res.json()["name"] == "Demo Project Updated"
+
   def test_create_project_requires_auth(self):
     unauth = TestClient(app)
     res = unauth.post("/research/projects", json={"name": "No Auth"})
@@ -228,6 +303,21 @@ class TestResearchAPI:
     )
     assert res.status_code == 201, res.text
     assert res.json()["char_count"] > 0
+
+  def test_ask_without_documents_returns_422(self, client, tmp_path, monkeypatch):
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "ask_empty.db"))
+    import axiom.services.api_gateway.routes.research as research_routes
+
+    research_routes._store = None
+    research_routes._qa = None
+
+    res = client.post("/research/projects", json={"name": "Empty Ask"})
+    project_id = res.json()["id"]
+    res = client.post(
+      f"/research/projects/{project_id}/ask",
+      json={"question": "What is this about?"},
+    )
+    assert res.status_code == 422
 
 
 def _make_text_pdf_bytes(text: str) -> bytes:

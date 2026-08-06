@@ -92,18 +92,31 @@ echo "5. Search across papers and notes..."
 curl -sf "$API/research/search?q=zeta&project_id=$PROJECT_ID" -H "$AUTH" | \
   python3 -c "import sys,json; r=json.load(sys.stdin); print(f'   Found {len(r)} result(s)'); [print(f'   - [{x[\"result_type\"]}] {x[\"title\"]}') for x in r[:3]]"
 
-echo "6. Resume research session..."
+if [ -n "${DOC_ID:-}" ]; then
+  echo "6. Ask a question about the paper..."
+  ASK=$(curl -sf -X POST "$API/research/projects/$PROJECT_ID/ask" \
+    -H "$AUTH" -H "Content-Type: application/json" \
+    -d "{\"question\":\"What does this paper say about the Riemann zeta function?\",\"document_id\":\"$DOC_ID\"}")
+  CONV_ID=$(echo "$ASK" | python3 -c "import sys,json; print(json.load(sys.stdin)['conversation_id'])")
+  echo "$ASK" | python3 -c "import sys,json; a=json.load(sys.stdin); print('   Answer:', a.get('answer','')[:120]+'...')"
+  echo "   Conversation ID: $CONV_ID"
+fi
+
+echo "7. Resume research session..."
 curl -sf -X POST "$API/research/projects/$PROJECT_ID/sessions/resume" -H "$AUTH" | \
   python3 -c "import sys,json; s=json.load(sys.stdin); print(f'   Session resumed at {s[\"last_active_at\"]}')"
 
 echo
-echo "7. Project detail:"
+echo "8. Project detail:"
 curl -sf "$API/research/projects/$PROJECT_ID" -H "$AUTH" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
 p = d['project']
 print(f'   {p[\"name\"]}: {p[\"document_count\"]} documents, {p[\"note_count\"]} notes')
+print(f'   Conversations: {len(d.get(\"conversations\", []))}')
 print(f'   Session active: {d.get(\"session\") is not None}')
+if d.get('active_conversation'):
+    print(f'   Active conversation messages: {len(d[\"active_conversation\"][\"messages\"])}')
 "
 
 echo

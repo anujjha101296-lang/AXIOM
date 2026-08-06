@@ -4,24 +4,30 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
 
 from axiom.config import settings
 from axiom.observability.logger import get_logger
 from axiom.research.pdf_extractor import PdfExtractor
 from axiom.research.schema import (
+    AskQuestionRequest,
+    AskQuestionResponse,
+    ConversationDetail,
     CreateNoteRequest,
     CreateProjectRequest,
     ProjectDetail,
+    ResearchConversation,
     ResearchDocument,
     ResearchNote,
     ResearchProject,
     ResearchSession,
     SearchResult,
     UpdateNoteRequest,
+    UpdateProjectRequest,
 )
 from axiom.research.store import ResearchStore
 from axiom.research.summarizer import DocumentSummarizer
+from axiom.research.qa import PaperQA
 from axiom.services.api_gateway.auth import verify_token
 from axiom.services.model_gateway.client import ModelClient
 
@@ -32,6 +38,7 @@ router = APIRouter(prefix="/research", tags=["research"])
 _store: ResearchStore | None = None
 _pdf_extractor = PdfExtractor()
 _summarizer: DocumentSummarizer | None = None
+_qa: PaperQA | None = None
 
 
 def get_research_store() -> ResearchStore:
@@ -46,6 +53,13 @@ def get_summarizer() -> DocumentSummarizer:
     if _summarizer is None:
         _summarizer = DocumentSummarizer(ModelClient())
     return _summarizer
+
+
+def get_paper_qa() -> PaperQA:
+    global _qa
+    if _qa is None:
+        _qa = PaperQA(ModelClient())
+    return _qa
 
 
 def _not_found(resource: str, identifier: str) -> HTTPException:
@@ -74,6 +88,21 @@ def list_projects(
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchProject]:
     return store.list_projects()
+
+
+@router.put("/projects/{project_id}", response_model=ResearchProject)
+def update_project(
+    project_id: str,
+    payload: UpdateProjectRequest,
+    token: str = Depends(verify_token),
+    store: ResearchStore = Depends(get_research_store),
+) -> ResearchProject:
+    if payload.name is None and payload.description is None:
+        raise HTTPException(status_code=400, detail="At least one field required to update")
+    try:
+        return store.update_project(project_id, name=payload.name, description=payload.description)
+    except KeyError:
+        raise _not_found("Project", project_id)
 
 
 @router.get("/projects/{project_id}", response_model=ProjectDetail)
@@ -219,14 +248,32 @@ def create_note(
 @router.get("/projects/{project_id}/notes", response_model=List[ResearchNote])
 def list_notes(
     project_id: str,
+    tag: Optional[str] = Query(None, description="Filter notes by tag"),
     token: str = Depends(verify_token),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchNote]:
     try:
         store.get_project(project_id)
-        return store.list_notes(project_id)
+        return store.list_notes(project_id, tag=tag)
     except KeyError:
         raise _not_found("Project", project_id)
+
+
+@router.delete("/projects/{project_id}/notes/{note_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+def delete_note(
+    project_id: str,
+    note_id: str,
+    token: str = Depends(verify_token),
+    store: ResearchStore = Depends(get_research_store),
+):
+    try:
+        note = store.get_note(note_id)
+        if note.project_id != project_id:
+            raise _not_found("Note", note_id)
+        store.delete_note(note_id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except KeyError:
+        raise _not_found("Note", note_id)
 
 
 @router.put("/projects/{project_id}/notes/{note_id}", response_model=ResearchNote)
@@ -265,6 +312,111 @@ def search_research(
         except KeyError:
             raise _not_found("Project", project_id)
     return store.search(q, project_id=project_id, limit=limit)
+
+
+@router.post("/projects/{project_id}/ask", response_model=AskQuestionResponse)
+def ask_about_papers(
+    project_id: str,
+    payload: AskQuestionRequest,
+    token: str = Depends(verify_token),
+    store: ResearchStore = Depends(get_research_store),
+    qa: PaperQA = Depends(get_paper_qa),
+) -> AskQuestionResponse:
+    try:
+        store.get_project(project_id)
+
+        if payload.conversation_id:
+            conversation = store.get_conversation(payload.conversation_id)
+            if conversation.project_id != project_id:
+                raise _not_found("Conversation", payload.conversation_id)
+        else:
+            title = payload.question.strip()[:80] or "Research Q&A"
+            conversation = store.create_conversation(
+                project_id,
+                title=title,
+                document_id=payload.document_id,
+            )
+
+        if payload.document_id:
+            doc = store.get_document(payload.document_id)
+            if doc.project_id != project_id:
+                raise _not_found("Document", payload.document_id)
+            documents = [doc]
+        else:
+            documents = store.list_documents(project_id)
+
+        if not documents:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Upload at least one PDF before asking questions",
+            )
+
+        store.add_message(conversation.id, "user", payload.question)
+        answer, sources = qa.answer(payload.question, documents)
+        assistant_msg = store.add_message(conversation.id, "assistant", answer, sources)
+        store.set_active_conversation(project_id, conversation.id)
+
+        logger.info(
+            "Paper question answered",
+            extra={
+                "project_id": project_id,
+                "conversation_id": conversation.id,
+                "document_scope": payload.document_id or "all",
+            },
+        )
+        return AskQuestionResponse(
+            answer=answer,
+            conversation_id=conversation.id,
+            message_id=assistant_msg.id,
+            sources=sources,
+        )
+    except KeyError as exc:
+        detail = str(exc)
+        if "Conversation" in detail:
+            raise HTTPException(status_code=404, detail=detail) from exc
+        if "Document" in detail:
+            raise HTTPException(status_code=404, detail=detail) from exc
+        raise _not_found("Project", project_id) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Q&A failed", extra={"project_id": project_id, "error": str(exc)})
+        raise HTTPException(status_code=500, detail="Failed to answer question") from exc
+
+
+@router.get("/projects/{project_id}/conversations", response_model=List[ResearchConversation])
+def list_conversations(
+    project_id: str,
+    token: str = Depends(verify_token),
+    store: ResearchStore = Depends(get_research_store),
+) -> List[ResearchConversation]:
+    try:
+        store.get_project(project_id)
+        return store.list_conversations(project_id)
+    except KeyError:
+        raise _not_found("Project", project_id)
+
+
+@router.get(
+    "/projects/{project_id}/conversations/{conversation_id}",
+    response_model=ConversationDetail,
+)
+def get_conversation(
+    project_id: str,
+    conversation_id: str,
+    token: str = Depends(verify_token),
+    store: ResearchStore = Depends(get_research_store),
+) -> ConversationDetail:
+    try:
+        detail = store.get_conversation_detail(conversation_id)
+        if detail.conversation.project_id != project_id:
+            raise _not_found("Conversation", conversation_id)
+        store.set_active_conversation(project_id, conversation_id)
+        return detail
+    except KeyError:
+        raise _not_found("Conversation", conversation_id)
 
 
 @router.post("/projects/{project_id}/sessions/resume", response_model=ResearchSession)

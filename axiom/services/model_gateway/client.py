@@ -109,6 +109,14 @@ class ModelClient:
                 "Key finding: evidence supports zeros on the critical line. "
                 "Limitation: results are conditional on unproven hypotheses."
             )
+        if "document context" in prompt_lower or "question:" in prompt_lower:
+            return (
+                "Based on the uploaded document, the paper discusses the Riemann zeta function "
+                "and its connection to prime distribution. The main claim is that non-trivial zeros "
+                "are conjectured to lie on the critical line Re(s)=1/2. The authors use analytic "
+                "methods including the functional equation. Limitations include reliance on "
+                "unproven hypotheses and bounded numerical evidence."
+            )
         if "theorem" in prompt_lower or "prove" in prompt_lower:
             return "Proof: Let x be an element of G. By Lagrange's theorem, we have x^|G| = e. Therefore, the statement holds."
         elif "hypothesis" in prompt_lower:

@@ -48,7 +48,45 @@ class ResearchSession(BaseModel):
     started_at: str
     last_active_at: str
     active_document_id: Optional[str] = None
+    active_conversation_id: Optional[str] = None
     context: dict = Field(default_factory=dict)
+
+
+class ResearchMessage(BaseModel):
+    id: str
+    conversation_id: str
+    role: str  # "user" | "assistant"
+    content: str
+    sources: List[str] = Field(default_factory=list)
+    created_at: str
+
+
+class ResearchConversation(BaseModel):
+    id: str
+    project_id: str
+    title: str
+    document_id: Optional[str] = None
+    message_count: int = 0
+    created_at: str
+    updated_at: str
+
+
+class ConversationDetail(BaseModel):
+    conversation: ResearchConversation
+    messages: List[ResearchMessage] = Field(default_factory=list)
+
+
+class AskQuestionRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=4000)
+    document_id: Optional[str] = None
+    conversation_id: Optional[str] = None
+
+
+class AskQuestionResponse(BaseModel):
+    answer: str
+    conversation_id: str
+    message_id: str
+    sources: List[str] = Field(default_factory=list)
 
 
 class SearchResult(BaseModel):
@@ -65,11 +103,18 @@ class ProjectDetail(BaseModel):
     documents: List[ResearchDocument] = Field(default_factory=list)
     notes: List[ResearchNote] = Field(default_factory=list)
     session: Optional[ResearchSession] = None
+    conversations: List[ResearchConversation] = Field(default_factory=list)
+    active_conversation: Optional[ConversationDetail] = None
 
 
 class CreateProjectRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: str = Field(default="", max_length=2000)
+
+
+class UpdateProjectRequest(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    description: Optional[str] = Field(default=None, max_length=2000)
 
 
 class CreateNoteRequest(BaseModel):

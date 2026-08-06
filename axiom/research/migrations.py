@@ -76,6 +76,39 @@ def ensure_research_schema(conn: sqlite3.Connection) -> None:
     """)
 
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS research_conversations (
+            id           TEXT PRIMARY KEY,
+            project_id   TEXT NOT NULL,
+            title        TEXT NOT NULL,
+            document_id  TEXT,
+            created_at   TEXT NOT NULL,
+            updated_at   TEXT NOT NULL,
+            FOREIGN KEY (project_id) REFERENCES research_projects(id) ON DELETE CASCADE,
+            FOREIGN KEY (document_id) REFERENCES research_documents(id) ON DELETE SET NULL
+        );
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_research_conversations_project "
+        "ON research_conversations(project_id);"
+    )
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS research_messages (
+            id               TEXT PRIMARY KEY,
+            conversation_id  TEXT NOT NULL,
+            role             TEXT NOT NULL,
+            content          TEXT NOT NULL,
+            sources_json     TEXT NOT NULL DEFAULT '[]',
+            created_at       TEXT NOT NULL,
+            FOREIGN KEY (conversation_id) REFERENCES research_conversations(id) ON DELETE CASCADE
+        );
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_research_messages_conversation "
+        "ON research_messages(conversation_id);"
+    )
+
+    conn.execute("""
         CREATE VIRTUAL TABLE IF NOT EXISTS research_fts USING fts5(
             entity_type,
             entity_id,

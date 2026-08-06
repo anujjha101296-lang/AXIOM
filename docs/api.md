@@ -157,7 +157,13 @@ Create a research project.
 List all projects (most recently active first).
 
 ### `GET /research/projects/{project_id}`
-Get project detail including documents, notes, and current session.
+Get project detail including documents, notes, conversations, active conversation messages, and current session.
+
+### `PUT /research/projects/{project_id}`
+Update project name and/or description.
+```json
+{"name": "Updated title", "description": "Updated description"}
+```
 
 ### `POST /research/projects/{project_id}/documents/upload`
 Upload a PDF (`multipart/form-data`, field `file`). Extracts text automatically.
@@ -178,7 +184,35 @@ Create a structured note.
 Update a note (`title`, `body`, `tags` — all optional).
 
 ### `GET /research/projects/{project_id}/notes`
-List notes for a project.
+List notes for a project. Query param `tag` filters by tag.
+
+### `DELETE /research/projects/{project_id}/notes/{note_id}`
+Delete a note.
+
+### `POST /research/projects/{project_id}/ask`
+Ask a question about uploaded papers. Creates or continues a saved conversation.
+```json
+{
+  "question": "What is the main theorem?",
+  "document_id": "optional-uuid",
+  "conversation_id": "optional-uuid-to-continue"
+}
+```
+Response:
+```json
+{
+  "answer": "...",
+  "conversation_id": "uuid",
+  "message_id": "uuid",
+  "sources": ["paper.pdf"]
+}
+```
+
+### `GET /research/projects/{project_id}/conversations`
+List saved Q&A conversations for a project.
+
+### `GET /research/projects/{project_id}/conversations/{conversation_id}`
+Get a conversation with full message history. Sets it as the active conversation.
 
 ### `GET /research/search?q=...&project_id=...`
 Full-text search across documents and notes. Optional `project_id` scopes to one project.

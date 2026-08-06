@@ -8,6 +8,13 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-06 — Product milestone — EM-001 Research Workspace (production)
+
+- **Summary:** Shipped production-ready researcher workflow: project organization, PDF pipeline, notes with tags, FTS search, paper Q&A with persisted conversations, session resume.
+- **Artifacts:** `axiom/research/qa.py`, conversation tables, `/research/projects/{id}/ask`, UI chat at `/research`.
+- **Evidence:** `159/159` core tests; `scripts/demo_research_workspace.sh` completes full workflow including Q&A.
+- **Next:** S0-E4 EPIC-002 integration gate.
+
 ### 2026-08-06 — Engineering — S0-E3 verification truthfulness audit
 
 - **Summary:** Centralized evidence-mode labeling so simulated, SMT-bounded, heuristic, and compiler-backed verification cannot claim formal proof status.

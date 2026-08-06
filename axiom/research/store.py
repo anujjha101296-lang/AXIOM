@@ -12,8 +12,11 @@ from typing import List, Optional
 from axiom.observability.logger import get_logger
 from axiom.research.migrations import ensure_research_schema
 from axiom.research.schema import (
+    ConversationDetail,
     ProjectDetail,
+    ResearchConversation,
     ResearchDocument,
+    ResearchMessage,
     ResearchNote,
     ResearchProject,
     ResearchSession,
@@ -104,12 +107,43 @@ class ResearchStore:
         documents = self.list_documents(project_id)
         notes = self.list_notes(project_id)
         session = self.get_session(project_id)
+        conversations = self.list_conversations(project_id)
+        active_conversation = None
+        if session and session.active_conversation_id:
+            try:
+                active_conversation = self.get_conversation_detail(session.active_conversation_id)
+            except KeyError:
+                pass
         return ProjectDetail(
             project=project,
             documents=documents,
             notes=notes,
             session=session,
+            conversations=conversations,
+            active_conversation=active_conversation,
         )
+
+    def update_project(
+        self,
+        project_id: str,
+        name: str | None = None,
+        description: str | None = None,
+    ) -> ResearchProject:
+        project = self.get_project(project_id)
+        new_name = name.strip() if name is not None else project.name
+        new_desc = description.strip() if description is not None else project.description
+        now = _utc_now()
+        self.conn.execute(
+            """
+            UPDATE research_projects
+            SET name = ?, description = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (new_name, new_desc, now, project_id),
+        )
+        self.conn.commit()
+        logger.info("Research project updated", extra={"project_id": project_id})
+        return self.get_project(project_id)
 
     def touch_project(self, project_id: str) -> None:
         self._touch_project_unlocked(project_id)
@@ -258,12 +292,35 @@ class ResearchStore:
             raise KeyError(f"Note not found: {note_id}")
         return self._row_to_note(row)
 
-    def list_notes(self, project_id: str) -> List[ResearchNote]:
-        rows = self.conn.execute(
-            "SELECT * FROM research_notes WHERE project_id = ? ORDER BY updated_at DESC",
-            (project_id,),
-        ).fetchall()
+    def list_notes(
+        self, project_id: str, tag: str | None = None
+    ) -> List[ResearchNote]:
+        if tag:
+            rows = self.conn.execute(
+                """
+                SELECT * FROM research_notes
+                WHERE project_id = ? AND tags LIKE ?
+                ORDER BY updated_at DESC
+                """,
+                (project_id, f'%"{tag}"%'),
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT * FROM research_notes WHERE project_id = ? ORDER BY updated_at DESC",
+                (project_id,),
+            ).fetchall()
         return [self._row_to_note(row) for row in rows]
+
+    def delete_note(self, note_id: str) -> None:
+        note = self.get_note(note_id)
+        self.conn.execute("DELETE FROM research_notes WHERE id = ?", (note_id,))
+        self.conn.execute(
+            "DELETE FROM research_fts WHERE entity_type = ? AND entity_id = ?",
+            ("note", note_id),
+        )
+        self._touch_project_unlocked(note.project_id)
+        self.conn.commit()
+        logger.info("Note deleted", extra={"note_id": note_id, "project_id": note.project_id})
 
     def update_note(
         self,
@@ -291,6 +348,116 @@ class ResearchStore:
         self.conn.commit()
 
         return self.get_note(note_id)
+
+    # ── Conversations & Q&A ───────────────────────────────────────────────────
+
+    def create_conversation(
+        self,
+        project_id: str,
+        title: str,
+        document_id: str | None = None,
+    ) -> ResearchConversation:
+        self.get_project(project_id)
+        if document_id:
+            self.get_document(document_id)
+        conv_id = _new_id()
+        now = _utc_now()
+        self.conn.execute(
+            """
+            INSERT INTO research_conversations
+            (id, project_id, title, document_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (conv_id, project_id, title.strip(), document_id, now, now),
+        )
+        self._touch_project_unlocked(project_id)
+        self.conn.commit()
+        return self.get_conversation(conv_id)
+
+    def get_conversation(self, conversation_id: str) -> ResearchConversation:
+        row = self.conn.execute(
+            """
+            SELECT c.*,
+                   (SELECT COUNT(*) FROM research_messages m WHERE m.conversation_id = c.id) AS message_count
+            FROM research_conversations c WHERE c.id = ?
+            """,
+            (conversation_id,),
+        ).fetchone()
+        if not row:
+            raise KeyError(f"Conversation not found: {conversation_id}")
+        return self._row_to_conversation(row)
+
+    def list_conversations(self, project_id: str) -> List[ResearchConversation]:
+        rows = self.conn.execute(
+            """
+            SELECT c.*,
+                   (SELECT COUNT(*) FROM research_messages m WHERE m.conversation_id = c.id) AS message_count
+            FROM research_conversations c
+            WHERE c.project_id = ?
+            ORDER BY c.updated_at DESC
+            """,
+            (project_id,),
+        ).fetchall()
+        return [self._row_to_conversation(row) for row in rows]
+
+    def get_conversation_detail(self, conversation_id: str) -> ConversationDetail:
+        conversation = self.get_conversation(conversation_id)
+        messages = self.list_messages(conversation_id)
+        return ConversationDetail(conversation=conversation, messages=messages)
+
+    def add_message(
+        self,
+        conversation_id: str,
+        role: str,
+        content: str,
+        sources: List[str] | None = None,
+    ) -> ResearchMessage:
+        conv = self.get_conversation(conversation_id)
+        msg_id = _new_id()
+        now = _utc_now()
+        source_list = sources or []
+        self.conn.execute(
+            """
+            INSERT INTO research_messages
+            (id, conversation_id, role, content, sources_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (msg_id, conversation_id, role, content, json.dumps(source_list), now),
+        )
+        self.conn.execute(
+            "UPDATE research_conversations SET updated_at = ? WHERE id = ?",
+            (now, conversation_id),
+        )
+        self._index_fts("conversation", msg_id, conv.project_id, f"{role}: {content[:80]}", content)
+        self._touch_project_unlocked(conv.project_id)
+        self.conn.commit()
+        return self.get_message(msg_id)
+
+    def get_message(self, message_id: str) -> ResearchMessage:
+        row = self.conn.execute(
+            "SELECT * FROM research_messages WHERE id = ?", (message_id,)
+        ).fetchone()
+        if not row:
+            raise KeyError(f"Message not found: {message_id}")
+        return self._row_to_message(row)
+
+    def list_messages(self, conversation_id: str) -> List[ResearchMessage]:
+        rows = self.conn.execute(
+            """
+            SELECT * FROM research_messages
+            WHERE conversation_id = ?
+            ORDER BY created_at ASC
+            """,
+            (conversation_id,),
+        ).fetchall()
+        return [self._row_to_message(row) for row in rows]
+
+    def set_active_conversation(self, project_id: str, conversation_id: str) -> ResearchSession:
+        self.get_conversation(conversation_id)
+        session = self.get_session(project_id)
+        ctx = session.context if session else {}
+        ctx["active_conversation_id"] = conversation_id
+        return self.resume_session(project_id, context=ctx)
 
     # ── Sessions ──────────────────────────────────────────────────────────────
 
@@ -542,5 +709,33 @@ class ResearchStore:
             started_at=row["started_at"],
             last_active_at=row["last_active_at"],
             active_document_id=row["active_document_id"],
+            active_conversation_id=context.get("active_conversation_id"),
             context=context,
+        )
+
+    @staticmethod
+    def _row_to_conversation(row: sqlite3.Row) -> ResearchConversation:
+        return ResearchConversation(
+            id=row["id"],
+            project_id=row["project_id"],
+            title=row["title"],
+            document_id=row["document_id"],
+            message_count=row["message_count"] if "message_count" in row.keys() else 0,
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+        )
+
+    @staticmethod
+    def _row_to_message(row: sqlite3.Row) -> ResearchMessage:
+        try:
+            sources = json.loads(row["sources_json"] or "[]")
+        except json.JSONDecodeError:
+            sources = []
+        return ResearchMessage(
+            id=row["id"],
+            conversation_id=row["conversation_id"],
+            role=row["role"],
+            content=row["content"],
+            sources=sources,
+            created_at=row["created_at"],
         )

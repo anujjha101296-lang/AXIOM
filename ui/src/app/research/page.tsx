@@ -31,6 +31,21 @@ interface ResearchNote {
   updated_at: string;
 }
 
+interface ResearchMessage {
+  id: string;
+  role: string;
+  content: string;
+  sources: string[];
+  created_at: string;
+}
+
+interface ResearchConversation {
+  id: string;
+  title: string;
+  message_count: number;
+  updated_at: string;
+}
+
 interface SearchResult {
   result_type: string;
   id: string;
@@ -42,7 +57,16 @@ interface ProjectDetail {
   project: ResearchProject;
   documents: ResearchDocument[];
   notes: ResearchNote[];
-  session?: { active_document_id?: string; last_active_at: string };
+  session?: {
+    active_document_id?: string;
+    active_conversation_id?: string;
+    last_active_at: string;
+  };
+  conversations: ResearchConversation[];
+  active_conversation?: {
+    conversation: ResearchConversation;
+    messages: ResearchMessage[];
+  };
 }
 
 export default function ResearchPage() {
@@ -52,10 +76,15 @@ export default function ResearchPage() {
   const [detail, setDetail] = useState<ProjectDetail | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDesc, setNewProjectDesc] = useState("");
+  const [editProjectName, setEditProjectName] = useState("");
+  const [editProjectDesc, setEditProjectDesc] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
+  const [noteTags, setNoteTags] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [chatQuestion, setChatQuestion] = useState("");
+  const [selectedDocId, setSelectedDocId] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -71,8 +100,7 @@ export default function ResearchPage() {
     try {
       const res = await fetch(`${API_BASE}/research/projects`, { headers: headers() });
       if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      setProjects(data);
+      setProjects(await res.json());
     } catch (e) {
       setStatus(`Failed to load projects: ${e}`);
     }
@@ -93,6 +121,8 @@ export default function ResearchPage() {
         const data: ProjectDetail = await res.json();
         setDetail(data);
         setSelectedId(projectId);
+        setEditProjectName(data.project.name);
+        setEditProjectDesc(data.project.description);
         setStatus(`Resumed session for "${data.project.name}"`);
       } catch (e) {
         setStatus(`Failed to load project: ${e}`);
@@ -125,6 +155,26 @@ export default function ResearchPage() {
       setStatus(`Created project "${project.name}"`);
     } catch (e) {
       setStatus(`Create failed: ${e}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveProject = async () => {
+    if (!selectedId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/research/projects/${selectedId}`, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify({ name: editProjectName, description: editProjectDesc }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      await loadProjects();
+      await loadProject(selectedId);
+      setStatus("Project updated");
+    } catch (e) {
+      setStatus(`Update failed: ${e}`);
     } finally {
       setLoading(false);
     }
@@ -173,18 +223,84 @@ export default function ResearchPage() {
     if (!selectedId || !noteTitle.trim()) return;
     setLoading(true);
     try {
+      const tags = noteTags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
       const res = await fetch(`${API_BASE}/research/projects/${selectedId}/notes`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ title: noteTitle, body: noteBody, tags: [] }),
+        body: JSON.stringify({
+          title: noteTitle,
+          body: noteBody,
+          tags,
+          document_id: selectedDocId || undefined,
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
       setNoteTitle("");
       setNoteBody("");
+      setNoteTags("");
       await loadProject(selectedId);
       setStatus("Note saved");
     } catch (e) {
       setStatus(`Note failed: ${e}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    if (!selectedId) return;
+    try {
+      const res = await fetch(
+        `${API_BASE}/research/projects/${selectedId}/notes/${noteId}`,
+        { method: "DELETE", headers: headers() }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      await loadProject(selectedId);
+      setStatus("Note deleted");
+    } catch (e) {
+      setStatus(`Delete failed: ${e}`);
+    }
+  };
+
+  const askQuestion = async (conversationId?: string) => {
+    if (!selectedId || !chatQuestion.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/research/projects/${selectedId}/ask`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          question: chatQuestion,
+          document_id: selectedDocId || undefined,
+          conversation_id: conversationId,
+        }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setChatQuestion("");
+      await loadProject(selectedId);
+      setStatus("Question answered");
+    } catch (e) {
+      setStatus(`Q&A failed: ${e}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadConversation = async (conversationId: string) => {
+    if (!selectedId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/research/projects/${selectedId}/conversations/${conversationId}`,
+        { headers: headers() }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      await loadProject(selectedId);
+    } catch (e) {
+      setStatus(`Failed to load conversation: ${e}`);
     } finally {
       setLoading(false);
     }
@@ -203,13 +319,15 @@ export default function ResearchPage() {
     }
   };
 
+  const messages = detail?.active_conversation?.messages ?? [];
+
   return (
     <div className="research-app">
       <header className="research-header">
         <div>
           <a href="/" className="research-back">← AXIOM</a>
           <h1>Research Workspace</h1>
-          <p>Projects · PDFs · Summaries · Notes · Search · Sessions</p>
+          <p>Projects · PDFs · Notes · Q&amp;A · Search · Sessions</p>
         </div>
         <div className="research-token">
           <label htmlFor="api-token">API Token</label>
@@ -269,11 +387,25 @@ export default function ResearchPage() {
           ) : (
             <>
               <section>
-                <h2>{detail.project.name}</h2>
-                <p>{detail.project.description || "No description"}</p>
+                <h2>Organize Project</h2>
+                <input
+                  value={editProjectName}
+                  onChange={(e) => setEditProjectName(e.target.value)}
+                  placeholder="Project name"
+                />
+                <textarea
+                  value={editProjectDesc}
+                  onChange={(e) => setEditProjectDesc(e.target.value)}
+                  placeholder="Description"
+                  rows={2}
+                />
+                <button type="button" onClick={saveProject} disabled={loading}>
+                  Save Project
+                </button>
                 {detail.session && (
                   <p className="research-meta">
-                    Session active · last: {new Date(detail.session.last_active_at).toLocaleString()}
+                    Session active · last:{" "}
+                    {new Date(detail.session.last_active_at).toLocaleString()}
                   </p>
                 )}
               </section>
@@ -292,6 +424,18 @@ export default function ResearchPage() {
 
               <section>
                 <h3>Documents ({detail.documents.length})</h3>
+                <select
+                  value={selectedDocId}
+                  onChange={(e) => setSelectedDocId(e.target.value)}
+                  className="research-select"
+                >
+                  <option value="">All documents (Q&amp;A scope)</option>
+                  {detail.documents.map((doc) => (
+                    <option key={doc.id} value={doc.id}>
+                      {doc.filename}
+                    </option>
+                  ))}
+                </select>
                 {detail.documents.map((doc) => (
                   <article key={doc.id} className="research-card">
                     <header>
@@ -313,11 +457,70 @@ export default function ResearchPage() {
               </section>
 
               <section>
+                <h3>Ask About Papers</h3>
+                <div className="research-chat">
+                  {messages.length === 0 && (
+                    <p className="research-muted">
+                      Ask a question about your uploaded papers. Conversations are saved
+                      automatically.
+                    </p>
+                  )}
+                  {messages.map((msg) => (
+                    <div key={msg.id} className={`research-chat-msg research-chat-${msg.role}`}>
+                      <strong>{msg.role === "user" ? "You" : "AXIOM"}</strong>
+                      <p>{msg.content}</p>
+                      {msg.sources?.length > 0 && (
+                        <small>Sources: {msg.sources.join(", ")}</small>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <textarea
+                  placeholder="What does this paper say about the critical line?"
+                  value={chatQuestion}
+                  onChange={(e) => setChatQuestion(e.target.value)}
+                  rows={3}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      askQuestion(detail.session?.active_conversation_id);
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => askQuestion(detail.session?.active_conversation_id)}
+                  disabled={loading || !chatQuestion.trim()}
+                >
+                  Ask
+                </button>
+                {detail.conversations.length > 0 && (
+                  <div className="research-conversations">
+                    <h4>Previous Conversations</h4>
+                    <ul>
+                      {detail.conversations.map((c) => (
+                        <li key={c.id}>
+                          <button type="button" onClick={() => loadConversation(c.id)}>
+                            {c.title} ({c.message_count} msgs)
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+
+              <section>
                 <h3>Structured Notes</h3>
                 <input
                   placeholder="Note title"
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
+                />
+                <input
+                  placeholder="Tags (comma-separated)"
+                  value={noteTags}
+                  onChange={(e) => setNoteTags(e.target.value)}
                 />
                 <textarea
                   placeholder="Note body — insights, questions, citations..."
@@ -332,8 +535,22 @@ export default function ResearchPage() {
                   {detail.notes.map((note) => (
                     <li key={note.id}>
                       <strong>{note.title}</strong>
+                      {note.tags.length > 0 && (
+                        <span className="research-tags">
+                          {note.tags.map((t) => (
+                            <span key={t} className="research-tag">
+                              {t}
+                            </span>
+                          ))}
+                        </span>
+                      )}
                       <p>{note.body}</p>
-                      <small>{new Date(note.updated_at).toLocaleString()}</small>
+                      <div className="research-note-actions">
+                        <small>{new Date(note.updated_at).toLocaleString()}</small>
+                        <button type="button" onClick={() => deleteNote(note.id)}>
+                          Delete
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -435,7 +652,10 @@ export default function ResearchPage() {
           margin: 0 0 1rem;
         }
         .research-new-project input,
-        .research-new-project textarea {
+        .research-new-project textarea,
+        .research-main input,
+        .research-main textarea,
+        .research-select {
           width: 100%;
           margin-bottom: 0.5rem;
           background: #12121a;
@@ -444,6 +664,9 @@ export default function ResearchPage() {
           padding: 0.5rem;
           border-radius: 6px;
           box-sizing: border-box;
+        }
+        .research-select {
+          max-width: 400px;
         }
         .research-new-project button,
         .research-main button {
@@ -454,6 +677,7 @@ export default function ResearchPage() {
           border-radius: 6px;
           cursor: pointer;
           font-size: 0.85rem;
+          margin-right: 0.5rem;
         }
         .research-new-project button:disabled,
         .research-main button:disabled {
@@ -502,9 +726,15 @@ export default function ResearchPage() {
           margin: 0 0 1rem;
           color: #b8b8d0;
         }
+        .research-main h4 {
+          font-size: 0.9rem;
+          color: #8888a0;
+          margin: 1rem 0 0.5rem;
+        }
         .research-meta {
           font-size: 0.85rem;
           color: #7c8cff;
+          margin-top: 0.5rem;
         }
         .research-card {
           background: #12121a;
@@ -533,18 +763,45 @@ export default function ResearchPage() {
           color: #666680;
           font-size: 0.85rem;
         }
-        .research-main input,
-        .research-main textarea {
-          width: 100%;
-          max-width: 600px;
-          display: block;
-          margin-bottom: 0.5rem;
+        .research-chat {
           background: #12121a;
           border: 1px solid #2a2a3a;
-          color: #e8e8ef;
-          padding: 0.5rem;
-          border-radius: 6px;
-          box-sizing: border-box;
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 0.75rem;
+          max-height: 320px;
+          overflow-y: auto;
+        }
+        .research-chat-msg {
+          margin-bottom: 1rem;
+        }
+        .research-chat-msg p {
+          margin: 0.35rem 0;
+          line-height: 1.5;
+          font-size: 0.9rem;
+        }
+        .research-chat-msg small {
+          color: #8888a0;
+          font-size: 0.75rem;
+        }
+        .research-chat-user strong {
+          color: #9ca8ff;
+        }
+        .research-chat-assistant strong {
+          color: #6ee7b7;
+        }
+        .research-conversations ul {
+          list-style: none;
+          padding: 0;
+        }
+        .research-conversations button {
+          background: transparent;
+          border: none;
+          color: #7c8cff;
+          cursor: pointer;
+          padding: 0.25rem 0;
+          font-size: 0.85rem;
+          text-align: left;
         }
         .research-notes {
           list-style: none;
@@ -562,6 +819,29 @@ export default function ResearchPage() {
           margin: 0.5rem 0;
           font-size: 0.9rem;
           line-height: 1.5;
+        }
+        .research-tags {
+          margin-left: 0.5rem;
+        }
+        .research-tag {
+          font-size: 0.7rem;
+          background: #2a2a4a;
+          color: #9ca8ff;
+          padding: 0.1rem 0.4rem;
+          border-radius: 4px;
+          margin-right: 0.25rem;
+        }
+        .research-note-actions {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .research-note-actions button {
+          background: transparent;
+          border: 1px solid #4a3030;
+          color: #ff8a8a;
+          padding: 0.25rem 0.5rem;
+          font-size: 0.75rem;
         }
         .research-search {
           display: flex;
