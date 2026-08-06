@@ -129,6 +129,54 @@ Return AXIOM's current capability scores against Millennium Prize Problems.
 
 ---
 
+## Research Workspace
+
+Base path: `/research` — all endpoints require authentication.
+
+### `POST /research/projects`
+Create a research project.
+```json
+{"name": "RH Literature Review", "description": "Survey of zeta zero results"}
+```
+
+### `GET /research/projects`
+List all projects (most recently active first).
+
+### `GET /research/projects/{project_id}`
+Get project detail including documents, notes, and current session.
+
+### `POST /research/projects/{project_id}/documents/upload`
+Upload a PDF (`multipart/form-data`, field `file`). Extracts text automatically.
+
+### `POST /research/projects/{project_id}/documents/{document_id}/summarize`
+Generate an LLM summary (or extractive fallback) for an uploaded document.
+
+### `GET /research/projects/{project_id}/documents`
+List documents in a project.
+
+### `POST /research/projects/{project_id}/notes`
+Create a structured note.
+```json
+{"title": "Key insight", "body": "...", "document_id": "optional-uuid", "tags": ["zeta"]}
+```
+
+### `PUT /research/projects/{project_id}/notes/{note_id}`
+Update a note (`title`, `body`, `tags` — all optional).
+
+### `GET /research/projects/{project_id}/notes`
+List notes for a project.
+
+### `GET /research/search?q=...&project_id=...`
+Full-text search across documents and notes. Optional `project_id` scopes to one project.
+
+### `POST /research/projects/{project_id}/sessions/resume`
+Resume or create a research session. Query param: `active_document_id` (optional).
+
+### `GET /research/projects/{project_id}/sessions/current`
+Get the current session for a project (creates one if missing).
+
+---
+
 ## System (Admin)
 
 ### `POST /self-improve`

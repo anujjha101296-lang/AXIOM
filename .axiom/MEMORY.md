@@ -8,6 +8,15 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-06 — Product milestone — Research Workspace v1
+
+- **Summary:** Shipped first complete researcher vertical slice: projects, PDF upload/extraction, summaries, structured notes, FTS search, session resume.
+- **Artifacts:** `axiom/research/`, `/research` API routes, `ui/src/app/research/page.tsx`, `tests/test_research_workspace.py`, `scripts/demo_research_workspace.sh`, `docs/api.md` Research section.
+- **Evidence:** `pytest tests/test_research_workspace.py` → 10 passed; core suite `144/144`; demo script completes end-to-end against live API.
+- **Fixes:** Reserved `LogRecord` keys (`name`, `filename`) in structured logging caused 500/404 on create/upload; corrected to `project_name` / `document_filename`.
+- **Limitation:** Summaries use model gateway with extractive fallback; blank/scanned PDFs return 422; UI requires bearer token in dev.
+- **Next:** S0-E3 verification truthfulness audit.
+
 ### 2026-08-06 — Engineering baseline — S0-E2 core complete
 
 - **Summary:** Restored trustworthy core test baseline after three P0 toolchain defects.

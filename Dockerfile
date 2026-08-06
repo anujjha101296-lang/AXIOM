@@ -30,7 +30,9 @@ RUN pip install --upgrade pip && \
     pylatexenc \
     requests \
     z3-solver \
-    anyio
+    anyio \
+    pypdf \
+    python-multipart
 
 # ────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime

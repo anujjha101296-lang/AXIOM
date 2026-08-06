@@ -98,6 +98,16 @@ class AxiomSettings(BaseSettings):
     # ── Self-Improvement ──────────────────────────────────────────────────────
     sil_workspace_root: str = Field(default=".", description="Where to write roadmap.md")
 
+    # ── Research Workspace ────────────────────────────────────────────────────
+    research_upload_dir: str = Field(
+        default="./data/research_uploads",
+        description="Directory for uploaded PDF files",
+    )
+    research_max_upload_bytes: int = Field(
+        default=20 * 1024 * 1024,
+        description="Maximum PDF upload size in bytes (20 MB)",
+    )
+
     # ── CORS ─────────────────────────────────────────────────────────────────
     cors_origins: Annotated[list[str], NoDecode] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"],

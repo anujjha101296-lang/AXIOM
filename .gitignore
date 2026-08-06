@@ -68,3 +68,4 @@ logs/
 # Temporary files
 tmp/
 /tmp/axiom*
+data/research_uploads/

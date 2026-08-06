@@ -7,7 +7,7 @@ Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Up
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) is **complete for the core suite**.
+AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) is **complete for the core suite**. Research Workspace v1 delivers the first end-to-end researcher vertical slice.
 
 ## Completed
 
@@ -15,7 +15,8 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 - AXIOM Operating System initialized under `.axiom/`.
 - Three-track execution initiated: Research capability, researcher-workspace product, and company/PMO foundation now progress in parallel.
 - **S0-E2 (core):** Test toolchain restored — `pytest.py` moved to `scripts/standalone_test_runner.py`, `prize_readiness.py` syntax fixed, ruff config consolidated in `pyproject.toml`, CORS origins parsing fixed, httpx pinned `<0.28`, MDE router mounted.
-- **Test baseline (2026-08-06):** `134/134` core tests pass (`pytest tests/ --ignore=tests/e2e`). Full suite: `334/360` pass; `26` e2e failures remain (MDE endpoints not yet in production API).
+- **Test baseline (2026-08-06):** `144/144` core tests pass (`pytest tests/ --ignore=tests/e2e`). Full suite: `334/360`; 26 e2e failures documented (MDE API surface gap).
+- **Research Workspace v1:** End-to-end vertical slice — create projects, upload PDFs, extract text, generate summaries, save structured notes, FTS search, resume sessions. API `/research/*`, UI `/research`, demo script `scripts/demo_research_workspace.sh`.
 
 ## Blocked
 
@@ -23,7 +24,7 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 
 ## Highest priority
 
-**S0-E3: verification truthfulness audit** — ensure simulated/heuristic results cannot claim formal verification. See `TASK_QUEUE.md`.
+**S0-E3: verification truthfulness audit** — ensure simulated/heuristic results cannot claim formal verification.
 
 ## Worktree integrity
 

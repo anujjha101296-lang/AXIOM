@@ -26,6 +26,7 @@ from axiom.services.api_gateway.auth import verify_token
 from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
+from axiom.services.api_gateway.routes.research import router as research_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -72,6 +73,9 @@ app.include_router(eval_router)
 
 # ── MDE Router (Mathematical Discovery Engine — theorem retrieval) ────────────
 app.include_router(mde_router)
+
+# ── Research Workspace (projects, PDFs, notes, search, sessions) ──────────────
+app.include_router(research_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
