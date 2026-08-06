@@ -4,7 +4,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if ! python3 -c "import venv" 2>/dev/null; then
+# `import venv` can succeed without ensurepip; require the distro package.
+if ! dpkg -s python3.12-venv >/dev/null 2>&1; then
   sudo apt-get update -qq
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3.12-venv
 fi
