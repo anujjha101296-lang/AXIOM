@@ -753,8 +753,9 @@ def review_controller() -> VerificationReviewController:
 @pytest.fixture
 def api_client():
     """Fixture providing TestClient or MockTestClient for FastAPI endpoints."""
+    token = os.environ.get("AXIOM_API_TOKEN", "test_token")
     if HAS_FASTAPI and real_app is not None:
-        return TestClient(real_app)
+        return TestClient(real_app, headers={"Authorization": f"Bearer {token}"})
     return MockTestClient()
 
 

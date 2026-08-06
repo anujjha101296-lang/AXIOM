@@ -8,6 +8,14 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-06 — Engineering baseline — S0-E2 core complete
+
+- **Summary:** Restored trustworthy core test baseline after three P0 toolchain defects.
+- **Changes:** Moved `pytest.py` → `scripts/standalone_test_runner.py`; fixed `prize_readiness.py` syntax; consolidated ruff config in `pyproject.toml`; fixed CORS comma-separated env parsing; pinned `httpx<0.28`; mounted MDE router; fixed e2e TestClient auth headers.
+- **Evidence:** `pytest tests/ --ignore=tests/e2e` → 134 passed, 0 failed (Python 3.12.3). Full suite: 334 passed, 26 e2e failed.
+- **Limitation:** 26 e2e tests fail because MDE conjecture/counterexample endpoints exist only in test modules, not production API. Coverage ~54%.
+- **Next:** S0-E3 verification truthfulness audit.
+
 ### 2026-08-05 — Architecture decision — operating contract
 
 - **Summary:** AXIOM moved from prompt-led execution toward a repository-native operating system.

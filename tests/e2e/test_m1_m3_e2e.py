@@ -731,7 +731,8 @@ def temp_db() -> EpistemicStore:
 @pytest.fixture
 def api_client() -> TestClient:
     """Fixture providing a TestClient for FastAPI endpoints."""
-    return TestClient(app)
+    token = os.environ.get("AXIOM_API_TOKEN", "test_token")
+    return TestClient(app, headers={"Authorization": f"Bearer {token}"})
 
 
 # ==============================================================================

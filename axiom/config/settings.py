@@ -8,10 +8,10 @@ Use `.env` for local development. Never commit `.env` to source control.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class AxiomSettings(BaseSettings):
@@ -99,10 +99,17 @@ class AxiomSettings(BaseSettings):
     sil_workspace_root: str = Field(default=".", description="Where to write roadmap.md")
 
     # ── CORS ─────────────────────────────────────────────────────────────────
-    cors_origins: list[str] = Field(
+    cors_origins: Annotated[list[str], NoDecode] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"],
         description="Allowed CORS origins",
     )
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value: object) -> list[str]:
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value  # type: ignore[return-value]
 
     @field_validator("jwt_secret_key")
     @classmethod
