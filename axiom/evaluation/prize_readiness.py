@@ -74,7 +74,7 @@ class PrizeReadinessScorer:
         self.engine = PrizeReadinessEngine()
         self.store = store
 
-    def score_all((self) -> List[Tuple[PrizeProblem, float]]:
+    def score_all(self) -> List[Tuple[PrizeProblem, float]]:
         """Compute readiness scores for all Millennium Problems dynamically."""
         # Default benchmark scores map
         sample_scores = {
