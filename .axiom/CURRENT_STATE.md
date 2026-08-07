@@ -3,30 +3,26 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-06
-**Active horizon:** Three-track foundation — research, product, and company
+**Active horizon:** Research Validation Program (RVP) — staged scientific validation
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) and verification truthfulness audit (S0-E3) are **complete for the core suite**. **Engineering Milestone 001 — Research Workspace** delivers a production-ready researcher workflow.
+AXIOM is a Python/FastAPI research platform. **Research Validation Program (RVP)** is operational with 266 known-answer problems, 10-dimension Research Capability Score, discovery pipeline outputs, replay, and dashboard API (`/rvp/*`). S0-E4 evidence gate complete. Engineering Governance System operational.
 
 ## Completed
 
-- Operating contract committed as `6dca714` (`VISION.md`, root engineering/architecture contract, and Sprint 0 roadmap).
-- AXIOM Operating System initialized under `.axiom/`.
-- Three-track execution initiated: Research capability, researcher-workspace product, and company/PMO foundation now progress in parallel.
-- **S0-E2 (core):** Test toolchain restored — `pytest.py` moved to `scripts/standalone_test_runner.py`, `prize_readiness.py` syntax fixed, ruff config consolidated in `pyproject.toml`, CORS origins parsing fixed, httpx pinned `<0.28`, MDE router mounted.
-- **Test baseline (2026-08-06):** `159/159` core tests pass (`pytest tests/ --ignore=tests/e2e`). Full suite: `334/360`; 26 e2e failures documented (MDE API surface gap).
-- **Research Workspace v1:** End-to-end vertical slice — create projects, upload PDFs, extract text, generate summaries, save structured notes, FTS search, resume sessions. API `/research/*`, UI `/research`, demo script `scripts/demo_research_workspace.sh`.
-- **S0-E3:** Verification truthfulness audit — `axiom/core/verification/truthfulness.py`; API responses expose `evidence_mode` and `formally_proven`; simulated/SMT/heuristic paths cannot claim `TIER_2_PROVEN`.
-- **EM-001 Research Workspace (production):** Projects CRUD, PDF upload/parse/store, notes with tags, FTS search, paper Q&A with saved conversations, session resume. UI at `/research`.
+- **S0-E2/E3/E4:** Test baseline, verification truthfulness, EPIC-002 evidence gate.
+- **Engineering Governance System:** `make engineering-health`, council reviews, health reports.
+- **Research Validation Program:** `axiom/research_validation/` — stages 0–6, known-answer dataset (266 problems), capability scoring, pipeline artifacts, reproducibility, dashboard, API, `make research-validation`.
+- **Core tests:** **176/176** pass (`pytest tests/ --ignore=tests/e2e`).
 
 ## Blocked
 
-- None for core engineering baseline.
+- None for RVP infrastructure validation.
 
 ## Highest priority
 
-**S0-E4: EPIC-002 integration gate** — integrate capability framework with evidence state, benchmark count, and limitations tested and documented.
+**H1-OBS** — Add reproducible run/provenance records linking RVP and SCEP evaluation runs (see `NEXT_RESEARCH_TARGETS.md`).
 
 ## Worktree integrity
 
