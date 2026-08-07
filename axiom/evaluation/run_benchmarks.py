@@ -22,7 +22,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 from axiom.evaluation.frameworks.evidence import run_all_capability_benchmarks
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
+from axiom.evaluation.frameworks.capability import CapabilitySnapshot
 from axiom.evaluation.reporting.delta_report import generate_delta_report
+from axiom.observability.run_provenance import record_scep_run
 
 
 def init_db(db_path: str):
@@ -160,7 +162,10 @@ def main():
     
     init_db(args.db)
 
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    wall_start = time.perf_counter()
     bundle = run_all_capability_benchmarks(args.db)
+    duration_ms = (time.perf_counter() - wall_start) * 1000
     snapshot = bundle.snapshot
     run_id = snapshot.run_id
 
@@ -179,6 +184,14 @@ def main():
     prev_run, prev_readiness = get_latest_run(args.db)
 
     save_run(args.db, snapshot, readiness_scores, bundle.all_results)
+    record_scep_run(
+        args.db,
+        snapshot,
+        bundle.all_results,
+        started_at=started_at,
+        duration_ms=duration_ms,
+        trigger="cli",
+    )
     print(f"\n✓ Saved run snapshot {run_id} in {args.db} (Composite Score: {snapshot.composite_score:.4f})")
     
     # Generate delta report

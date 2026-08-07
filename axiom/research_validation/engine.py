@@ -22,6 +22,7 @@ from axiom.research_validation.scoring import (
     score_answer,
 )
 from axiom.research_validation.store import RVPStore
+from axiom.observability.run_provenance import record_rvp_run
 
 
 class ResearchValidationEngine:
@@ -30,6 +31,7 @@ class ResearchValidationEngine:
     PASS_THRESHOLD = 0.5
 
     def __init__(self, db_path: str) -> None:
+        self.db_path = db_path
         self.store = RVPStore(db_path)
 
     def list_stages(self) -> list[dict[str, Any]]:
@@ -67,6 +69,7 @@ class ResearchValidationEngine:
         return self.run_validation(config)
 
     def _run_single(self, config: ResearchRunConfig, problem) -> ResearchRunResult:
+        started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         start = time.perf_counter()
         attempts: list[dict[str, Any]] = []
         report = ""
@@ -88,13 +91,32 @@ class ResearchValidationEngine:
         )
         pipeline = build_pipeline_output(problem, report, answer_score, attempts)
         elapsed_ms = (time.perf_counter() - start) * 1000
+        finished_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         cfg_dict = config.to_dict()
         cfg_dict["problem_id"] = problem.id
+        run_id = str(uuid.uuid4())[:8]
+        cfg_hash = config_hash(config)
+        verification_invoked = bool(getattr(config, "enable_verification", False))
+
+        provenance_record = record_rvp_run(
+            self.db_path,
+            run_id=run_id,
+            config_hash=cfg_hash,
+            config=cfg_dict,
+            started_at=started_at,
+            finished_at=finished_at,
+            duration_ms=elapsed_ms,
+            stage=config.stage,
+            problem_id=problem.id,
+            answer_score=answer_score,
+            passed=answer_score >= self.PASS_THRESHOLD,
+            verification_invoked=verification_invoked,
+        )
 
         return ResearchRunResult(
-            run_id=str(uuid.uuid4())[:8],
-            config_hash=config_hash(config),
-            timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            run_id=run_id,
+            config_hash=cfg_hash,
+            timestamp=finished_at,
             stage=config.stage,
             problem_id=problem.id,
             config=cfg_dict,
@@ -103,10 +125,9 @@ class ResearchValidationEngine:
             passed=answer_score >= self.PASS_THRESHOLD,
             pipeline=pipeline,
             provenance={
+                **provenance_record.to_dict(),
                 "seed": config.seed,
-                "config_hash": config_hash(config),
                 "attempts": len(attempts),
-                "evidence_state": "measured",
                 "hidden_answer_accessed": False,
             },
             cost_ms=elapsed_ms,

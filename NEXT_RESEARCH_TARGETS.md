@@ -2,26 +2,26 @@
 
 ## ONE Recommended Initiative
 
-### H1-OBS — Evaluation Provenance Records
+### P3-WF — Mount Workflow Engine HTTP API
 
-Attach reproducible provenance (inputs, runtime, configuration, evidence tier) to every
-RVP and SCEP evaluation run. S0-E4 evidence gate is complete; provenance is the highest-leverage
-next step to make validation results independently auditable and replayable at scale.
+Expose the existing workflow engine (`axiom/workflow/`) via `/workflows/*` and link
+workflow runs to H1-OBS provenance records. H1-OBS is complete; autonomous research
+(Program 3) is blocked until workflows are callable over HTTP.
 
 ## Staged Progression
 
 | Priority | Target | Rationale |
 |---------:|--------|-----------|
-| 1 | Complete Stage 0 infrastructure runs | Establish replay and dashboard baseline |
-| 2 | Stage 1 known-answer batch (n≥50) | Measure answer-score trend before claiming improvement |
-| 3 | Wire LLM to research reports | Replace heuristic templates with model-backed reasoning |
-| 4 | Stage 2 paper reproduction pilots | Test on 5 canonical ML/math papers |
-| 5 | Per-user research isolation | Required before external validation participants |
+| 1 | Mount `/workflows` router in `main.py` | Code exists; 404 blocks autonomous research |
+| 2 | Merge research loop branch | Long-horizon discovery orchestration |
+| 3 | Stage 1 known-answer batch (n≥50) | Measure answer-score trend with provenance |
+| 4 | Wire LLM to research reports | Replace heuristic templates |
+| 5 | Formal prover CI (Lean 4) | Convert simulated proof tier to measured |
 
 ## Weak Dimensions (from latest runs)
 
-- **human intervention required** — 0.233
-- **recovery from failure** — 0.413
+- **human intervention required** — 0.219
+- **recovery from failure** — 0.408
 - **literature retrieval** — 0.600
 
 ---

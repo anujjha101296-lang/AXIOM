@@ -28,6 +28,7 @@ from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
 from axiom.services.api_gateway.routes.research_validation import router as rvp_router
+from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -80,6 +81,9 @@ app.include_router(research_router)
 
 # ── Research Validation Program (RVP) ───────────────────────────────────────
 app.include_router(rvp_router)
+
+# ── H1-OBS Run Provenance (SCEP + RVP audit records) ────────────────────────
+app.include_router(provenance_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path

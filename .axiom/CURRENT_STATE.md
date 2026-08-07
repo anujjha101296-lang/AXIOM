@@ -2,27 +2,29 @@
 
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
-**Last updated:** 2026-08-06
-**Active horizon:** Research Validation Program (RVP) — staged scientific validation
+**Last updated:** 2026-08-07
+**Active horizon:** Frontier Research Platform — H1-OBS provenance complete; autonomous research next
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI research platform. **Research Validation Program (RVP)** is operational with 266 known-answer problems, 10-dimension Research Capability Score, discovery pipeline outputs, replay, and dashboard API (`/rvp/*`). S0-E4 evidence gate complete. Engineering Governance System operational.
+AXIOM is a Python/FastAPI research platform. **H1-OBS Evaluation Provenance Records** now link every SCEP and RVP run to auditable inputs, runtime, configuration, environment, and evidence tier. RVP operational (266 problems). S0-E4 evidence gate complete. Engineering Governance operational.
 
 ## Completed
 
 - **S0-E2/E3/E4:** Test baseline, verification truthfulness, EPIC-002 evidence gate.
 - **Engineering Governance System:** `make engineering-health`, council reviews, health reports.
 - **Research Validation Program:** `axiom/research_validation/` — stages 0–6, known-answer dataset (266 problems), capability scoring, pipeline artifacts, reproducibility, dashboard, API, `make research-validation`.
-- **Core tests:** **176/176** pass (`pytest tests/ --ignore=tests/e2e`).
+- **H1-OBS:** Unified `run_provenance` table, `/provenance/*` API, SCEP+RVP integration — see `docs/H1-OBS_run_provenance.md`.
+- **Verification review:** `VERIFIED_CAPABILITIES.md`, `IMPLEMENTATION_MATRIX.md`, `PRODUCT_READINESS.md`, `RESEARCH_READINESS.md`.
+- **Core tests:** **189/189** pass (`pytest tests/ --ignore=tests/e2e`).
 
 ## Blocked
 
-- None for RVP infrastructure validation.
+- None for provenance infrastructure.
 
 ## Highest priority
 
-**H1-OBS** — Add reproducible run/provenance records linking RVP and SCEP evaluation runs (see `NEXT_RESEARCH_TARGETS.md`).
+**Mount workflow API + merge research loop** — unlock autonomous research (Program 3). See `FRONTIER_RESEARCH_PLATFORM.md`.
 
 ## Worktree integrity
 
