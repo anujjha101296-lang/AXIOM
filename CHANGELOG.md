@@ -8,7 +8,47 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
-### Sprint 0 — Production Foundation
+### SIMR — Scientific Intelligence & Model Routing (2026-08-08)
+- **SIMR v1:** `.axiom/SIMR.md`, model/tool registries, capability graph, routing policy docs
+- **Model registry:** 5 models with capability scores and fallback chains
+- **Tool registry:** Scientific tools + workflow workers with TSS risk classes
+- **Router:** Problem profiling, strategy generation, verification-aware selection
+- **Research compiler:** Problem → capability graph → execution plan
+- **Failure memory:** Model failure tracking and adaptive deprioritization
+- **API:** `/routing/*` routes with optional authentication
+- **Integration:** Research Q&A uses router instead of hardcoded model
+- **Health check:** `scripts/simr_health_check.py`, `make simr-health`
+- **Tests:** `tests/test_simr_routing.py` (14 tests)
+
+### E&R — Evidence & Reproducibility Loop (2026-08-08)
+- **E&R v1:** `.axiom/ERL.md`, evidence/reproducibility/verification status reports
+- **Claim registry:** SQLite `er_*` tables with versioned claims and provenance graph
+- **Discovery gate:** status upgrades and discovery labels require evidence and verification
+- **API:** `/evidence/*` routes with optional authentication
+- **Reproduction:** `compare_provenance_runs()` integrated with H1-OBS provenance
+- **Health check:** `scripts/erl_health_check.py`, `make erl-health`
+- **Tests:** `tests/test_evidence_registry.py` (12 tests)
+
+### TSS — Trust, Security & Safety Loop (2026-08-08)
+- **TSS v1:** `.axiom/TSS.md`, security scorecards, incident runbook
+- **Production guard:** blocks insecure production startup; audits config on API boot
+- **Optional route auth:** `/eval`, `/gcp`, `/provenance` (enable via env in production)
+- **Secret scanner:** `scripts/tss_security_check.py`, `make tss-security`
+- **Agent safety:** `ToolRiskClass` + prompt-injection heuristics
+
+### H1-OBS — Run Provenance (2026-08-08)
+- **Unified provenance:** `run_provenance` SQLite table for SCEP evaluation runs
+- **API:** `GET /provenance/runs`, `GET /provenance/runs/{type}/{id}`, `GET /eval/runs/{id}`
+- **Integration:** `POST /eval/run` and CLI benchmark runner record provenance automatically
+- **Tests:** `tests/test_run_provenance.py` (9 tests)
+
+### CEL — Continuous Evolution Loop (2026-08-08)
+- **S0-E4 evidence gate:** `EvidenceState` enum; capability snapshots and prize readiness expose `evidence_tier`, `benchmark_count`, and `limitations`
+- **CEL artifacts:** `.axiom/CEL.md`, `TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`
+- **Health check:** `scripts/cel_health_check.py`, `make cel-health`
+- **Tests:** `tests/test_s0_e4_evidence_gate.py`
+
+### AXIOM Operating System v1.0
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)
 - Added structured JSON logging via `structlog` (`axiom/observability/logger.py`)

@@ -5,8 +5,62 @@ Core benchmark models, scoring schemas, and the level-classification engine.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
+
+
+class EvidenceState(StrEnum):
+    """How a capability score was produced (S0-E4 evidence gate)."""
+
+    MEASURED = "measured"
+    SIMULATED = "simulated"
+    ESTIMATED = "estimated"
+    BASELINE = "baseline"
+    UNAVAILABLE = "unavailable"
+
+
+_EVIDENCE_RANK = {
+    EvidenceState.UNAVAILABLE: 0,
+    EvidenceState.BASELINE: 1,
+    EvidenceState.ESTIMATED: 2,
+    EvidenceState.SIMULATED: 3,
+    EvidenceState.MEASURED: 4,
+}
+
+
+def derive_evidence_state(
+    benchmark_count: int,
+    *,
+    estimated: bool = False,
+    simulated: bool = False,
+    baseline: bool = False,
+) -> EvidenceState:
+    """Classify evidence quality for a dimension score."""
+    if baseline:
+        return EvidenceState.BASELINE
+    if benchmark_count <= 0:
+        return EvidenceState.UNAVAILABLE
+    if estimated:
+        return EvidenceState.ESTIMATED
+    if simulated:
+        return EvidenceState.SIMULATED
+    return EvidenceState.MEASURED
+
+
+def rollup_evidence_tier(states: dict[str, str]) -> dict[str, Any]:
+    """Compute aggregate evidence tier from per-dimension states."""
+    if not states:
+        return {"aggregate": EvidenceState.UNAVAILABLE.value, "dimensions": {}}
+    numeric = {
+        k: _EVIDENCE_RANK.get(EvidenceState(v), 0) for k, v in states.items()
+    }
+    min_rank = min(numeric.values())
+    rank_to_state = {v: k.value for k, v in _EVIDENCE_RANK.items()}
+    return {
+        "aggregate": rank_to_state.get(min_rank, EvidenceState.UNAVAILABLE.value),
+        "dimensions": states,
+        "weakest_dimension": min(numeric, key=numeric.get),
+    }
 
 
 class CapabilityDimension(str, Enum):
@@ -87,6 +141,7 @@ class DimensionScore:
     confidence: float     # 0.0 – 1.0: statistical confidence in score
     benchmark_count: int  # number of benchmark cases contributing
     estimated: bool = False  # True if score is estimated (no benchmark evidence)
+    evidence_state: EvidenceState = EvidenceState.UNAVAILABLE
 
     @property
     def weighted_score(self) -> float:
@@ -101,6 +156,8 @@ class CapabilitySnapshot:
     dimension_scores: list[DimensionScore] = field(default_factory=list)
     composite_score: float = 0.0
     estimated_dimensions: list[str] = field(default_factory=list)
+    evidence_tier: dict[str, Any] = field(default_factory=dict)
+    limitations: list[str] = field(default_factory=list)
 
     def compute_composite(self) -> float:
         """S_composite = Σ w_d × S_d"""
@@ -109,7 +166,32 @@ class CapabilitySnapshot:
         self.estimated_dimensions = [
             s.dimension.value for s in self.dimension_scores if s.estimated
         ]
+        states = {s.dimension.value: s.evidence_state.value for s in self.dimension_scores}
+        self.evidence_tier = rollup_evidence_tier(states)
+        self.limitations = self._build_limitations()
         return self.composite_score
+
+    def _build_limitations(self) -> list[str]:
+        limits: list[str] = []
+        for s in self.dimension_scores:
+            if s.evidence_state == EvidenceState.SIMULATED:
+                limits.append(
+                    f"{s.dimension.value}: simulated formal verification — not compiler-backed proof"
+                )
+            elif s.evidence_state == EvidenceState.ESTIMATED:
+                limits.append(f"{s.dimension.value}: estimated score — limited benchmark evidence")
+            elif s.evidence_state == EvidenceState.BASELINE:
+                limits.append(f"{s.dimension.value}: baseline placeholder — run benchmarks for measurement")
+            elif s.benchmark_count == 0:
+                limits.append(f"{s.dimension.value}: no benchmark cases executed")
+        if self.estimated_dimensions:
+            limits.append(
+                f"Composite includes estimated dimensions: {', '.join(self.estimated_dimensions)}"
+            )
+        agg = self.evidence_tier.get("aggregate", EvidenceState.UNAVAILABLE.value)
+        if agg in (EvidenceState.SIMULATED.value, EvidenceState.BASELINE.value, EvidenceState.ESTIMATED.value):
+            limits.append(f"Aggregate evidence tier is '{agg}' — do not treat scores as independently verified")
+        return limits
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -117,6 +199,8 @@ class CapabilitySnapshot:
             "timestamp": self.timestamp,
             "composite_score": self.composite_score,
             "estimated_dimensions": self.estimated_dimensions,
+            "evidence_tier": self.evidence_tier,
+            "limitations": self.limitations,
             "dimensions": {
                 s.dimension.value: {
                     "score": s.raw_score,
@@ -125,6 +209,7 @@ class CapabilitySnapshot:
                     "confidence": s.confidence,
                     "benchmark_count": s.benchmark_count,
                     "estimated": s.estimated,
+                    "evidence_state": s.evidence_state.value,
                     "weighted": s.weighted_score,
                 }
                 for s in self.dimension_scores
@@ -147,9 +232,18 @@ def make_dimension_score(
     benchmark_count: int,
     confidence: float = 0.8,
     estimated: bool = False,
+    simulated: bool = False,
+    baseline: bool = False,
+    evidence_state: EvidenceState | None = None,
 ) -> DimensionScore:
-    """Construct a DimensionScore with level classification."""
+    """Construct a DimensionScore with level classification and evidence state."""
     level = classify_level(raw_score, dimension)
+    state = evidence_state or derive_evidence_state(
+        benchmark_count,
+        estimated=estimated,
+        simulated=simulated,
+        baseline=baseline,
+    )
     return DimensionScore(
         dimension=dimension,
         raw_score=round(raw_score, 4),
@@ -158,4 +252,28 @@ def make_dimension_score(
         confidence=confidence,
         benchmark_count=benchmark_count,
         estimated=estimated,
+        evidence_state=state,
+    )
+
+
+# Dimensions that use simulated formal verification when compilers are absent
+_SIMULATED_DIMENSIONS = frozenset({CapabilityDimension.PROOF_VERIFICATION})
+
+
+def make_dimension_score_from_benchmark(
+    dimension: CapabilityDimension,
+    raw_score: float,
+    benchmark_count: int,
+    confidence: float = 0.8,
+    estimated: bool = False,
+) -> DimensionScore:
+    """Build dimension score with correct simulated flag for proof verification."""
+    simulated = dimension in _SIMULATED_DIMENSIONS and benchmark_count > 0
+    return make_dimension_score(
+        dimension,
+        raw_score,
+        benchmark_count,
+        confidence=confidence,
+        estimated=estimated,
+        simulated=simulated,
     )
