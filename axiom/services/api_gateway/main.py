@@ -22,11 +22,15 @@ from axiom.core.verification.smt_gateway import SmtGateway
 from axiom.evaluation.prize_readiness import PrizeReadinessScorer
 from axiom.observability.logger import configure_logging, get_logger
 from axiom.observability.metrics import METRICS
+from axiom.security.production_guard import audit_security_config, enforce_production_security
 from axiom.services.api_gateway.auth import verify_token
 from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
+from axiom.services.api_gateway.routes.gcp_api import router as gcp_router
+from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
+from axiom.services.api_gateway.routes.evidence_api import router as evidence_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -39,6 +43,18 @@ async def lifespan(app: FastAPI):
     """Run startup tasks, yield, then run shutdown tasks."""
     logger.info("AXIOM API Gateway starting up",
                 extra={"version": settings.app_version, "env": settings.environment})
+    enforce_production_security(settings)
+    for finding in audit_security_config(settings):
+        log_fn = logger.warning if finding.severity in ("critical", "high") else logger.info
+        log_fn(
+            "security_audit",
+            extra={
+                "finding_id": finding.id,
+                "severity": finding.severity,
+                "component": finding.component,
+                "message": finding.message,
+            },
+        )
     # Run database migrations on startup
     if store.conn:
         run_migrations(store.conn)
@@ -76,6 +92,15 @@ app.include_router(mde_router)
 
 # ── Research Workspace (projects, PDFs, notes, search, sessions) ──────────────
 app.include_router(research_router)
+
+# ── Grand Challenge Program (long-term scientific campaigns) ─────────────────
+app.include_router(gcp_router)
+
+# ── H1-OBS Run Provenance (SCEP audit records) ──────────────────────────────
+app.include_router(provenance_router)
+
+# ── E&R Evidence & Reproducibility Loop ───────────────────────────────────────
+app.include_router(evidence_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
