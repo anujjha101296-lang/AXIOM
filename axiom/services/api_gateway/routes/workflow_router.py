@@ -14,6 +14,8 @@ from typing import Any, Optional
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 
+from axiom.config import settings
+from axiom.scientific_method.engine import SMEBypassError, ScientificMethodEngine
 from axiom.workflow import (
     WorkflowEngine, WorkflowStatus, Workflow, WorkflowResult,
     get_engine,
@@ -27,7 +29,8 @@ workflow_router = APIRouter(prefix="/workflows", tags=["workflow"])
 
 class CreateWorkflowRequest(BaseModel):
     objective: str
-    domain: str = "general"
+    domain: str = "research"
+    sme_session_id: str
     metadata: dict[str, Any] = {}
 
 
@@ -74,15 +77,25 @@ def _summarize(workflow: Workflow) -> WorkflowSummary:
 @workflow_router.post("", response_model=WorkflowSummary, status_code=201)
 async def create_workflow(body: CreateWorkflowRequest):
     """
-    Create a new workflow.
-    The workflow is not started automatically — call POST /workflows/{id}/run.
+    Create a new SME-governed workflow.
+    Requires a completed SME session (POST /sme/sessions/{id}/run first).
     """
-    engine = get_engine()
+    sme = ScientificMethodEngine(settings.db_path)
+    try:
+        sme.validate_workflow_gate(
+            body.domain, body.sme_session_id, require_completed=True
+        )
+    except SMEBypassError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+    engine = get_engine(settings.db_path)
+    metadata = {**body.metadata, "sme_session_id": body.sme_session_id}
     workflow = engine.create_workflow(
         objective=body.objective,
         domain=body.domain,
-        metadata=body.metadata,
+        metadata=metadata,
     )
+    sme.link_workflow(body.sme_session_id, workflow.id)
     return _summarize(workflow)
 
 
@@ -92,7 +105,7 @@ async def list_workflows(
     limit: int = 50,
 ):
     """List workflows, optionally filtered by status."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     wf_status = WorkflowStatus(status) if status else None
     workflows = engine.list_workflows(status=wf_status, limit=limit)
     return [_summarize(w) for w in workflows]
@@ -101,7 +114,7 @@ async def list_workflows(
 @workflow_router.get("/{workflow_id}")
 async def get_workflow(workflow_id: str):
     """Get full workflow state including all tasks."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     workflow = engine.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(status_code=404, detail=f"Workflow '{workflow_id}' not found")
@@ -114,7 +127,7 @@ async def run_workflow(workflow_id: str, background_tasks: BackgroundTasks):
     Start executing a workflow.
     Runs in the background; poll GET /workflows/{id} for status.
     """
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     workflow = engine.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(status_code=404, detail=f"Workflow '{workflow_id}' not found")
@@ -138,7 +151,7 @@ async def _run_in_background(engine: WorkflowEngine, workflow_id: str) -> None:
 @workflow_router.post("/{workflow_id}/pause")
 async def pause_workflow(workflow_id: str):
     """Pause a running workflow (current batch completes, then stops)."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     await engine.pause(workflow_id)
     return {"message": "Pause requested", "workflow_id": workflow_id}
 
@@ -146,7 +159,7 @@ async def pause_workflow(workflow_id: str):
 @workflow_router.post("/{workflow_id}/resume")
 async def resume_workflow(workflow_id: str, background_tasks: BackgroundTasks):
     """Resume a paused workflow from the latest checkpoint."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     workflow = engine.get_workflow(workflow_id)
     if workflow is None:
         raise HTTPException(status_code=404, detail=f"Workflow '{workflow_id}' not found")
@@ -157,7 +170,7 @@ async def resume_workflow(workflow_id: str, background_tasks: BackgroundTasks):
 @workflow_router.post("/{workflow_id}/cancel")
 async def cancel_workflow(workflow_id: str):
     """Cancel a running or paused workflow."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     await engine.cancel(workflow_id)
     return {"message": "Cancellation requested", "workflow_id": workflow_id}
 
@@ -165,7 +178,7 @@ async def cancel_workflow(workflow_id: str):
 @workflow_router.post("/{workflow_id}/approve")
 async def approve_task(workflow_id: str, body: ApproveRequest):
     """Unblock a task that is waiting for human approval."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     await engine.approve(workflow_id, body.task_id)
     return {"message": "Task approved", "task_id": body.task_id}
 
@@ -173,7 +186,7 @@ async def approve_task(workflow_id: str, body: ApproveRequest):
 @workflow_router.get("/{workflow_id}/artifacts")
 async def get_artifacts(workflow_id: str):
     """Get all artifacts produced by a workflow."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     artifacts = engine.get_artifacts(workflow_id)
     return [a.model_dump(mode="json") for a in artifacts]
 
@@ -181,7 +194,7 @@ async def get_artifacts(workflow_id: str):
 @workflow_router.get("/{workflow_id}/artifacts/{artifact_id}")
 async def get_artifact(workflow_id: str, artifact_id: str):
     """Get a specific artifact by ID."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     store = engine.artifact_store
     artifact = store.get(artifact_id)
     if artifact is None or artifact.workflow_id != workflow_id:
@@ -192,7 +205,7 @@ async def get_artifact(workflow_id: str, artifact_id: str):
 @workflow_router.get("/{workflow_id}/events")
 async def get_events(workflow_id: str):
     """Get the full event log for a workflow."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     events = engine.get_events(workflow_id)
     return [e.model_dump(mode="json") for e in events]
 
@@ -200,7 +213,7 @@ async def get_events(workflow_id: str):
 @workflow_router.get("/{workflow_id}/checkpoints")
 async def get_checkpoints(workflow_id: str):
     """List all checkpoints for a workflow (for recovery)."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     checkpoints = engine.get_checkpoints(workflow_id)
     return [c.model_dump(mode="json") for c in checkpoints]
 
@@ -210,7 +223,7 @@ async def replay_from_checkpoint(
     workflow_id: str, checkpoint_id: str, background_tasks: BackgroundTasks
 ):
     """Replay a workflow from a specific checkpoint."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     background_tasks.add_task(engine.replay_from_checkpoint, workflow_id, checkpoint_id)
     return {
         "message": "Replay started from checkpoint",
@@ -222,5 +235,5 @@ async def replay_from_checkpoint(
 @workflow_router.get("/workers/list")
 async def list_workers():
     """List all registered workers and their capabilities."""
-    engine = get_engine()
+    engine = get_engine(settings.db_path)
     return engine.registry.list_all()

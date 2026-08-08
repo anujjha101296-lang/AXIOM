@@ -13,8 +13,13 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 3 | R0-PLAN | Establish the initial researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
 | 4 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
 | 5 | S0-E3 | Audit verification routes/models for simulation versus formal-proof truthfulness. | S0-E2 test baseline | Regression tests prove fallback results cannot claim formal verification. | **Complete** |
-| 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Ready — highest priority** |
-| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | Deferred |
+| 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Complete** — see `docs/S0-E4_evidence_gate.md` |
+| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | **Complete** — see `docs/H1-OBS_run_provenance.md` |
+| 8 | RVP-1 | Research Validation Program — staged benchmarks and capability scoring. | S0-E4 | 200+ known-answer problems, capability score, pipeline outputs, dashboard. | **Complete** — see `RESEARCH_VALIDATION.md` |
+| 9 | P3-WF | Mount workflow engine HTTP API (`/workflows/*`). | H1-OBS | Workflow create/run/status via API; provenance linked. | **Complete** — SME-gated |
+| 10 | SME-1 | Scientific Method Engine — mandatory 10-phase research workflow. | H1-OBS, P3-WF | All research workflows require completed SME session; 10 phases enforced. | **Complete** — see `docs/SME_scientific_method_engine.md` |
+| 11 | ACA-1 | AXIOM Cognitive Architecture — permanent 9-layer reasoning model. | SME-1 | 9 layers delegate to existing subsystems; model providers interchangeable. | **Complete** — see `docs/ACA_cognitive_architecture.md` |
+| 12 | P3-RL | Merge research loop through ACA+SME-gated workflows. | ACA-1, SME-1 | Long-horizon discovery runs through full cognitive + scientific stack. | **Ready — highest priority** |
 
 ## Queue protocol
 

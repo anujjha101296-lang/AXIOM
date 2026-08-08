@@ -634,6 +634,7 @@ _default_engine: WorkflowEngine | None = None
 
 def get_engine(db_path: str | Path = _DEFAULT_DB) -> WorkflowEngine:
     global _default_engine
-    if _default_engine is None:
-        _default_engine = WorkflowEngine(db_path=db_path)
+    resolved = str(db_path)
+    if _default_engine is None or str(_default_engine.store.db_path) != resolved:
+        _default_engine = WorkflowEngine(db_path=resolved)
     return _default_engine

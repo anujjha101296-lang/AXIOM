@@ -1,0 +1,3999 @@
+[
+  {
+    "id": "ka_algebra_sum_n",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Sum of First n Integers",
+    "problem_statement": "Find a closed-form formula for 1+2+...+n and verify for n=100.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "n(n+1)/2; sum for n=100 is 5050",
+    "answer_keywords": [
+      "n(n+1)/2",
+      "5050",
+      "closed form",
+      "gauss",
+      "arithmetic"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_nt_primes_infinite",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Infinitude of Primes",
+    "problem_statement": "Prove or justify that there are infinitely many primes.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "Euclid's proof by contradiction on prime product + 1",
+    "answer_keywords": [
+      "euclid",
+      "infinite",
+      "contradiction",
+      "prime",
+      "product"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_geom_euler_polyhedra",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Euler's Polyhedron Formula",
+    "problem_statement": "State and verify V - E + F = 2 for a cube.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "V=8, E=12, F=6; V-E+F=2",
+    "answer_keywords": [
+      "v - e + f",
+      "euler",
+      "2",
+      "cube",
+      "8",
+      "12",
+      "6"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_binary_search",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Binary Search Complexity",
+    "problem_statement": "What is the time complexity of binary search on a sorted array of n elements?",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(log n)",
+    "answer_keywords": [
+      "o(log n)",
+      "logarithm",
+      "log n",
+      "binary search"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_newton_second",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Newton's Second Law",
+    "problem_statement": "State Newton's second law and give units in SI for force.",
+    "difficulty": "high_school",
+    "hidden_answer": "F=ma; newton = kg\u00b7m/s\u00b2",
+    "answer_keywords": [
+      "f=ma",
+      "force",
+      "mass",
+      "acceleration",
+      "newton"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_repro_linear_reg",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Linear Regression MSE",
+    "problem_statement": "Reproduce the MSE formula for linear regression with predictions \u0177 and targets y.",
+    "difficulty": "graduate",
+    "hidden_answer": "MSE = (1/n) \u03a3(y - \u0177)\u00b2",
+    "answer_keywords": [
+      "mse",
+      "mean squared error",
+      "(y",
+      "prediction",
+      "1/n"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_000",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 1",
+    "problem_statement": "Find the remainder when 10 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "3",
+    "answer_keywords": [
+      "remainder",
+      "3"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_001",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 2",
+    "problem_statement": "How many positive divisors does 13 have?",
+    "difficulty": "contest",
+    "hidden_answer": "2",
+    "answer_keywords": [
+      "divisor",
+      "2"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_002",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 3",
+    "problem_statement": "Solve x\u00b2 - 7x + 8 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_003",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 4",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+19\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "2470",
+    "answer_keywords": [
+      "sum of squares",
+      "2470"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_004",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 5",
+    "problem_statement": "Is 25 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_005",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 6",
+    "problem_statement": "Find the remainder when 25 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "4",
+    "answer_keywords": [
+      "remainder",
+      "4"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_006",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 7",
+    "problem_statement": "How many positive divisors does 28 have?",
+    "difficulty": "contest",
+    "hidden_answer": "6",
+    "answer_keywords": [
+      "divisor",
+      "6"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_007",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 8",
+    "problem_statement": "Solve x\u00b2 - 12x + 13 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_008",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 9",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+34\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "13685",
+    "answer_keywords": [
+      "sum of squares",
+      "13685"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_009",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 10",
+    "problem_statement": "Is 15 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_010",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 11",
+    "problem_statement": "Find the remainder when 40 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "5",
+    "answer_keywords": [
+      "remainder",
+      "5"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_011",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 12",
+    "problem_statement": "How many positive divisors does 43 have?",
+    "difficulty": "contest",
+    "hidden_answer": "2",
+    "answer_keywords": [
+      "divisor",
+      "2"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_012",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 13",
+    "problem_statement": "Solve x\u00b2 - 7x + 10 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_013",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 14",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+49\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "40425",
+    "answer_keywords": [
+      "sum of squares",
+      "40425"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_014",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 15",
+    "problem_statement": "Is 45 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_015",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 16",
+    "problem_statement": "Find the remainder when 55 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "6",
+    "answer_keywords": [
+      "remainder",
+      "6"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_016",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 17",
+    "problem_statement": "How many positive divisors does 58 have?",
+    "difficulty": "contest",
+    "hidden_answer": "4",
+    "answer_keywords": [
+      "divisor",
+      "4"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_017",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 18",
+    "problem_statement": "Solve x\u00b2 - 12x + 7 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_018",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 19",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+64\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "89440",
+    "answer_keywords": [
+      "sum of squares",
+      "89440"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_019",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 20",
+    "problem_statement": "Is 55 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_020",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 21",
+    "problem_statement": "Find the remainder when 70 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "0",
+    "answer_keywords": [
+      "remainder",
+      "0"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_021",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 22",
+    "problem_statement": "How many positive divisors does 73 have?",
+    "difficulty": "contest",
+    "hidden_answer": "2",
+    "answer_keywords": [
+      "divisor",
+      "2"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_022",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 23",
+    "problem_statement": "Solve x\u00b2 - 7x + 12 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_023",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 24",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+79\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "167480",
+    "answer_keywords": [
+      "sum of squares",
+      "167480"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_024",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 25",
+    "problem_statement": "Is 15 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_025",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 26",
+    "problem_statement": "Find the remainder when 85 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "1",
+    "answer_keywords": [
+      "remainder",
+      "1"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_026",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 27",
+    "problem_statement": "How many positive divisors does 88 have?",
+    "difficulty": "contest",
+    "hidden_answer": "8",
+    "answer_keywords": [
+      "divisor",
+      "8"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_027",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 28",
+    "problem_statement": "Solve x\u00b2 - 12x + 9 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_028",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 29",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+94\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "281295",
+    "answer_keywords": [
+      "sum of squares",
+      "281295"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_029",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 30",
+    "problem_statement": "Is 75 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_030",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 31",
+    "problem_statement": "Find the remainder when 100 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "2",
+    "answer_keywords": [
+      "remainder",
+      "2"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_031",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 32",
+    "problem_statement": "How many positive divisors does 103 have?",
+    "difficulty": "contest",
+    "hidden_answer": "2",
+    "answer_keywords": [
+      "divisor",
+      "2"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_032",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 33",
+    "problem_statement": "Solve x\u00b2 - 7x + 6 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_033",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 34",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+109\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "437635",
+    "answer_keywords": [
+      "sum of squares",
+      "437635"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_034",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 35",
+    "problem_statement": "Is 85 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_035",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 36",
+    "problem_statement": "Find the remainder when 115 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "3",
+    "answer_keywords": [
+      "remainder",
+      "3"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_036",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 37",
+    "problem_statement": "How many positive divisors does 118 have?",
+    "difficulty": "contest",
+    "hidden_answer": "4",
+    "answer_keywords": [
+      "divisor",
+      "4"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_037",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 38",
+    "problem_statement": "Solve x\u00b2 - 12x + 11 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_038",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 39",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+124\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "643250",
+    "answer_keywords": [
+      "sum of squares",
+      "643250"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_039",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 40",
+    "problem_statement": "Is 15 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_040",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 41",
+    "problem_statement": "Find the remainder when 130 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "4",
+    "answer_keywords": [
+      "remainder",
+      "4"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_041",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 42",
+    "problem_statement": "How many positive divisors does 133 have?",
+    "difficulty": "contest",
+    "hidden_answer": "4",
+    "answer_keywords": [
+      "divisor",
+      "4"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_042",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 43",
+    "problem_statement": "Solve x\u00b2 - 7x + 8 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_043",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 44",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+139\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "904890",
+    "answer_keywords": [
+      "sum of squares",
+      "904890"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_044",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 45",
+    "problem_statement": "Is 105 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_045",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 46",
+    "problem_statement": "Find the remainder when 145 is divided by 7.",
+    "difficulty": "contest",
+    "hidden_answer": "5",
+    "answer_keywords": [
+      "remainder",
+      "5"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_046",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 47",
+    "problem_statement": "How many positive divisors does 148 have?",
+    "difficulty": "contest",
+    "hidden_answer": "6",
+    "answer_keywords": [
+      "divisor",
+      "6"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_047",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 48",
+    "problem_statement": "Solve x\u00b2 - 12x + 13 = 0 for integer roots.",
+    "difficulty": "contest",
+    "hidden_answer": "roots 2, 3",
+    "answer_keywords": [
+      "2",
+      "3",
+      "factor"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_048",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 49",
+    "problem_statement": "Compute the sum of squares 1\u00b2+2\u00b2+...+154\u00b2.",
+    "difficulty": "contest",
+    "hidden_answer": "1229305",
+    "answer_keywords": [
+      "sum of squares",
+      "1229305"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_olympiad_049",
+    "stage": 1,
+    "category": "mathematical_olympiad",
+    "title": "Olympiad Problem 50",
+    "problem_statement": "Is 115 prime? Justify.",
+    "difficulty": "contest",
+    "hidden_answer": "no",
+    "answer_keywords": [
+      "prime",
+      "no"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_000",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 1)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_001",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 2)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_002",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 3)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_003",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 4)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_004",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 5)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_005",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 6)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_006",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 7)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_007",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 8)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_008",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 9)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_009",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 10)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_010",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 11)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_011",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 12)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_012",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 13)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_013",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 14)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_014",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 15)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_015",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 16)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_016",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 17)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_017",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 18)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_018",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 19)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_019",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 20)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_020",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 21)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_021",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 22)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_022",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 23)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_023",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 24)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_024",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 25)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_025",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Pythagorean Theorem (variant 26)",
+    "problem_statement": "State Pythagorean Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a\u00b2+b\u00b2=c\u00b2 for right triangles",
+    "answer_keywords": [
+      "pythagorean",
+      "a^2",
+      "right"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_026",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fermat's Little Theorem (variant 27)",
+    "problem_statement": "State Fermat's Little Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "a^(p-1) \u2261 1 (mod p) for prime p",
+    "answer_keywords": [
+      "fermat",
+      "mod",
+      "prime"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_027",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Bayes' Theorem (variant 28)",
+    "problem_statement": "State Bayes' Theorem and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "P(A|B) = P(B|A)P(A)/P(B)",
+    "answer_keywords": [
+      "bayes",
+      "conditional",
+      "probability"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_028",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Fundamental Theorem of Calculus (variant 29)",
+    "problem_statement": "State Fundamental Theorem of Calculus and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "\u222b\u2090\u1d47 f'(x)dx = f(b)-f(a)",
+    "answer_keywords": [
+      "fundamental",
+      "calculus",
+      "integral"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_theorem_029",
+    "stage": 1,
+    "category": "historical_theorem",
+    "title": "Cauchy-Schwarz (variant 30)",
+    "problem_statement": "State Cauchy-Schwarz and give one application.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "(\u03a3a\u1d62b\u1d62)\u00b2 \u2264 (\u03a3a\u1d62\u00b2)(\u03a3b\u1d62\u00b2)",
+    "answer_keywords": [
+      "cauchy",
+      "schwarz",
+      "inequality"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_000",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 1",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_001",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 2",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_002",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 3",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_003",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 4",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_004",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 5",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_005",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 6",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_006",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 7",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_007",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 8",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_008",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 9",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_009",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 10",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_010",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 11",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_011",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 12",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_012",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 13",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_013",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 14",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_014",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 15",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_015",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 16",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_016",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 17",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_017",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 18",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_018",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 19",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_019",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 20",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_020",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 21",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_021",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 22",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_022",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 23",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_023",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 24",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_024",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 25",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_025",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 26",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_026",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 27",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_027",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 28",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_028",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 29",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_029",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 30",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_030",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 31",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_031",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 32",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_032",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 33",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_033",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 34",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_034",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 35",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_035",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 36",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_036",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 37",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_037",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 38",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_038",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 39",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_039",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 40",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_040",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 41",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_041",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 42",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_042",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 43",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_043",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 44",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_044",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 45",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_045",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dijkstra Analysis 46",
+    "problem_statement": "Analyze time complexity of Dijkstra on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "shortest path O((V+E) log V)",
+    "answer_keywords": [
+      "dijkstra",
+      "shortest",
+      "priority queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_046",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Merge sort Analysis 47",
+    "problem_statement": "Analyze time complexity of Merge sort on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(n log n) comparisons",
+    "answer_keywords": [
+      "merge sort",
+      "o(n log n)",
+      "divide"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_047",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Dynamic programming knapsack Analysis 48",
+    "problem_statement": "Analyze time complexity of Dynamic programming knapsack on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(nW) pseudo-polynomial",
+    "answer_keywords": [
+      "knapsack",
+      "dynamic programming",
+      "o(nw)"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_048",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "BFS Analysis 49",
+    "problem_statement": "Analyze time complexity of BFS on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(V+E) graph traversal",
+    "answer_keywords": [
+      "bfs",
+      "breadth",
+      "queue"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_algo_049",
+    "stage": 1,
+    "category": "algorithm_design",
+    "title": "Hash table lookup Analysis 50",
+    "problem_statement": "Analyze time complexity of Hash table lookup on typical inputs.",
+    "difficulty": "undergraduate",
+    "hidden_answer": "O(1) average",
+    "answer_keywords": [
+      "hash",
+      "o(1)",
+      "average"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_000",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_001",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_002",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_003",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_004",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_005",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_006",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_007",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_008",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_009",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_010",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_011",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_012",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_013",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_014",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_015",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_016",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_017",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_018",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_019",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_020",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_021",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_022",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_023",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_024",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_025",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Attention Is All You Need",
+    "problem_statement": "Summarize the core contribution of 'Attention Is All You Need' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "scaled dot-product attention",
+    "answer_keywords": [
+      "attention",
+      "transformer",
+      "query",
+      "key"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_026",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: ResNet",
+    "problem_statement": "Summarize the core contribution of 'ResNet' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "skip connections enable deep training",
+    "answer_keywords": [
+      "residual",
+      "skip",
+      "deep"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_027",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Adam optimizer",
+    "problem_statement": "Summarize the core contribution of 'Adam optimizer' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "adaptive moment estimation",
+    "answer_keywords": [
+      "adam",
+      "learning rate",
+      "momentum"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_028",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: PageRank",
+    "problem_statement": "Summarize the core contribution of 'PageRank' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "eigenvector centrality on web graph",
+    "answer_keywords": [
+      "pagerank",
+      "eigenvector",
+      "markov"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_paper_029",
+    "stage": 2,
+    "category": "paper_reproduction",
+    "title": "Reproduce: Word2Vec",
+    "problem_statement": "Summarize the core contribution of 'Word2Vec' and one equation or algorithm.",
+    "difficulty": "graduate",
+    "hidden_answer": "CBOW and skip-gram embeddings",
+    "answer_keywords": [
+      "word2vec",
+      "embedding",
+      "cbow"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_000",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 1",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_001",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 2",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_002",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 3",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_003",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 4",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_004",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 5",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_005",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 6",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_006",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 7",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_007",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 8",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_008",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 9",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_009",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 10",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_010",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 11",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_011",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 12",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_012",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 13",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_013",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 14",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_014",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 15",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_015",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 16",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_016",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 17",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_017",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 18",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_018",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 19",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_019",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 20",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_020",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 21",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_021",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 22",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_022",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 23",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_023",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 24",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_024",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 25",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_025",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 26",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_026",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 27",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_027",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 28",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_028",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 29",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_029",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 30",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_030",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 31",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_031",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 32",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_032",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 33",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_033",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 34",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_034",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 35",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_035",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 36",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_036",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 37",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_037",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 38",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_038",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 39",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_039",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 40",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_040",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 41",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_041",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 42",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_042",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 43",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_043",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 44",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_044",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 45",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_045",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 46",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_046",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 47",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_047",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 48",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_048",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 49",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_049",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 50",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_050",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 51",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_051",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 52",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_052",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 53",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_053",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 54",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_054",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 55",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_055",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 56",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_056",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 57",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_057",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 58",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_058",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 59",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_059",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 60",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_060",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 61",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_061",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 62",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_062",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 63",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_063",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 64",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_064",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 65",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_065",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 66",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_066",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 67",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_067",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 68",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_068",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 69",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_069",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 70",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_070",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 71",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_071",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 72",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_072",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 73",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_073",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 74",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_074",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 75",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_075",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 76",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_076",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 77",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_077",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 78",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_078",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 79",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_079",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 80",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_080",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 81",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_081",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 82",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_082",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 83",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_083",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 84",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_084",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 85",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_085",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ohm's law Application 86",
+    "problem_statement": "Apply Ohm's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "V=IR",
+    "answer_keywords": [
+      "ohm",
+      "voltage",
+      "current",
+      "resistance"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_086",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Ideal gas law Application 87",
+    "problem_statement": "Apply Ideal gas law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "PV=nRT",
+    "answer_keywords": [
+      "ideal gas",
+      "pv=nrt",
+      "temperature"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_087",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Snell's law Application 88",
+    "problem_statement": "Apply Snell's law to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "n\u2081sin\u03b8\u2081=n\u2082sin\u03b8\u2082",
+    "answer_keywords": [
+      "snell",
+      "refraction",
+      "angle"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_088",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Half-life decay Application 89",
+    "problem_statement": "Apply Half-life decay to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "N(t)=N\u2080e^{-\u03bbt}",
+    "answer_keywords": [
+      "half-life",
+      "exponential",
+      "decay"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_sci_089",
+    "stage": 1,
+    "category": "scientific_reasoning",
+    "title": "Central limit theorem Application 90",
+    "problem_statement": "Apply Central limit theorem to a textbook scenario and state the governing relation.",
+    "difficulty": "high_school",
+    "hidden_answer": "sample mean \u2192 normal for large n",
+    "answer_keywords": [
+      "central limit",
+      "normal",
+      "sample mean"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_000",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 1",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_001",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 2",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_002",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 3",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_003",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 4",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_004",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 5",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_005",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 6",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_006",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 7",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_007",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 8",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_008",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 9",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  },
+  {
+    "id": "ka_infra_009",
+    "stage": 0,
+    "category": "infrastructure",
+    "title": "Infrastructure Check 10",
+    "problem_statement": "Verify the research validation pipeline can record a run and score it.",
+    "difficulty": "smoke",
+    "hidden_answer": "pipeline_ok=true",
+    "answer_keywords": [
+      "pipeline",
+      "validation",
+      "record",
+      "score"
+    ],
+    "evaluation_notes": ""
+  }
+]
