@@ -18,7 +18,8 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 8 | RVP-1 | Research Validation Program — staged benchmarks and capability scoring. | S0-E4 | 200+ known-answer problems, capability score, pipeline outputs, dashboard. | **Complete** — see `RESEARCH_VALIDATION.md` |
 | 9 | P3-WF | Mount workflow engine HTTP API (`/workflows/*`). | H1-OBS | Workflow create/run/status via API; provenance linked. | **Complete** — SME-gated |
 | 10 | SME-1 | Scientific Method Engine — mandatory 10-phase research workflow. | H1-OBS, P3-WF | All research workflows require completed SME session; 10 phases enforced. | **Complete** — see `docs/SME_scientific_method_engine.md` |
-| 11 | P3-RL | Merge research loop through SME-gated workflows. | SME-1 | Long-horizon discovery runs through SME phases with provenance. | **Ready — highest priority** |
+| 11 | ACA-1 | AXIOM Cognitive Architecture — permanent 9-layer reasoning model. | SME-1 | 9 layers delegate to existing subsystems; model providers interchangeable. | **Complete** — see `docs/ACA_cognitive_architecture.md` |
+| 12 | P3-RL | Merge research loop through ACA+SME-gated workflows. | ACA-1, SME-1 | Long-horizon discovery runs through full cognitive + scientific stack. | **Ready — highest priority** |
 
 ## Queue protocol
 

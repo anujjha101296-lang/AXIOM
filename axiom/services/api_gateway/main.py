@@ -30,6 +30,7 @@ from axiom.services.api_gateway.routes.research import router as research_router
 from axiom.services.api_gateway.routes.research_validation import router as rvp_router
 from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
 from axiom.services.api_gateway.routes.sme_api import router as sme_router
+from axiom.services.api_gateway.routes.aca_api import router as aca_router
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
 
 # Initialise structured logging from settings
@@ -89,6 +90,9 @@ app.include_router(provenance_router)
 
 # ── Scientific Method Engine (mandatory for all research workflows) ─────────
 app.include_router(sme_router)
+
+# ── AXIOM Cognitive Architecture (permanent reasoning model) ────────────────
+app.include_router(aca_router)
 
 # ── Workflow Engine (SME-gated) ─────────────────────────────────────────────
 app.include_router(workflow_router)

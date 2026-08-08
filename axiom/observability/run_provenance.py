@@ -20,7 +20,7 @@ from typing import Any, Literal
 from axiom.config import settings
 from axiom.evaluation.frameworks.capability import CapabilitySnapshot, EvidenceState
 
-RunType = Literal["scep", "rvp", "sme"]
+RunType = Literal["scep", "rvp", "sme", "aca"]
 
 _EVIDENCE_RANK = {
     EvidenceState.UNAVAILABLE.value: 0,
