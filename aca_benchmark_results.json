@@ -1,0 +1,52 @@
+{
+  "benchmark": "ACA_compliance",
+  "timestamp": "2026-08-08T03:45:26Z",
+  "architecture_layers": 9,
+  "architecture_pillars": 8,
+  "runs": [
+    {
+      "cycle_id": "0760a7ec-b00",
+      "objective": "Prove or disprove: sum of first n integers equals n(n+1)/2",
+      "domain": "mathematics",
+      "model_provider": "heuristic",
+      "layers_completed": 9,
+      "layers_required": 9,
+      "layer_subsystems": {
+        "perception": "axiom.core.parser.arxiv_parser",
+        "understanding": "axiom.core.knowledge_graph.db.EpistemicStore",
+        "memory": "axiom.core.memory.working_memory.WorkingMemory",
+        "reasoning": "axiom.core.reasoning.hypothesis_engine.HypothesisEngine",
+        "planning": "axiom.workflow.scheduler.WorkflowScheduler",
+        "execution": "axiom.workflow.executor.ParallelExecutor",
+        "verification": "axiom.core.verification.truthfulness",
+        "learning": "axiom.core.reasoning.self_improvement.SelfImprovementLoop",
+        "reflection": "axiom.governance.review.EngineeringReview"
+      },
+      "duration_ms": 13.37,
+      "compliant": true
+    },
+    {
+      "cycle_id": "d0165389-1be",
+      "objective": "Survey literature on graph neural networks for molecules",
+      "domain": "research",
+      "model_provider": "heuristic",
+      "layers_completed": 9,
+      "layers_required": 9,
+      "layer_subsystems": {
+        "perception": "axiom.core.parser.arxiv_parser",
+        "understanding": "axiom.core.knowledge_graph.db.EpistemicStore",
+        "memory": "axiom.core.memory.working_memory.WorkingMemory",
+        "reasoning": "axiom.core.reasoning.hypothesis_engine.HypothesisEngine",
+        "planning": "axiom.workflow.scheduler.WorkflowScheduler",
+        "execution": "axiom.workflow.executor.ParallelExecutor",
+        "verification": "axiom.core.verification.truthfulness",
+        "learning": "axiom.core.reasoning.self_improvement.SelfImprovementLoop",
+        "reflection": "axiom.governance.review.EngineeringReview"
+      },
+      "duration_ms": 16.17,
+      "compliant": true
+    }
+  ],
+  "all_compliant": true,
+  "mean_duration_ms": 14.77
+}

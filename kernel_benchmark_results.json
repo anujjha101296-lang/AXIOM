@@ -1,0 +1,91 @@
+{
+  "benchmark": "ResearchKernel_compliance",
+  "timestamp": "2026-08-08T03:52:16Z",
+  "kernel_stages": 10,
+  "kernel_plugins": 3,
+  "runs": [
+    {
+      "run_id": "0c9bb789-4dc",
+      "objective": "Prove sum(1..n) = n(n+1)/2 for all positive integers n",
+      "plugin_id": "mathematics",
+      "domain": "mathematics",
+      "stages_completed": 10,
+      "stages_required": 10,
+      "stage_subsystems": {
+        "goal_decomposition": "plugin + aca.understanding",
+        "research_planning": "plugin + sme + aca.planning",
+        "evidence_acquisition": "plugin + egs",
+        "multi_agent_orchestration": "workflow.scheduler",
+        "verification_pipeline": "plugin + sme.verification + truthfulness",
+        "memory_integration": "working_memory + sme.memory",
+        "reflection": "aca.reflection",
+        "learning": "self_improvement + kernel.store",
+        "benchmark_execution": "plugin.benchmarks",
+        "report_generation": "kernel.reports + plugin"
+      },
+      "benchmark_count": 2,
+      "benchmarks_passed": 2,
+      "has_report": true,
+      "aca_cycle_id": "9c4333b1-f48",
+      "sme_session_id": "91b96a46-727",
+      "duration_ms": 31.99,
+      "compliant": true
+    },
+    {
+      "run_id": "db51e27b-38e",
+      "objective": "Design an O(n log n) sorting algorithm with correctness proof",
+      "plugin_id": "computer_science",
+      "domain": "computer_science",
+      "stages_completed": 10,
+      "stages_required": 10,
+      "stage_subsystems": {
+        "goal_decomposition": "plugin + aca.understanding",
+        "research_planning": "plugin + sme + aca.planning",
+        "evidence_acquisition": "plugin + egs",
+        "multi_agent_orchestration": "workflow.scheduler",
+        "verification_pipeline": "plugin + sme.verification + truthfulness",
+        "memory_integration": "working_memory + sme.memory",
+        "reflection": "aca.reflection",
+        "learning": "self_improvement + kernel.store",
+        "benchmark_execution": "plugin.benchmarks",
+        "report_generation": "kernel.reports + plugin"
+      },
+      "benchmark_count": 2,
+      "benchmarks_passed": 2,
+      "has_report": true,
+      "aca_cycle_id": "642a1718-4b8",
+      "sme_session_id": "3207a3dd-e20",
+      "duration_ms": 17.63,
+      "compliant": true
+    },
+    {
+      "run_id": "1a60bca7-6fd",
+      "objective": "Design a 4-bit adder meeting 500 MHz timing at 28nm",
+      "plugin_id": "vlsi_hardware",
+      "domain": "vlsi_hardware",
+      "stages_completed": 10,
+      "stages_required": 10,
+      "stage_subsystems": {
+        "goal_decomposition": "plugin + aca.understanding",
+        "research_planning": "plugin + sme + aca.planning",
+        "evidence_acquisition": "plugin + egs",
+        "multi_agent_orchestration": "workflow.scheduler",
+        "verification_pipeline": "plugin + sme.verification + truthfulness",
+        "memory_integration": "working_memory + sme.memory",
+        "reflection": "aca.reflection",
+        "learning": "self_improvement + kernel.store",
+        "benchmark_execution": "plugin.benchmarks",
+        "report_generation": "kernel.reports + plugin"
+      },
+      "benchmark_count": 2,
+      "benchmarks_passed": 2,
+      "has_report": true,
+      "aca_cycle_id": "cab2affd-2af",
+      "sme_session_id": "130869a1-d7f",
+      "duration_ms": 14.67,
+      "compliant": true
+    }
+  ],
+  "all_compliant": true,
+  "mean_duration_ms": 21.43
+}
