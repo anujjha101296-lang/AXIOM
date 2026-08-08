@@ -18,7 +18,8 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 8 | GCP-2 | Execute first Tier 1 campaign ("Foundations of Known-Answer Mathematical Reasoning"). | GCP-1 | 2-week bounded campaign; >= 2/3 challenges pass; journal + checkpoints. | **Ready — requires Layer 1 strategic approval** |
 | 9 | OS-1 | AXIOM Operating System v1.0 — Continuous Evolution Loop codified. | GCP-1 | 7 layers, metrics, repo map, templates, constitution update. | **Complete** — see `AXIOM_OPERATING_SYSTEM.md` |
 | 10 | CEL-1 | CEL master loop, scorecards, and health check. | OS-1, S0-E4 | `.axiom/CEL.md`, scorecards, `make cel-health` passes. | **Complete** |
-| 11 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | **Ready — highest priority** |
+| 11 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | **Complete** — see `docs/H1-OBS_run_provenance.md` |
+| 12 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive, accessible page distinguishes current capabilities from future vision. | **Ready — highest priority** |
 
 ## Queue protocol
 

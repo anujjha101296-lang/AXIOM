@@ -10,6 +10,7 @@
 | Research workspace v1 | shipped | Projects, PDFs, notes, FTS, Q&A |
 | Capability scores API | shipped | `/eval/scores`, `/eval/run` |
 | Evidence transparency | shipped | S0-E4 evidence states on all scores |
+| Run provenance (H1-OBS) | shipped | `/provenance` API, eval history enriched |
 | Grand Challenge campaigns | framework only | GCP-2 awaits approval |
 
 ## Usability

@@ -7,7 +7,8 @@
 
 | Suite | Command | Result | Notes |
 |-------|---------|--------|-------|
-| Core unit/integration | `pytest tests/ --ignore=tests/e2e -q` | 183 pass | Primary CI gate |
+| Core unit/integration | `pytest tests/ --ignore=tests/e2e -q` | 192 pass | Primary CI gate |
+| H1-OBS provenance | `pytest tests/test_run_provenance.py -q` | 9 pass | SCEP audit trail |
 | S0-E4 evidence gate | `pytest tests/test_s0_e4_evidence_gate.py -q` | pass | Evidence metadata regression |
 | SCEP / EPIC-002 | `pytest tests/test_eval_api.py tests/test_evaluation_platform.py -q` | pass | Capability + prize readiness |
 | Operating system | `pytest tests/test_operating_system.py -q` | 5/5 | Governance artifacts |

@@ -8,6 +8,12 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### H1-OBS — Run Provenance (2026-08-08)
+- **Unified provenance:** `run_provenance` SQLite table for SCEP evaluation runs
+- **API:** `GET /provenance/runs`, `GET /provenance/runs/{type}/{id}`, `GET /eval/runs/{id}`
+- **Integration:** `POST /eval/run` and CLI benchmark runner record provenance automatically
+- **Tests:** `tests/test_run_provenance.py` (9 tests)
+
 ### CEL — Continuous Evolution Loop (2026-08-08)
 - **S0-E4 evidence gate:** `EvidenceState` enum; capability snapshots and prize readiness expose `evidence_tier`, `benchmark_count`, and `limitations`
 - **CEL artifacts:** `.axiom/CEL.md`, `TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`

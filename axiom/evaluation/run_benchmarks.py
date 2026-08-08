@@ -27,6 +27,7 @@ from axiom.evaluation.frameworks.capability import (
 )
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
+from axiom.observability.run_provenance import record_scep_run
 from axiom.evaluation.benchmarks.suite import (
     run_math_reasoning_benchmarks,
     run_proof_verification_benchmarks,
@@ -173,6 +174,8 @@ def main():
     print("======================================================================")
     
     init_db(args.db)
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    wall_start = time.perf_counter()
     
     # Run the 8 benchmark suites
     print("\n[1/8] Executing Mathematical Reasoning benchmarks...")
@@ -235,6 +238,15 @@ def main():
     # Save current run with benchmark results
     all_results = mr_results + pv_results + cg_results + kq_results + ce_results + rp_results + ls_results + rd_results
     save_run(args.db, snapshot, readiness_scores, all_results)
+    duration_ms = (time.perf_counter() - wall_start) * 1000
+    record_scep_run(
+        args.db,
+        snapshot,
+        all_results,
+        started_at=started_at,
+        duration_ms=duration_ms,
+        trigger="cli",
+    )
     print(f"\n✓ Saved run snapshot {run_id} in {args.db} (Composite Score: {snapshot.composite_score:.4f})")
     
     # Generate delta report

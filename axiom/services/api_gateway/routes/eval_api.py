@@ -20,6 +20,7 @@ from axiom.evaluation.frameworks.capability import (
 )
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
+from axiom.observability.run_provenance import get_provenance_store, record_scep_run
 from axiom.evaluation.benchmarks.suite import (
     run_math_reasoning_benchmarks,
     run_proof_verification_benchmarks,
@@ -137,30 +138,61 @@ def get_prize_readiness():
 
 @router.get("/history")
 def get_run_history():
-    """Get the last 10 evaluation runs."""
+    """Get the last 10 evaluation runs with provenance summaries."""
     conn = sqlite3.connect(settings.db_path)
     cursor = conn.cursor()
-    
+    provenance = get_provenance_store(settings.db_path)
+
     try:
         rows = cursor.execute(
             "SELECT run_id, timestamp, composite_score FROM eval_runs ORDER BY timestamp DESC LIMIT 10"
         ).fetchall()
-        history = [
-            {"run_id": r[0], "timestamp": r[1], "composite_score": r[2]}
-            for r in rows
-        ]
+        history = []
+        for r in rows:
+            entry = {"run_id": r[0], "timestamp": r[1], "composite_score": r[2]}
+            prov = provenance.get("scep", r[0])
+            if prov:
+                entry["duration_ms"] = prov.get("duration_ms")
+                entry["evidence_tier"] = prov.get("evidence_tier", {}).get("aggregate")
+                entry["config_hash"] = prov.get("config_hash")
+            history.append(entry)
     except sqlite3.OperationalError:
         history = []
-        
+
     conn.close()
     return history
+
+
+@router.get("/runs/{run_id}")
+def get_eval_run(run_id: str):
+    """Retrieve a SCEP evaluation run snapshot and its provenance record."""
+    conn = sqlite3.connect(settings.db_path)
+    cursor = conn.cursor()
+
+    try:
+        row = cursor.execute(
+            "SELECT json_data FROM eval_runs WHERE run_id = ?", (run_id,)
+        ).fetchone()
+    except sqlite3.OperationalError:
+        row = None
+
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Eval run not found: {run_id}")
+
+    snapshot = json.loads(row[0])
+    provenance = get_provenance_store(settings.db_path).get("scep", run_id)
+    return {"snapshot": snapshot, "provenance": provenance}
 
 
 @router.post("/run", response_model=BenchmarkRunResponse)
 def trigger_benchmark():
     """Run all capability benchmarks synchronously and return current scores & delta report."""
     db_path = settings.db_path
-    
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    wall_start = time.perf_counter()
+
     # Run all 8 suites
     mr_results, mr_score = run_math_reasoning_benchmarks()
     pv_results, pv_score = run_proof_verification_benchmarks()
@@ -267,6 +299,16 @@ def trigger_benchmark():
         
     conn.commit()
     conn.close()
+
+    duration_ms = (time.perf_counter() - wall_start) * 1000
+    record_scep_run(
+        db_path,
+        snapshot,
+        all_results,
+        started_at=started_at,
+        duration_ms=duration_ms,
+        trigger="api",
+    )
     
     # Generate delta report
     report = generate_delta_report(

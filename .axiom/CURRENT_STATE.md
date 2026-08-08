@@ -39,6 +39,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **AXIOM Operating System v1.0:** Continuous Evolution Loop, seven layers, north star metrics, repository map — `AXIOM_OPERATING_SYSTEM.md`, `.axiom/OPERATING_SYSTEM.md`.
 - **S0-E4 (EPIC-002 evidence gate):** `EvidenceState` on capability snapshots, prize readiness, and `/eval/*` APIs — `docs/S0-E4_evidence_gate.md`.
 - **CEL v1:** Master loop (`.axiom/CEL.md`), scorecards (`TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`), `scripts/cel_health_check.py`.
+- **H1-OBS:** Unified `run_provenance` table and `/provenance` API for SCEP evaluation runs — `docs/H1-OBS_run_provenance.md`.
 
 ## Blocked
 
@@ -46,7 +47,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 
 ## Highest priority
 
-**H1-OBS** — Reproducible run/provenance records for scientific capability evaluations (unblocked). **GCP-2** remains ready pending founder strategic approval.
+**P0-WEB** — Honest public landing experience linking to `/research` workspace. **GCP-2** remains ready pending founder strategic approval.
 
 ## Worktree integrity
 

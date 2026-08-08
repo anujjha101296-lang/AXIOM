@@ -7,7 +7,8 @@
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Core tests passing | 183 | 100% core | ✅ |
+| Core tests passing | 192 | 100% core | ✅ |
+| H1-OBS provenance | complete | SCEP runs auditable |
 | Lint (ruff) | pass | pass | ✅ |
 | Docker build | available | builds | ✅ |
 | CI workflows | present | green on core | ⚠️ e2e partial |
@@ -37,5 +38,5 @@
 
 ## Next engineering initiative
 
-**GCP-2** — First Tier 1 campaign (blocked: Layer 1 strategic approval)  
-**Fallback:** **H1-OBS** — Run provenance records for scientific evaluations
+**P0-WEB** — Honest public landing experience  
+**GCP-2** — First Tier 1 campaign (blocked: Layer 1 strategic approval)
