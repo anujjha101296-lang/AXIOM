@@ -68,6 +68,10 @@ class AxiomSettings(BaseSettings):
         default=False,
         description="Require bearer token for /evidence/* (recommended in production)",
     )
+    require_auth_for_routing_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /routing/* (recommended in production)",
+    )
     block_insecure_production_config: bool = Field(
         default=True,
         description="Refuse startup in production when critical security misconfig is detected",

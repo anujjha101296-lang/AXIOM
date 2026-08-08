@@ -42,6 +42,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **H1-OBS:** Unified `run_provenance` table and `/provenance` API for SCEP evaluation runs — `docs/H1-OBS_run_provenance.md`.
 - **TSS-1:** Trust, Security & Safety Loop — `.axiom/TSS.md`, security scorecards, production guard, optional route auth, secret scanner — `SECURITY_STATUS.md`.
 - **E&R-1:** Evidence & Reproducibility Loop — claim registry, discovery gate, provenance graph, reproduction engine, `/evidence/*` API — `EVIDENCE_STATUS.md`.
+- **SIMR-1:** Scientific Intelligence & Model Routing — model/tool registries, capability graph, router, research compiler, `/routing/*` API — `MODEL_REGISTRY.md`.
 
 ## Blocked
 

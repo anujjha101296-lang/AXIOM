@@ -7,6 +7,7 @@ from typing import List, Tuple
 
 from axiom.observability.logger import get_logger
 from axiom.research.schema import ResearchDocument
+from axiom.routing.selector import route_task
 from axiom.services.model_gateway.client import ModelClient
 
 logger = get_logger(__name__)
@@ -41,7 +42,11 @@ class PaperQA:
         )
 
         try:
-            answer = self.model_client.generate(prompt, model="mock-model", temperature=0.2)
+            routing = route_task(
+                f"Literature Q&A: {question.strip()}",
+            )
+            model = routing.selected_model
+            answer = self.model_client.generate(prompt, model=model, temperature=0.2)
             if answer and len(answer.strip()) >= 20:
                 logger.info(
                     "Paper Q&A answered",

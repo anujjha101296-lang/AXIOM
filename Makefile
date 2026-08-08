@@ -127,6 +127,9 @@ tss-security: ## Run TSS trust/security/safety check
 erl-health: ## Run E&R evidence & reproducibility health check
 	@python3 scripts/erl_health_check.py
 
+simr-health: ## Run SIMR model routing health check
+	@python3 scripts/simr_health_check.py
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

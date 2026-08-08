@@ -8,6 +8,18 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### SIMR — Scientific Intelligence & Model Routing (2026-08-08)
+- **SIMR v1:** `.axiom/SIMR.md`, model/tool registries, capability graph, routing policy docs
+- **Model registry:** 5 models with capability scores and fallback chains
+- **Tool registry:** Scientific tools + workflow workers with TSS risk classes
+- **Router:** Problem profiling, strategy generation, verification-aware selection
+- **Research compiler:** Problem → capability graph → execution plan
+- **Failure memory:** Model failure tracking and adaptive deprioritization
+- **API:** `/routing/*` routes with optional authentication
+- **Integration:** Research Q&A uses router instead of hardcoded model
+- **Health check:** `scripts/simr_health_check.py`, `make simr-health`
+- **Tests:** `tests/test_simr_routing.py` (14 tests)
+
 ### E&R — Evidence & Reproducibility Loop (2026-08-08)
 - **E&R v1:** `.axiom/ERL.md`, evidence/reproducibility/verification status reports
 - **Claim registry:** SQLite `er_*` tables with versioned claims and provenance graph
