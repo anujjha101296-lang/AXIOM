@@ -3,11 +3,27 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-08
-**Active horizon:** Grand Challenge Program — permanent research campaign framework
+**Active horizon:** AXIOM Operating System v1.0 — Continuous Evolution Loop
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI research platform. EPIC-001 (MIP), EPIC-002 (SCEP), and the Research Workspace are committed. The **Grand Challenge Program** (`axiom/grand_challenge/`) provides a six-tier campaign framework from toy reasoning to frontier readiness assessment.
+AXIOM operates as a **self-improving research organization** governed by the Continuous Evolution Loop (`.axiom/OPERATING_SYSTEM.md`). Work flows through seven nested layers — strategic (monthly), engineering (daily), research (per campaign), product (per release), capability (weekly), learning (continuous), and frontier (GCP tiers).
+
+The repository is the organizational memory. Prompts do not advance the mission; evidence, benchmarks, and state updates do.
+
+## Operating system (v1.0)
+
+| Layer | Cadence | Key artifact |
+|------:|---------|--------------|
+| 1 Strategic | Monthly | `.axiom/templates/MONTHLY_STRATEGIC_REVIEW.md` |
+| 2 Engineering | Daily | `.axiom/TASK_QUEUE.md`, `.axiom/ENGINEERING.md` |
+| 3 Research | Per campaign | `GRAND_CHALLENGE_PROGRAM.md`, GCP engine |
+| 4 Product | Per release | `.axiom/PRODUCT.md` |
+| 5 Capability | Weekly | SCEP benchmarks, `.axiom/NORTH_STAR_METRICS.md` |
+| 6 Learning | Continuous | `.axiom/MEMORY.md` |
+| 7 Frontier | Per GCP tier | `READINESS_GATES.md` |
+
+Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 
 ## Completed
 
@@ -19,7 +35,8 @@ AXIOM is a Python/FastAPI research platform. EPIC-001 (MIP), EPIC-002 (SCEP), an
 - **Research Workspace v1:** End-to-end vertical slice — create projects, upload PDFs, extract text, generate summaries, save structured notes, FTS search, resume sessions. API `/research/*`, UI `/research`, demo script `scripts/demo_research_workspace.sh`.
 - **S0-E3:** Verification truthfulness audit — `axiom/core/verification/truthfulness.py`; API responses expose `evidence_mode` and `formally_proven`; simulated/SMT/heuristic paths cannot claim `TIER_2_PROVEN`.
 - **EM-001 Research Workspace (production):** Projects CRUD, PDF upload/parse/store, notes with tags, FTS search, paper Q&A with saved conversations, session resume. UI at `/research`.
-- **Grand Challenge Program (GCP):** Six-tier challenge registry, campaign management, readiness gates, `/gcp/*` API — `GRAND_CHALLENGE_PROGRAM.md`, `CHALLENGE_REGISTRY.md`, `READINESS_GATES.md`, `ROADMAP_ALIGNMENT.md`.
+- **Grand Challenge Program (GCP):** Six-tier challenge registry, campaign management, readiness gates, `/gcp/*` API — `GRAND_CHALLENGE_PROGRAM.md`.
+- **AXIOM Operating System v1.0:** Continuous Evolution Loop, seven layers, north star metrics, repository map — `AXIOM_OPERATING_SYSTEM.md`, `.axiom/OPERATING_SYSTEM.md`.
 
 ## Blocked
 
@@ -27,7 +44,7 @@ AXIOM is a Python/FastAPI research platform. EPIC-001 (MIP), EPIC-002 (SCEP), an
 
 ## Highest priority
 
-**First Tier 1 campaign** — "Foundations of Known-Answer Mathematical Reasoning" (see `GRAND_CHALLENGE_PROGRAM.md`). Execute bounded campaign before Tier 2 paper reproduction.
+**Execute the engineering loop (Layer 2):** Select highest-ROI task from `TASK_QUEUE.md`, implement with tests and benchmarks, update state. **First Tier 1 campaign** ("Foundations of Known-Answer Mathematical Reasoning") awaits human strategic approval in Layer 1 monthly review.
 
 ## Worktree integrity
 
