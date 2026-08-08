@@ -6,7 +6,7 @@
 .PHONY: help setup dev test test-coverage lint lint-fix type-check \
         docker-build docker-up docker-down docker-logs \
         prize-readiness self-improve engineering-health research-validation \
-        sme-benchmark aca-benchmark clean format
+        sme-benchmark aca-benchmark kernel-benchmark clean format
 
 PYTHON := python3
 PYTEST := $(PYTHON) -m pytest
@@ -133,6 +133,11 @@ aca-benchmark: ## Run AXIOM Cognitive Architecture compliance benchmark
 	@echo "$(BOLD)Running ACA compliance benchmark...$(RESET)"
 	PYTHONPATH=. $(PYTHON) scripts/run_aca_benchmark.py
 	@echo "$(GREEN)✓ Report: aca_benchmark_results.json$(RESET)"
+
+kernel-benchmark: ## Run Research Kernel compliance benchmark (3 domains)
+	@echo "$(BOLD)Running Research Kernel compliance benchmark...$(RESET)"
+	PYTHONPATH=. $(PYTHON) scripts/run_kernel_benchmark.py
+	@echo "$(GREEN)✓ Report: kernel_benchmark_results.json$(RESET)"
 
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations

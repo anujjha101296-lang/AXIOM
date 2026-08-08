@@ -3,17 +3,18 @@
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
 **Last updated:** 2026-08-08
-**Active horizon:** AXIOM Cognitive Architecture (ACA) — permanent model-agnostic reasoning
+**Active horizon:** AXIOM Research Kernel — permanent execution engine for research workflows
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI research platform with a **three-layer governance stack**:
+AXIOM is a Python/FastAPI research platform with a **four-layer governance stack**:
 
 1. **ACA** (`axiom/cognitive/`) — permanent 9-layer cognitive architecture; models interchangeable
-2. **SME** (`axiom/scientific_method/`) — mandatory 10-phase scientific method for research workflows
-3. **H1-OBS** — provenance records for SCEP, RVP, SME, and ACA runs
+2. **Research Kernel** (`axiom/research_kernel/`) — permanent 10-stage execution engine; domain plugins
+3. **SME** (`axiom/scientific_method/`) — mandatory 10-phase scientific method for research workflows
+4. **H1-OBS** — provenance records for SCEP, RVP, SME, ACA, and kernel runs
 
-Workflow creation requires completed SME session. All reasoning delegates through ACA layer adapters to existing subsystems (no duplication).
+Workflow creation requires completed SME session. Research runs execute through the kernel, which delegates to ACA, SME, and workflow subsystems without duplication.
 
 ## Completed
 
@@ -23,8 +24,9 @@ Workflow creation requires completed SME session. All reasoning delegates throug
 - **H1-OBS:** Unified `run_provenance` table, `/provenance/*` API.
 - **Scientific Method Engine (SME):** 10-phase mandatory workflow, `/sme/*` API, workflow gate — `docs/SME_scientific_method_engine.md`.
 - **AXIOM Cognitive Architecture (ACA):** 9-layer permanent reasoning model, `/aca/*` API, model provider abstraction — `docs/ACA_cognitive_architecture.md`.
+- **Research Kernel:** 10-stage permanent execution engine, 3 domain plugins (math, CS, VLSI), `/kernel/*` API — `RESEARCH_KERNEL.md`, `PLUGIN_API.md`, `KERNEL_ARCHITECTURE.md`.
 - **Workflow API:** `/workflows/*` mounted with SME gate.
-- **Core tests:** **209/209** pass (`pytest tests/ --ignore=tests/e2e`).
+- **Core tests:** **220/220** pass (`pytest tests/ --ignore=tests/e2e`).
 
 ## Blocked
 
@@ -32,7 +34,7 @@ Workflow creation requires completed SME session. All reasoning delegates throug
 
 ## Highest priority
 
-**Research loop merge** — wire long-horizon discovery through ACA → SME → Workflow pipeline. See `FRONTIER_RESEARCH_PLATFORM.md`.
+**Research loop merge** — wire long-horizon discovery through Kernel → ACA → SME → Workflow pipeline. See `FRONTIER_RESEARCH_PLATFORM.md`.
 
 ## Worktree integrity
 
