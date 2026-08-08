@@ -37,14 +37,16 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **EM-001 Research Workspace (production):** Projects CRUD, PDF upload/parse/store, notes with tags, FTS search, paper Q&A with saved conversations, session resume. UI at `/research`.
 - **Grand Challenge Program (GCP):** Six-tier challenge registry, campaign management, readiness gates, `/gcp/*` API — `GRAND_CHALLENGE_PROGRAM.md`.
 - **AXIOM Operating System v1.0:** Continuous Evolution Loop, seven layers, north star metrics, repository map — `AXIOM_OPERATING_SYSTEM.md`, `.axiom/OPERATING_SYSTEM.md`.
+- **S0-E4 (EPIC-002 evidence gate):** `EvidenceState` on capability snapshots, prize readiness, and `/eval/*` APIs — `docs/S0-E4_evidence_gate.md`.
+- **CEL v1:** Master loop (`.axiom/CEL.md`), scorecards (`TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`), `scripts/cel_health_check.py`.
 
 ## Blocked
 
-- None for core engineering baseline.
+- **GCP-2:** First Tier 1 campaign requires Layer 1 strategic approval.
 
 ## Highest priority
 
-**Execute the engineering loop (Layer 2):** Select highest-ROI task from `TASK_QUEUE.md`, implement with tests and benchmarks, update state. **First Tier 1 campaign** ("Foundations of Known-Answer Mathematical Reasoning") awaits human strategic approval in Layer 1 monthly review.
+**H1-OBS** — Reproducible run/provenance records for scientific capability evaluations (unblocked). **GCP-2** remains ready pending founder strategic approval.
 
 ## Worktree integrity
 

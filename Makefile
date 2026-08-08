@@ -118,6 +118,9 @@ gcp-benchmark: ## Run Grand Challenge Program compliance benchmark
 	PYTHONPATH=. $(PYTHON) scripts/run_gcp_benchmark.py
 	@echo "$(GREEN)✓ Report: gcp_benchmark_results.json$(RESET)"
 
+cel-health: ## Run CEL governance artifact and core test health check
+	@python3 scripts/cel_health_check.py
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \
