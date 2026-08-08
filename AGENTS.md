@@ -1,10 +1,23 @@
 # AXIOM Session Entry Point
 
-Before starting any task in this repository, read `.axiom/CONSTITUTION.md` and then the documents in its **Source of truth and read order** section.
+AXIOM is a **self-improving research organization**. Do not work in "prompt → done → next" mode. Work inside the **Continuous Evolution Loop** defined in `.axiom/OPERATING_SYSTEM.md`.
 
-Treat `.axiom/CURRENT_STATE.md` and `.axiom/TASK_QUEUE.md` as the current operational source of truth. Follow `.axiom/ENGINEERING.md` for implementation work and the relevant domain contract for research, product, go-to-market, capability, or prize-related work.
+Before starting any task in this repository:
 
-Do not overwrite unrelated uncommitted work. Update the AXIOM Operating System after meaningful work according to the contracts. Human approval is required for the external or irreversible actions specified in `.axiom/CONSTITUTION.md`.
+1. Read `.axiom/CONSTITUTION.md`
+2. Read `.axiom/OPERATING_SYSTEM.md` — master loop and seven layers
+3. Read `.axiom/CURRENT_STATE.md` and `.axiom/TASK_QUEUE.md`
+4. Read the relevant domain contract (`ENGINEERING.md`, `RESEARCH.md`, `PRODUCT.md`, etc.)
+
+After completing meaningful work:
+
+1. Run tests and benchmarks (if capability-affecting)
+2. Update `CURRENT_STATE.md`, `TASK_QUEUE.md`, and `MEMORY.md` as appropriate
+3. Commit focused changes and push
+
+Treat `.axiom/CURRENT_STATE.md` and `.axiom/TASK_QUEUE.md` as the current operational source of truth. Human approval is required for the external or irreversible actions specified in `.axiom/CONSTITUTION.md`.
+
+Do not overwrite unrelated uncommitted work.
 
 ## Cursor Cloud specific instructions
 
