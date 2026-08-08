@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from axiom.evaluation.frameworks.capability import (
     CapabilitySnapshot,
     CapabilityDimension,
-    make_dimension_score,
+    make_dimension_score_from_benchmark,
 )
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
@@ -213,14 +213,14 @@ def main():
     
     snapshot = CapabilitySnapshot(run_id=run_id, timestamp=timestamp)
     snapshot.dimension_scores = [
-        make_dimension_score(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
-        make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
-        make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
-        make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
     ]
     snapshot.compute_composite()
     

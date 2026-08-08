@@ -15,7 +15,8 @@ from axiom.config import settings
 from axiom.evaluation.frameworks.capability import (
     CapabilitySnapshot,
     CapabilityDimension,
-    make_dimension_score,
+    EvidenceState,
+    make_dimension_score_from_benchmark,
 )
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
@@ -38,6 +39,8 @@ class BenchmarkRunResponse(BaseModel):
     timestamp: str
     composite_score: float
     dimensions: Dict[str, Any]
+    evidence_tier: Dict[str, Any]
+    limitations: List[str]
     readiness: List[Dict[str, Any]]
     weakest_capability: str
     highest_priority: str
@@ -63,21 +66,50 @@ def _get_current_scores(db_path: str) -> Dict[str, Any]:
     if row:
         return json.loads(row[0])
         
-    # Standard baseline fallback if DB empty
+    # Standard baseline fallback if DB empty — explicitly labeled BASELINE
     return {
         "run_id": "initial",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "composite_score": 0.354,
+        "evidence_tier": {"aggregate": EvidenceState.BASELINE.value},
+        "limitations": [
+            "No benchmark run recorded — scores are baseline placeholders",
+            "Run POST /eval/run to produce measured capability scores",
+        ],
         "dimensions": {
-            "mathematical_reasoning": {"score": 0.40, "level": 1, "level_name": "L1: Basic"},
-            "proof_verification": {"score": 0.35, "level": 0, "level_name": "L0: None"},
-            "conjecture_generation": {"score": 0.30, "level": 2, "level_name": "L2: Nontrivial"},
-            "knowledge_quality": {"score": 0.45, "level": 2, "level_name": "L2: Structured"},
-            "counterexample_search": {"score": 0.35, "level": 2, "level_name": "L2: Heuristic"},
-            "research_planning": {"score": 0.30, "level": 1, "level_name": "L1: Linear"},
-            "literature_synthesis": {"score": 0.40, "level": 1, "level_name": "L1: Extraction"},
-            "research_productivity": {"score": 0.30, "level": 2, "level_name": "L2: Semi-Auto"},
-        }
+            "mathematical_reasoning": {
+                "score": 0.40, "level": 1, "level_name": "L1: Basic",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "proof_verification": {
+                "score": 0.35, "level": 0, "level_name": "L0: None",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "conjecture_generation": {
+                "score": 0.30, "level": 2, "level_name": "L2: Undergraduate",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "knowledge_quality": {
+                "score": 0.45, "level": 2, "level_name": "L2: Undergraduate",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "counterexample_search": {
+                "score": 0.35, "level": 2, "level_name": "L2: Undergraduate",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "research_planning": {
+                "score": 0.30, "level": 1, "level_name": "L1: Basic",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "literature_synthesis": {
+                "score": 0.40, "level": 1, "level_name": "L1: Basic",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+            "research_productivity": {
+                "score": 0.30, "level": 2, "level_name": "L2: Undergraduate",
+                "benchmark_count": 0, "evidence_state": EvidenceState.BASELINE.value,
+            },
+        },
     }
 
 
@@ -145,14 +177,14 @@ def trigger_benchmark():
     
     snapshot = CapabilitySnapshot(run_id=run_id, timestamp=timestamp)
     snapshot.dimension_scores = [
-        make_dimension_score(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
-        make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
-        make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
-        make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
+        make_dimension_score_from_benchmark(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
     ]
     snapshot.compute_composite()
     
@@ -258,6 +290,8 @@ def trigger_benchmark():
         "timestamp": snapshot.timestamp,
         "composite_score": snapshot.composite_score,
         "dimensions": snapshot.to_dict()["dimensions"],
+        "evidence_tier": snapshot.evidence_tier,
+        "limitations": snapshot.limitations,
         "readiness": [r.to_dict() for r in readiness_scores],
         "weakest_capability": report.weakest_capability,
         "highest_priority": report.highest_priority,

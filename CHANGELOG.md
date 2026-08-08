@@ -8,7 +8,13 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
-### Sprint 0 — Production Foundation
+### CEL — Continuous Evolution Loop (2026-08-08)
+- **S0-E4 evidence gate:** `EvidenceState` enum; capability snapshots and prize readiness expose `evidence_tier`, `benchmark_count`, and `limitations`
+- **CEL artifacts:** `.axiom/CEL.md`, `TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`
+- **Health check:** `scripts/cel_health_check.py`, `make cel-health`
+- **Tests:** `tests/test_s0_e4_evidence_gate.py`
+
+### AXIOM Operating System v1.0
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)
 - Added structured JSON logging via `structlog` (`axiom/observability/logger.py`)
