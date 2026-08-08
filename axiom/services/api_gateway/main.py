@@ -30,6 +30,7 @@ from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
 from axiom.services.api_gateway.routes.gcp_api import router as gcp_router
 from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
+from axiom.services.api_gateway.routes.evidence_api import router as evidence_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -97,6 +98,9 @@ app.include_router(gcp_router)
 
 # ── H1-OBS Run Provenance (SCEP audit records) ──────────────────────────────
 app.include_router(provenance_router)
+
+# ── E&R Evidence & Reproducibility Loop ───────────────────────────────────────
+app.include_router(evidence_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path

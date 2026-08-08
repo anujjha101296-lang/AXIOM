@@ -124,6 +124,9 @@ cel-health: ## Run CEL governance artifact and core test health check
 tss-security: ## Run TSS trust/security/safety check
 	@python3 scripts/tss_security_check.py
 
+erl-health: ## Run E&R evidence & reproducibility health check
+	@python3 scripts/erl_health_check.py
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

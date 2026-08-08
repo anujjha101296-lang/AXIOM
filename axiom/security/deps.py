@@ -20,3 +20,4 @@ def _make_optional_auth(setting_attr: str):
 eval_route_auth = _make_optional_auth("require_auth_for_eval_routes")
 gcp_route_auth = _make_optional_auth("require_auth_for_gcp_routes")
 provenance_route_auth = _make_optional_auth("require_auth_for_provenance_routes")
+evidence_route_auth = _make_optional_auth("require_auth_for_evidence_routes")

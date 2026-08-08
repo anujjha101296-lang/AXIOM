@@ -8,6 +8,15 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### E&R — Evidence & Reproducibility Loop (2026-08-08)
+- **E&R v1:** `.axiom/ERL.md`, evidence/reproducibility/verification status reports
+- **Claim registry:** SQLite `er_*` tables with versioned claims and provenance graph
+- **Discovery gate:** status upgrades and discovery labels require evidence and verification
+- **API:** `/evidence/*` routes with optional authentication
+- **Reproduction:** `compare_provenance_runs()` integrated with H1-OBS provenance
+- **Health check:** `scripts/erl_health_check.py`, `make erl-health`
+- **Tests:** `tests/test_evidence_registry.py` (12 tests)
+
 ### TSS — Trust, Security & Safety Loop (2026-08-08)
 - **TSS v1:** `.axiom/TSS.md`, security scorecards, incident runbook
 - **Production guard:** blocks insecure production startup; audits config on API boot

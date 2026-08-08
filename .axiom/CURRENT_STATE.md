@@ -41,6 +41,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **CEL v1:** Master loop (`.axiom/CEL.md`), scorecards (`TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`), `scripts/cel_health_check.py`.
 - **H1-OBS:** Unified `run_provenance` table and `/provenance` API for SCEP evaluation runs — `docs/H1-OBS_run_provenance.md`.
 - **TSS-1:** Trust, Security & Safety Loop — `.axiom/TSS.md`, security scorecards, production guard, optional route auth, secret scanner — `SECURITY_STATUS.md`.
+- **E&R-1:** Evidence & Reproducibility Loop — claim registry, discovery gate, provenance graph, reproduction engine, `/evidence/*` API — `EVIDENCE_STATUS.md`.
 
 ## Blocked
 

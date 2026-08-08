@@ -20,7 +20,6 @@ Usage:
 
 from __future__ import annotations
 
-import os
 import time
 from enum import Enum
 from typing import Optional
