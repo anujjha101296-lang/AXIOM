@@ -1,0 +1,36 @@
+{
+  "benchmark": "SME_compliance",
+  "timestamp": "2026-08-08T03:42:31Z",
+  "runs": [
+    {
+      "session_id": "7fb0f532-54a",
+      "objective": "Does the sum of the first n integers equal n(n+1)/2?",
+      "domain": "mathematics",
+      "phases_completed": 10,
+      "phases_required": 10,
+      "hypothesis_count": 3,
+      "criticism_count": 3,
+      "experiment_count": 3,
+      "memory_records": 7,
+      "has_notebook": true,
+      "duration_ms": 27.32,
+      "compliant": true
+    },
+    {
+      "session_id": "33293933-247",
+      "objective": "Can graph connectivity be determined in polynomial time?",
+      "domain": "research",
+      "phases_completed": 10,
+      "phases_required": 10,
+      "hypothesis_count": 3,
+      "criticism_count": 3,
+      "experiment_count": 3,
+      "memory_records": 7,
+      "has_notebook": true,
+      "duration_ms": 25.06,
+      "compliant": true
+    }
+  ],
+  "all_compliant": true,
+  "mean_duration_ms": 26.19
+}

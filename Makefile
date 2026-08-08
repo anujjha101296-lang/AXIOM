@@ -5,7 +5,8 @@
 
 .PHONY: help setup dev test test-coverage lint lint-fix type-check \
         docker-build docker-up docker-down docker-logs \
-        prize-readiness self-improve engineering-health research-validation clean format
+        prize-readiness self-improve engineering-health research-validation \
+        sme-benchmark clean format
 
 PYTHON := python3
 PYTEST := $(PYTHON) -m pytest
@@ -122,6 +123,11 @@ research-validation: ## Run Research Validation Program and generate reports
 	@echo "$(BOLD)Running AXIOM Research Validation Program...$(RESET)"
 	PYTHONPATH=. $(PYTHON) scripts/run_research_validation.py
 	@echo "$(GREEN)✓ Reports: RESEARCH_VALIDATION.md, BENCHMARK_RESULTS.md, CAPABILITY_SCORE.md, NEXT_RESEARCH_TARGETS.md$(RESET)"
+
+sme-benchmark: ## Run Scientific Method Engine compliance benchmark
+	@echo "$(BOLD)Running SME compliance benchmark...$(RESET)"
+	PYTHONPATH=. $(PYTHON) scripts/run_sme_benchmark.py
+	@echo "$(GREEN)✓ Report: sme_benchmark_results.json$(RESET)"
 
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
