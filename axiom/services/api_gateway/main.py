@@ -22,6 +22,7 @@ from axiom.core.verification.smt_gateway import SmtGateway
 from axiom.evaluation.prize_readiness import PrizeReadinessScorer
 from axiom.observability.logger import configure_logging, get_logger
 from axiom.observability.metrics import METRICS
+from axiom.security.production_guard import audit_security_config, enforce_production_security
 from axiom.services.api_gateway.auth import verify_token
 from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
@@ -41,6 +42,18 @@ async def lifespan(app: FastAPI):
     """Run startup tasks, yield, then run shutdown tasks."""
     logger.info("AXIOM API Gateway starting up",
                 extra={"version": settings.app_version, "env": settings.environment})
+    enforce_production_security(settings)
+    for finding in audit_security_config(settings):
+        log_fn = logger.warning if finding.severity in ("critical", "high") else logger.info
+        log_fn(
+            "security_audit",
+            extra={
+                "finding_id": finding.id,
+                "severity": finding.severity,
+                "component": finding.component,
+                "message": finding.message,
+            },
+        )
     # Run database migrations on startup
     if store.conn:
         run_migrations(store.conn)

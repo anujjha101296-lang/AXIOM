@@ -121,6 +121,9 @@ gcp-benchmark: ## Run Grand Challenge Program compliance benchmark
 cel-health: ## Run CEL governance artifact and core test health check
 	@python3 scripts/cel_health_check.py
 
+tss-security: ## Run TSS trust/security/safety check
+	@python3 scripts/tss_security_check.py
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

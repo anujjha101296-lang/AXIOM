@@ -8,6 +8,13 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### TSS — Trust, Security & Safety Loop (2026-08-08)
+- **TSS v1:** `.axiom/TSS.md`, security scorecards, incident runbook
+- **Production guard:** blocks insecure production startup; audits config on API boot
+- **Optional route auth:** `/eval`, `/gcp`, `/provenance` (enable via env in production)
+- **Secret scanner:** `scripts/tss_security_check.py`, `make tss-security`
+- **Agent safety:** `ToolRiskClass` + prompt-injection heuristics
+
 ### H1-OBS — Run Provenance (2026-08-08)
 - **Unified provenance:** `run_provenance` SQLite table for SCEP evaluation runs
 - **API:** `GET /provenance/runs`, `GET /provenance/runs/{type}/{id}`, `GET /eval/runs/{id}`

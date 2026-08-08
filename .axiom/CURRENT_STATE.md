@@ -40,6 +40,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **S0-E4 (EPIC-002 evidence gate):** `EvidenceState` on capability snapshots, prize readiness, and `/eval/*` APIs — `docs/S0-E4_evidence_gate.md`.
 - **CEL v1:** Master loop (`.axiom/CEL.md`), scorecards (`TECH_DEBT.md`, `BENCHMARK_RESULTS.md`, `ENGINEERING_SCORECARD.md`, `PRODUCT_SCORECARD.md`), `scripts/cel_health_check.py`.
 - **H1-OBS:** Unified `run_provenance` table and `/provenance` API for SCEP evaluation runs — `docs/H1-OBS_run_provenance.md`.
+- **TSS-1:** Trust, Security & Safety Loop — `.axiom/TSS.md`, security scorecards, production guard, optional route auth, secret scanner — `SECURITY_STATUS.md`.
 
 ## Blocked
 

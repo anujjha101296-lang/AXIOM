@@ -28,12 +28,14 @@ from typing import Optional
 from fastapi import Depends, Header, HTTPException, status
 from pydantic import BaseModel
 
+from axiom.config import settings
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-SECRET_TOKEN = os.getenv("AXIOM_API_TOKEN", "axiom-dev-token")
-JWT_SECRET   = os.getenv("JWT_SECRET_KEY",  "CHANGE-ME-IN-PRODUCTION")
-JWT_ALGO     = "HS256"
-JWT_EXPIRY   = int(os.getenv("JWT_EXPIRY_MINUTES", "60")) * 60  # seconds
+
+# ── Configuration (sourced from settings / environment) ───────────────────────
+SECRET_TOKEN = settings.axiom_api_token
+JWT_SECRET = settings.jwt_secret_key
+JWT_ALGO = settings.jwt_algorithm
+JWT_EXPIRY = settings.jwt_expiry_minutes * 60  # seconds
 
 
 # ── Roles ─────────────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ Honest inventory of known debt. P0 items block trust or builds; P1 items reduce 
 | TD-005 | P1 | Kernel | Research Kernel on feature branch `cursor/research-kernel-dc7e` | Merge PR #15 after integration review |
 | TD-006 | P2 | Landing | Public landing page still in progress (`P0-WEB`) | Complete honest capability disclosure |
 | TD-007 | P2 | CI | Full suite 334/360 — e2e excluded from core gate | Document and track e2e repair separately |
+| TD-008 | P1 | Security | Agent execution budgets and code sandbox not implemented | TSS agent safety roadmap |
 
 ## Review cadence
 

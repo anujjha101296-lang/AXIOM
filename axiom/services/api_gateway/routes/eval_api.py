@@ -8,7 +8,7 @@ import json
 import sqlite3
 import time
 from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 from pydantic import BaseModel
 
 from axiom.config import settings
@@ -21,6 +21,7 @@ from axiom.evaluation.frameworks.capability import (
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
 from axiom.observability.run_provenance import get_provenance_store, record_scep_run
+from axiom.security.deps import eval_route_auth
 from axiom.evaluation.benchmarks.suite import (
     run_math_reasoning_benchmarks,
     run_proof_verification_benchmarks,
@@ -115,14 +116,14 @@ def _get_current_scores(db_path: str) -> Dict[str, Any]:
 
 
 @router.get("/scores")
-def get_capability_scores():
+def get_capability_scores(_token: str = Depends(eval_route_auth)):
     """Retrieve the latest capability scores for all 8 dimensions."""
     data = _get_current_scores(settings.db_path)
     return data["dimensions"]
 
 
 @router.get("/prize-readiness")
-def get_prize_readiness():
+def get_prize_readiness(_token: str = Depends(eval_route_auth)):
     """Get the latest prize readiness scores for all 6 Millennium Problems."""
     data = _get_current_scores(settings.db_path)
     
@@ -137,7 +138,7 @@ def get_prize_readiness():
 
 
 @router.get("/history")
-def get_run_history():
+def get_run_history(_token: str = Depends(eval_route_auth)):
     """Get the last 10 evaluation runs with provenance summaries."""
     conn = sqlite3.connect(settings.db_path)
     cursor = conn.cursor()
@@ -164,7 +165,7 @@ def get_run_history():
 
 
 @router.get("/runs/{run_id}")
-def get_eval_run(run_id: str):
+def get_eval_run(run_id: str, _token: str = Depends(eval_route_auth)):
     """Retrieve a SCEP evaluation run snapshot and its provenance record."""
     conn = sqlite3.connect(settings.db_path)
     cursor = conn.cursor()
@@ -187,7 +188,7 @@ def get_eval_run(run_id: str):
 
 
 @router.post("/run", response_model=BenchmarkRunResponse)
-def trigger_benchmark():
+def trigger_benchmark(_token: str = Depends(eval_route_auth)):
     """Run all capability benchmarks synchronously and return current scores & delta report."""
     db_path = settings.db_path
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())

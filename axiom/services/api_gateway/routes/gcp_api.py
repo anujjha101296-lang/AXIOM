@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 
 from axiom.config import settings
@@ -12,8 +12,13 @@ from axiom.grand_challenge.engine import GrandChallengeEngine
 from axiom.grand_challenge.gates import list_gates
 from axiom.grand_challenge.models import ChallengeTier
 from axiom.grand_challenge.registry import get_challenge, list_challenges, program_manifest
+from axiom.security.deps import gcp_route_auth
 
-router = APIRouter(prefix="/gcp", tags=["grand-challenge"])
+router = APIRouter(
+    prefix="/gcp",
+    tags=["grand-challenge"],
+    dependencies=[Depends(gcp_route_auth)],
+)
 
 
 class CreateCampaignRequest(BaseModel):

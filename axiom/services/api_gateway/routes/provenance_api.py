@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 
 from axiom.config import settings
 from axiom.observability.run_provenance import RunType, get_provenance_store
+from axiom.security.deps import provenance_route_auth
 
-router = APIRouter(prefix="/provenance", tags=["provenance"])
+router = APIRouter(
+    prefix="/provenance",
+    tags=["provenance"],
+    dependencies=[Depends(provenance_route_auth)],
+)
 
 
 @router.get("/runs")
