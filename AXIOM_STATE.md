@@ -97,4 +97,4 @@ Unmerged research loops cannot unlock YC demos on `main`. Auth accounts exist; w
 
 ## Current commit
 
-Recorded at end of this cycle in the PR / cycle report.
+`589f6fc` on `cursor/axiom-master-os-dc7e` (pushed).
