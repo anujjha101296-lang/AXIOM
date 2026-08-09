@@ -32,7 +32,7 @@ echo -e "\n${CYAN}[3/5] Installing Python dependencies...${RESET}"
 pip install --quiet --upgrade pip
 pip install --quiet \
     fastapi uvicorn[standard] pydantic pydantic-settings \
-    networkx sympy pylatexenc requests z3-solver anyio httpx \
+    networkx sympy pylatexenc requests z3-solver anyio 'httpx>=0.27.0,<0.28.0' \
     pytest pytest-cov pytest-anyio ruff mypy
 echo -e "${GREEN}✓ Python dependencies installed${RESET}"
 

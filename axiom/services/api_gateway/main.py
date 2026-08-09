@@ -22,11 +22,21 @@ from axiom.core.verification.smt_gateway import SmtGateway
 from axiom.evaluation.prize_readiness import PrizeReadinessScorer
 from axiom.observability.logger import configure_logging, get_logger
 from axiom.observability.metrics import METRICS
+from axiom.security.production_guard import audit_security_config, enforce_production_security
 from axiom.services.api_gateway.auth import verify_token
 from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
+from axiom.services.api_gateway.routes.gcp_api import router as gcp_router
+from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
+from axiom.services.api_gateway.routes.evidence_api import router as evidence_router
+from axiom.services.api_gateway.routes.routing_api import router as routing_router
+from axiom.services.api_gateway.routes.formal_math_api import router as formal_math_router
+from axiom.services.api_gateway.routes.experiment_api import router as experiment_router
+from axiom.services.api_gateway.routes.frce_api import router as frce_router
+from axiom.services.api_gateway.routes.skai_api import router as skai_router
+from axiom.services.api_gateway.routes.workflow_router import workflow_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -39,6 +49,18 @@ async def lifespan(app: FastAPI):
     """Run startup tasks, yield, then run shutdown tasks."""
     logger.info("AXIOM API Gateway starting up",
                 extra={"version": settings.app_version, "env": settings.environment})
+    enforce_production_security(settings)
+    for finding in audit_security_config(settings):
+        log_fn = logger.warning if finding.severity in ("critical", "high") else logger.info
+        log_fn(
+            "security_audit",
+            extra={
+                "finding_id": finding.id,
+                "severity": finding.severity,
+                "component": finding.component,
+                "message": finding.message,
+            },
+        )
     # Run database migrations on startup
     if store.conn:
         run_migrations(store.conn)
@@ -76,6 +98,33 @@ app.include_router(mde_router)
 
 # ── Research Workspace (projects, PDFs, notes, search, sessions) ──────────────
 app.include_router(research_router)
+
+# ── Grand Challenge Program (long-term scientific campaigns) ─────────────────
+app.include_router(gcp_router)
+
+# ── H1-OBS Run Provenance (SCEP audit records) ──────────────────────────────
+app.include_router(provenance_router)
+
+# ── E&R Evidence & Reproducibility Loop ───────────────────────────────────────
+app.include_router(evidence_router)
+
+# ── SIMR Scientific Intelligence & Model Routing ────────────────────────────────
+app.include_router(routing_router)
+
+# ── FMTP Formal Mathematics & Theorem-Proving ─────────────────────────────────
+app.include_router(formal_math_router)
+
+# ── SEC Scientific Experimentation & Compute ──────────────────────────────────
+app.include_router(experiment_router)
+
+# ── FRCE Frontier Research Campaign Engine ───────────────────────────────────
+app.include_router(frce_router)
+
+# ── SKAI Scientific Knowledge Acquisition & Intelligence ─────────────────────
+app.include_router(skai_router)
+
+# ── Workflow Engine (multi-agent orchestration) ──────────────────────────────
+app.include_router(workflow_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
@@ -231,11 +280,20 @@ def trigger_ingest(payload: IngestionRequest, token: str = Depends(verify_token)
 # Protected Query Endpoint
 @app.post("/query", tags=["discovery"])
 def run_query(payload: QueryRequest, token: str = Depends(verify_token)):
+    """Reasoning-aware knowledge retrieval via SKAI (replaces empty stub)."""
+    from axiom.skai.orchestrator import SkaiOrchestrator
+
     logger.info(f"Query parsed: {payload.query_string}")
+    skai = SkaiOrchestrator(settings.db_path)
+    retrieval = skai.synthesize_knowledge(payload.query_string)
+    entities = retrieval.get("retrieval", {}).get("entities", [])
     return {
         "status": "success",
         "query": payload.query_string,
-        "results": []
+        "results": entities,
+        "gaps": retrieval.get("gaps", []),
+        "coverage": retrieval.get("coverage"),
+        "synthesis_note": retrieval.get("synthesis_note"),
     }
 
 # Verify Conjecture: Runs Z3 SMT Counterexample solver

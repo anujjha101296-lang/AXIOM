@@ -5,7 +5,7 @@
 
 .PHONY: help setup dev test test-coverage lint lint-fix type-check \
         docker-build docker-up docker-down docker-logs \
-        prize-readiness self-improve clean format
+        prize-readiness self-improve gcp-benchmark clean format
 
 PYTHON := python3
 PYTEST := $(PYTHON) -m pytest
@@ -112,6 +112,35 @@ self-improve: ## Trigger self-improvement audit and regenerate roadmap.md
 		 path = loop.run(); \
 		 print(f'Roadmap written to: {path}')"
 	@echo "$(GREEN)✓ roadmap.md updated.$(RESET)"
+
+gcp-benchmark: ## Run Grand Challenge Program compliance benchmark
+	@echo "$(BOLD)Running GCP compliance benchmark...$(RESET)"
+	PYTHONPATH=. $(PYTHON) scripts/run_gcp_benchmark.py
+	@echo "$(GREEN)✓ Report: gcp_benchmark_results.json$(RESET)"
+
+cel-health: ## Run CEL governance artifact and core test health check
+	@python3 scripts/cel_health_check.py
+
+tss-security: ## Run TSS trust/security/safety check
+	@python3 scripts/tss_security_check.py
+
+erl-health: ## Run E&R evidence & reproducibility health check
+	@python3 scripts/erl_health_check.py
+
+simr-health: ## Run SIMR model routing health check
+	@python3 scripts/simr_health_check.py
+
+fmtp-health: ## Run FMTP formal mathematics health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/fmtp_health_check.py; else python3 scripts/fmtp_health_check.py; fi
+
+sec-health: ## Run SEC experiment & compute health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/sec_health_check.py; else python3 scripts/sec_health_check.py; fi
+
+frce-health: ## Run FRCE frontier research campaign health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/frce_health_check.py; else python3 scripts/frce_health_check.py; fi
+
+skai-health: ## Run SKAI knowledge acquisition health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/skai_health_check.py; else python3 scripts/skai_health_check.py; fi
 
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations

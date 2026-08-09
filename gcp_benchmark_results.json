@@ -1,0 +1,15 @@
+{
+  "benchmark": "GCP_compliance",
+  "timestamp": "2026-08-08T03:57:02Z",
+  "program_tiers": 6,
+  "program_challenges": 15,
+  "campaign_id": "58e798bd-bef",
+  "experiments_run": 3,
+  "experiments_passed": 3,
+  "evidence_records": 3,
+  "checkpoints": 0,
+  "progress_fraction": 1.0,
+  "readiness_blockers": [],
+  "duration_ms": 4.61,
+  "compliant": true
+}
