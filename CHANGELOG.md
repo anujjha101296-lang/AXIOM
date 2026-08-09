@@ -8,6 +8,13 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### AXIOM-MASTER-001 — Continuous Autonomous Execution (2026-08-09)
+- Installed `.axiom/MASTER_DIRECTIVE.md` as binding engineering execution law
+- Wired `AGENTS.md` and `.axiom/CONSTITUTION.md` to continuous-loop operation
+- Added `AXIOM_STATE.md` honest system snapshot and `.axiom/MERGE_ORDER.md`
+- Competitive wedge documented: scientific research loop, not coding-agent clone
+- Queue reordered: LAND-1 / FOUNDER-MERGE before new research-loop sprawl
+
 ### Sprint 0 — Production Foundation
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)

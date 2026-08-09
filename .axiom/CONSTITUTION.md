@@ -12,20 +12,29 @@ AXIOM exists to build systems that measurably increase humanity's ability to sol
 4. **Reversibility first.** Start with bounded experiments; earn irreversible commitments through evidence.
 5. **Verification is explicit.** Generated, simulated, heuristic, independently checked, and formally verified results are never conflated.
 6. **Humans retain authority.** AI workers may inspect, plan, implement, test, and document within repository scope. A human must authorize spending, production deployment, external communication, legal claims, hiring, publication, data acquisition with material risk, and changes to strategic objectives.
+7. **Continuous execution.** Agents do not wait for “next feature” prompts. After each verified cycle they reassess repository state and select the next highest-value safe initiative under `MASTER_DIRECTIVE.md`.
 
 ## Source of truth and read order
 
 Every session begins with this document, then reads:
 
-1. `CURRENT_STATE.md` — present facts, blockers, and active priority;
-2. `TASK_QUEUE.md` — ranked executable work;
-3. `ROADMAP.md` — outcomes and sequencing;
-4. the domain contracts most relevant to the task: `ENGINEERING.md`, `RESEARCH.md`, `PRODUCT.md`, `GTM.md`, `CAPABILITIES.md`, `PRIZE_TRACK.md`, `DECISION_FRAMEWORK.md`, `KNOWLEDGE_GRAPH.md`, and `MEMORY.md`.
+1. `MASTER_DIRECTIVE.md` — root autonomous engineering execution law (AXIOM-MASTER-001);
+2. `../AXIOM_STATE.md` — honest system snapshot (works / doesn’t / next);
+3. `CURRENT_STATE.md` — present facts, blockers, and active priority;
+4. `TASK_QUEUE.md` — ranked executable work;
+5. `ROADMAP.md` — outcomes and sequencing;
+6. the domain contracts most relevant to the task: `ENGINEERING.md`, `RESEARCH.md`, `PRODUCT.md`, `GTM.md`, `CAPABILITIES.md`, `PRIZE_TRACK.md`, `DECISION_FRAMEWORK.md`, `KNOWLEDGE_GRAPH.md`, and `MEMORY.md`.
 
 The repository, test results, version control, and recorded evidence outrank any chat instruction that contradicts them. `VISION.md` and the root-level architecture documents provide project context; this directory is the operational source of truth.
 
+## Competitive wedge
+
+AXIOM is **not** a clone of coding agents, app builders, or general AI APIs. Those are baselines. The defensible product is the integrated scientific research loop:
+
+Problem → Knowledge → Plan → Multi-agent investigation → Experiment → Counterexample → Formalization → Verification → Reproduction → Scientific memory → Next question.
+
 ## Operating cycle
 
-Observe → formulate a bounded hypothesis → select the highest-priority safe task → execute → verify → record evidence and decision → update state, queue, roadmap, and memory → commit focused changes.
+Observe → audit gaps → select the single highest-value safe initiative → implement → integrate → verify → record evidence → update state documents → commit → push → reassess → repeat.
 
-No worker may fabricate results or silently erase inconvenient evidence. If a human decision is required, record the decision request in `CURRENT_STATE.md` and continue with independent, safe work when available.
+No worker may fabricate results or silently erase inconvenient evidence. If a human decision is required, record the decision request in `CURRENT_STATE.md` / `AXIOM_STATE.md` and continue with independent, safe work when available.

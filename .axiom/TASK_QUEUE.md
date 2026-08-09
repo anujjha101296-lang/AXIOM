@@ -1,21 +1,34 @@
 # Prioritized Task Queue
 
-Read `CONSTITUTION.md`, `CURRENT_STATE.md`, `DECISION_FRAMEWORK.md`, `ROADMAP.md`, and `MEMORY.md`. This queue is the next-work source of truth; update it after each cycle.
+Read `CONSTITUTION.md`, `MASTER_DIRECTIVE.md`, `../AXIOM_STATE.md`, `CURRENT_STATE.md`, `DECISION_FRAMEWORK.md`, `ROADMAP.md`, and `MEMORY.md`.
+
+Agents select the **first unblocked** task and continue without waiting for “next”.
 
 ## Ranking method
 
-Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.md`: impact, dependency unlock, scientific value, engineering value, prize-readiness impact, confidence, reversibility, and effort. P0 safety, integrity, data-loss, and supported-build failures always outrank the formula.
+P0 safety / integrity / false-claim / supported-build failures always win. Otherwise score by impact, dependency unlock, scientific value, engineering value, prize-readiness, confidence, reversibility, effort (`DECISION_FRAMEWORK.md`). Prefer work that lands on GitHub `main` and advances the YC-ready MVP.
 
 | Rank | ID | Task | Dependencies | Acceptance signal | Status |
 |---:|---|---|---|---|---|
-| 1 | S0-E2 | Provision and document Python 3.10+ runtime; align local setup, CI, and Docker where applicable; run full suite. | Runtime authority/environment | Test collection works under supported runtime; complete results recorded. | **Complete (core):** 134/134 core tests pass; 26 e2e failures documented |
-| 2 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive, accessible page distinguishes current capabilities from future vision. | In progress — `/research` workspace linked from landing |
-| 3 | R0-PLAN | Establish the initial researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
-| 4 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
-| 5 | S0-E3 | Audit verification routes/models for simulation versus formal-proof truthfulness. | S0-E2 test baseline | Regression tests prove fallback results cannot claim formal verification. | **Complete** |
-| 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Ready — highest priority** |
-| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | Deferred |
+| 1 | MASTER-OS | Install AXIOM-MASTER-001; wire AGENTS/CONSTITUTION; create AXIOM_STATE | — | Directive readable; sessions start with continuous loop | **In progress (this cycle)** |
+| 2 | LAND-1 | Land P0-WEB + Master OS on `main`; document merge order for research stack | MASTER-OS | Honest `/` on mainline path; merge order published | Ready |
+| 3 | FOUNDER-MERGE | Authorize bottom-up merge of draft PRs #17→#26 (or squash tip) | LAND-1 | `main` contains research loops or explicit decline | **Founder gate** |
+| 4 | MVP-AUTH | Real user signup/login + session for research workspace | LAND-1 | User can create account and own projects | Ready after LAND-1 |
+| 5 | MVP-EVIDENCE | Show evidence/citations in research Q&A UI (no fake sources) | MVP-AUTH or workspace | Answers display provenance when available | Ready |
+| 6 | S0-E4 | EPIC-002 evidence gate integration | S0-E3 | Evidence state on eval APIs documented + tested | Ready on main; also on draft stacks |
+| 7 | R0-PLAN | Researcher workflow + benchmark program + monthly evidence review | Existing evidence | Plan names measurement and non-claims | In progress |
+| 8 | C0-PMO | Daily/weekly PMO cadence | AOS | Operating answers for priorities/blockers | In progress |
+| 9 | GCP-2 | First Tier 1 campaign | Research stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
+
+## Historical (complete on main or prior)
+
+| ID | Status |
+|----|--------|
+| S0-E2 | Complete (core) |
+| S0-E3 | Complete |
+| EM-001 | Complete on main |
+| P0-WEB | Complete on draft PR #27 — land via LAND-1 |
 
 ## Queue protocol
 
-Select the first unblocked task. If blocked, record the blocker in `CURRENT_STATE.md`, choose the next independent safe task, and preserve rank/reasoning. Add new work only with an acceptance signal, dependencies, evidence source, and a link to a capability or opportunity in `KNOWLEDGE_GRAPH.md`.
+Select the first unblocked task. If blocked, record the blocker in `CURRENT_STATE.md` / `AXIOM_STATE.md`, choose the next independent safe task, and preserve rank. Do not open new speculative research-loop PRs while LAND-1 / FOUNDER-MERGE are unresolved.

@@ -8,6 +8,14 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-09 — Operating system — AXIOM-MASTER-001 installed
+
+- **Summary:** Replaced isolated “next feature” prompting with continuous autonomous execution under `.axiom/MASTER_DIRECTIVE.md`. Wired `AGENTS.md` + `CONSTITUTION.md`. Created `AXIOM_STATE.md` documenting that 25+ draft PRs never landed on `main` is the primary organizational failure mode.
+- **Artifacts:** `.axiom/MASTER_DIRECTIVE.md`, `AXIOM_STATE.md`, `.axiom/MERGE_ORDER.md`, updated `AGENTS.md`, `CONSTITUTION.md`, `TASK_QUEUE.md`, `CURRENT_STATE.md`.
+- **Decision:** Product-first YC MVP + research loop wedge; do not reinvent coding-agent / app-builder / general-API stacks; stop opening orphan research-loop PRs until LAND-1 / FOUNDER-MERGE resolve.
+- **Founder gate:** Authorize merge of draft PR chain #17→#26 (or squash tip).
+- **Next:** LAND-1 (land P0-WEB + OS), then MVP-AUTH.
+
 ### 2026-08-06 — Product milestone — EM-001 Research Workspace (production)
 
 - **Summary:** Shipped production-ready researcher workflow: project organization, PDF pipeline, notes with tags, FTS search, paper Q&A with persisted conversations, session resume.
