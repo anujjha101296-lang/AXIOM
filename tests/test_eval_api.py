@@ -129,6 +129,8 @@ def test_get_capability_scores_endpoint(temp_eval_db):
         assert "score" in info
         assert "level" in info
         assert "level_name" in info
+        assert "evidence_state" in info
+        assert "benchmark_count" in info
         assert 0.0 <= info["score"] <= 1.0
 
 
@@ -146,6 +148,8 @@ def test_post_eval_run_endpoint(temp_eval_db):
     assert "highest_priority" in response
     assert "recommended_next_epic" in response
     assert "regression_detected" in response
+    assert "evidence_tier" in response
+    assert "limitations" in response
     
     # Assert values
     assert isinstance(response["run_id"], str)
@@ -196,6 +200,11 @@ def test_get_prize_readiness_endpoint(temp_eval_db):
     # Verify sorted descending by score
     scores = [item["score"] for item in readiness]
     assert scores == sorted(scores, reverse=True)
+
+    for item in readiness:
+        assert "evidence_tier" in item
+        assert "benchmark_count" in item
+        assert "limitations" in item
 
 
 def test_fastapi_client_integration(temp_eval_db):
