@@ -35,4 +35,6 @@ Reason: `cursor/vfactory-verification-dc7e` already contains the entire linear s
 
 ## Current commit
 
-Recorded after merge commit + push.
+`e3a9cf8` on `cursor/integrate-mainline-dc7e` (pushed).  
+Core tests: **299 passed / 3 failed** (known SCEP audit-doc failures).  
+PR: https://github.com/anujjha101296-lang/AXIOM/pull/29
