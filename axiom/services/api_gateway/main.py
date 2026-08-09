@@ -28,6 +28,7 @@ from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
+from axiom.services.api_gateway.routes.auth_api import router as auth_router
 from axiom.services.api_gateway.routes.gcp_api import router as gcp_router
 from axiom.services.api_gateway.routes.provenance_api import router as provenance_router
 from axiom.services.api_gateway.routes.evidence_api import router as evidence_router
@@ -99,6 +100,9 @@ app.include_router(mde_router)
 
 # ── Research Workspace (projects, PDFs, notes, search, sessions) ──────────────
 app.include_router(research_router)
+
+# ── Auth (signup / login / me) ────────────────────────────────────────────────
+app.include_router(auth_router)
 
 # ── Grand Challenge Program (long-term scientific campaigns) ─────────────────
 app.include_router(gcp_router)

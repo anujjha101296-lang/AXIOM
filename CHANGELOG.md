@@ -8,6 +8,24 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### INTEGRATE — Tip integration (2026-08-09)
+- Combined VFACTORY research tip with MASTER-OS, P0-WEB, and MVP-AUTH
+- Chosen merge strategy: tip integration (not bottom-up of 10 PRs)
+
+### AXIOM-MASTER-001 — Continuous Autonomous Execution (2026-08-09)
+- Installed `.axiom/MASTER_DIRECTIVE.md` as binding engineering execution law
+- Wired `AGENTS.md` and `.axiom/CONSTITUTION.md` to continuous-loop operation
+- Added `AXIOM_STATE.md` honest system snapshot and `.axiom/MERGE_ORDER.md`
+
+### P0-WEB — Honest Public Landing Page (2026-08-09)
+- Replaced mock metrics and dead waitlist with verified capability disclosure
+- Primary CTA to `/research`; static Next.js server component
+
+### MVP-AUTH — Signup / Login (2026-08-09)
+- `axiom/identity/` + `/auth/signup|/login|/me` + `/login` UI
+- JWT accepted by `verify_token`; static token still works
+- Limitation: project owner isolation deferred
+
 ### VFACTORY — Verification Factory (2026-08-09)
 - **VFACTORY v1:** Capability registry (15 capabilities), test pyramid runners, verification scoring
 - **User journeys:** A (research workspace), B (campaign), C (formal math), D (sandbox recovery)

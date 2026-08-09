@@ -62,7 +62,12 @@ class TokenPayload(BaseModel):
 def verify_token(authorization: str = Header(None)) -> str:
     """
     FastAPI dependency: verifies the `Authorization: Bearer <token>` header.
-    Used on every protected endpoint. Returns the raw token string.
+
+    Accepts:
+      1. Static MVP token (`AXIOM_API_TOKEN`) — single-tenant / local dev
+      2. Signed JWT from `/auth/signup` or `/auth/login` — multi-user path
+
+    Returns the raw token string (static or JWT).
     """
     if not authorization:
         raise HTTPException(
@@ -78,13 +83,20 @@ def verify_token(authorization: str = Header(None)) -> str:
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = parts[1]
-    if token != SECRET_TOKEN:
+    if token == SECRET_TOKEN:
+        return token
+    # Multi-user JWT path
+    try:
+        decode_jwt_token(token)
+        return token
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token",
             headers={"WWW-Authenticate": "Bearer"},
-        )
-    return token
+        ) from None
 
 
 # ── JWT Utilities (production multi-user path) ────────────────────────────────

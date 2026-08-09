@@ -88,6 +88,15 @@ export default function ResearchPage() {
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("axiom_access_token");
+      if (saved) setToken(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const headers = useCallback(
     () => ({
       Authorization: `Bearer ${token}`,

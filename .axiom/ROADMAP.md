@@ -25,6 +25,10 @@ Make ingest, knowledge representation, bounded hypothesis generation, counterexa
 
 ## Track B — Product (continuous)
 
+### Milestone 0 — Master Directive + land `main` (active)
+
+Operate under `MASTER_DIRECTIVE.md`. Land P0-WEB and research-loop draft stack onto `main` (see `MERGE_ORDER.md`). Stop orphan PR sprawl.
+
 ### Milestone 1 — Researcher workflow MVP (1–2 months)
 
 Deliver one end-to-end workflow that a mathematical/scientific researcher can understand, try, and evaluate. Its value proposition, limits, and supporting documentation must be honest and testable. Target learning signal: 10–20 early users or equivalent structured research-user conversations; no user count is claimed until measured.
