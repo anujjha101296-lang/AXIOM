@@ -136,6 +136,9 @@ fmtp-health: ## Run FMTP formal mathematics health check
 sec-health: ## Run SEC experiment & compute health check
 	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/sec_health_check.py; else python3 scripts/sec_health_check.py; fi
 
+frce-health: ## Run FRCE frontier research campaign health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/frce_health_check.py; else python3 scripts/frce_health_check.py; fi
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

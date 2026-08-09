@@ -15,7 +15,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 5 | S0-E3 | Audit verification routes/models for simulation versus formal-proof truthfulness. | S0-E2 test baseline | Regression tests prove fallback results cannot claim formal verification. | **Complete** |
 | 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Complete** — see `docs/S0-E4_evidence_gate.md` |
 | 7 | GCP-1 | Grand Challenge Program — six-tier campaign framework with readiness gates. | S0-E4 | 15+ challenges, campaign API, gates, 4 docs, Tier 1 campaign recommended. | **Complete** — see `GRAND_CHALLENGE_PROGRAM.md` |
-| 8 | GCP-2 | Execute first Tier 1 campaign ("Foundations of Known-Answer Mathematical Reasoning"). | GCP-1 | 2-week bounded campaign; >= 2/3 challenges pass; journal + checkpoints. | **Ready — requires Layer 1 strategic approval** |
+| 8 | GCP-2 | Execute first Tier 1 campaign ("Foundations of Known-Answer Mathematical Reasoning"). | FRCE-1 | 2-week bounded campaign; >= 2/3 challenges pass; journal + checkpoints. | **Ready — requires Layer 1 strategic approval** |
 | 9 | OS-1 | AXIOM Operating System v1.0 — Continuous Evolution Loop codified. | GCP-1 | 7 layers, metrics, repo map, templates, constitution update. | **Complete** — see `AXIOM_OPERATING_SYSTEM.md` |
 | 10 | CEL-1 | CEL master loop, scorecards, and health check. | OS-1, S0-E4 | `.axiom/CEL.md`, scorecards, `make cel-health` passes. | **Complete** |
 | 11 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | **Complete** — see `docs/H1-OBS_run_provenance.md` |
@@ -24,6 +24,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 14 | SIMR-1 | Scientific Intelligence & Model Routing — model/tool selection. | E&R-1, SCEP | Model/tool registries, router, `/routing/*`, `make simr-health` passes. | **Complete** — see `MODEL_REGISTRY.md` |
 | 15 | FMTP-1 | Formal Mathematics & Theorem-Proving Loop. | SIMR-1, MIP | Prover registry, formalization, proof search, `/formal/*`, `make fmtp-health` passes. | **Complete** — see `FORMAL_MATH_STATUS.md` |
 | 16 | SEC-1 | Scientific Experimentation & Compute Loop. | FMTP-1, TSS | Experiment kernel, sandbox, `/experiments/*`, `make sec-health` passes. | **Complete** — see `EXPERIMENT_ENGINE.md` |
+| 17 | FRCE-1 | Frontier Research Campaign Engine — connect all loops. | SEC-1, E&R-1, SIMR-1, FMTP-1, GCP-1 | Campaign orchestrator, `/frce/*`, `make frce-health` passes. | **Complete** — see `FRONTIER_CAMPAIGN_ENGINE.md` |
 
 ## Queue protocol
 

@@ -2,7 +2,7 @@
 
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
-**Last updated:** 2026-08-08
+**Last updated:** 2026-08-09
 **Active horizon:** AXIOM Operating System v1.0 — Continuous Evolution Loop
 
 ## Where we are today
@@ -45,6 +45,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **SIMR-1:** Scientific Intelligence & Model Routing — model/tool registries, capability graph, router, research compiler, `/routing/*` API — `MODEL_REGISTRY.md`.
 - **FMTP-1:** Formal Mathematics & Theorem-Proving — prover registry, formalization pipelines, proof search, compilation gate, `/formal/*` API — `FORMAL_MATH_STATUS.md`.
 - **SEC-1:** Scientific Experimentation & Compute — experiment kernel, sandbox, lifecycle, `/experiments/*` API — `EXPERIMENT_ENGINE.md`.
+- **FRCE-1:** Frontier Research Campaign Engine — orchestrates E&R, SIMR, FMTP, SEC, GCP into long-running research missions — `FRONTIER_CAMPAIGN_ENGINE.md`.
 
 ## Blocked
 

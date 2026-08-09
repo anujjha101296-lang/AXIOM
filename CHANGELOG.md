@@ -8,6 +8,18 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### FRCE — Frontier Research Campaign Engine (2026-08-09)
+- **FRCE v1:** `.axiom/FRCE.md`, campaign engine docs, orchestration architecture
+- **Campaign kernel:** state machine, research graph, graduated contribution levels
+- **Orchestrator:** connects SIMR, SEC, FMTP, E&R, GCP in research cycles
+- **Pivot mechanism:** continue/pivot/escalate/pause/abandon after each cycle
+- **Human gates:** novel claims, counterexamples, formal proofs, resource thresholds
+- **Memory:** campaign memory + global compounding with provenance
+- **Challenge ladder:** levels 0–9 with evidence-based advancement
+- **API:** `/frce/*` routes with optional authentication
+- **Health check:** `scripts/frce_health_check.py`, `make frce-health`
+- **Tests:** `tests/test_frce_campaign.py` (14 tests)
+
 ### SEC — Scientific Experimentation & Compute Loop (2026-08-09)
 - **SEC v1:** `.axiom/SEC.md`, experiment engine docs, sandbox security
 - **Experiment kernel:** lifecycle, versioned store, hypothesis linking
