@@ -26,3 +26,4 @@ formal_math_route_auth = _make_optional_auth("require_auth_for_formal_math_route
 experiment_route_auth = _make_optional_auth("require_auth_for_experiment_routes")
 frce_route_auth = _make_optional_auth("require_auth_for_frce_routes")
 skai_route_auth = _make_optional_auth("require_auth_for_skai_routes")
+workflow_route_auth = _make_optional_auth("require_auth_for_workflow_routes")
