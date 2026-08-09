@@ -48,6 +48,38 @@ class AxiomSettings(BaseSettings):
     )
     jwt_algorithm: str = Field(default="HS256")
     jwt_expiry_minutes: int = Field(default=60, ge=1)
+    axiom_api_token: str = Field(
+        default="axiom-dev-token",
+        description="MVP bearer token for API authentication",
+    )
+    require_auth_for_eval_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /eval/* (recommended in production)",
+    )
+    require_auth_for_gcp_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /gcp/* (recommended in production)",
+    )
+    require_auth_for_provenance_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /provenance/* (recommended in production)",
+    )
+    require_auth_for_evidence_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /evidence/* (recommended in production)",
+    )
+    require_auth_for_routing_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /routing/* (recommended in production)",
+    )
+    require_auth_for_formal_math_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /formal/* (recommended in production)",
+    )
+    block_insecure_production_config: bool = Field(
+        default=True,
+        description="Refuse startup in production when critical security misconfig is detected",
+    )
     api_token: str = Field(
         default="axiom-dev-token",
         description="Static bearer token for simple single-tenant auth",
