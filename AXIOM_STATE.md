@@ -2,33 +2,31 @@
 
 **Last updated:** 2026-08-09  
 **Directive:** AXIOM-MASTER-001  
-**Branch:** `cursor/integrate-mainline-dc7e`  
-**Strategy:** Tip integration + continuous MVP execution
+**Branch:** `cursor/integrate-mainline-dc7e`
 
 ## One-line status
 
-Integrated tip: research loops + OS + auth + ownership + citations + campaigns + agent activity + **logout/login persistence** + **experiments UI**.
+Integrated tip is MVP-ready for founder merge: auth, ownership, research, campaigns, experiments, docker smoke green.
 
-## What works on this tip
+## What works
 
 | Area | Status |
 |------|--------|
-| Research workspace `/research` | Live |
-| Signup/login + Log out | Live |
-| Project ownership | Live |
-| Q&A citations / provider_mode | Live |
-| Campaigns `/campaigns` | Live |
-| Experiments `/experiments` | Live |
-| Persistence after re-login | Live (`test_mvp_persistence`) |
-| MVP journey test | Green |
+| Research `/research` | Live |
+| Auth + logout/login persistence | Live |
+| Project / FRCE / SEC ownership | Live |
+| Campaigns + agent activity | Live |
+| Experiments UI | Live |
+| Docker compose api+ui | Live (`scripts/docker_smoke.sh`) |
 
 ## Next
 
-1. Founder merges PR #29 to `main`
-2. Docker compose smoke
-3. Per-user FRCE/SEC ownership
+1. **Founder merges PR #29 to `main`**
+2. Controlled internet research polish
+3. Close superseded draft PRs after merge
 
-## Current commit
+## Evidence
 
-See tip of `cursor/integrate-mainline-dc7e`.  
-PR: https://github.com/anujjha101296-lang/AXIOM/pull/29
+- Resource ownership tests green
+- `DOCKER_SMOKE_PASSED` (api healthy + ui reachable)
+- PR: https://github.com/anujjha101296-lang/AXIOM/pull/29

@@ -97,6 +97,7 @@ class ExperimentStore:
         campaign_id: str | None = None,
         claim_id: str | None = None,
         hypothesis_id: str | None = None,
+        owner_id: str | None = None,
     ) -> Experiment:
         now = _utc_now()
         experiment = Experiment(
@@ -109,6 +110,7 @@ class ExperimentStore:
             campaign_id=campaign_id,
             claim_id=claim_id,
             hypothesis_id=hypothesis_id,
+            owner_id=owner_id,
         )
         self._save(experiment)
         return experiment
@@ -155,20 +157,26 @@ class ExperimentStore:
         self,
         status: ExperimentStatus | None = None,
         limit: int = 50,
+        *,
+        owner_id: str | None = None,
     ) -> list[Experiment]:
         conn = self._conn()
+        fetch_limit = limit if owner_id in (None, "dev") else max(limit * 3, 100)
         if status:
             rows = conn.execute(
                 "SELECT json_data FROM sec_experiments WHERE status = ? ORDER BY updated_at DESC LIMIT ?",
-                (status.value, limit),
+                (status.value, fetch_limit),
             ).fetchall()
         else:
             rows = conn.execute(
                 "SELECT json_data FROM sec_experiments ORDER BY updated_at DESC LIMIT ?",
-                (limit,),
+                (fetch_limit,),
             ).fetchall()
         self._release_conn(conn)
-        return [_experiment_from_dict(json.loads(r["json_data"])) for r in rows]
+        experiments = [_experiment_from_dict(json.loads(r["json_data"])) for r in rows]
+        if owner_id is None or owner_id == "dev":
+            return experiments[:limit]
+        return [e for e in experiments if e.owner_id == owner_id][:limit]
 
     def transition(self, experiment_id: str, new_status: ExperimentStatus) -> Experiment:
         experiment = self.get(experiment_id)

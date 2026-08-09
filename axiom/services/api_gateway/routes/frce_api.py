@@ -11,6 +11,7 @@ from axiom.campaign.models import LadderLevel, ResourceBudget
 from axiom.campaign.orchestrator import FrontierCampaignEngine
 from axiom.config import settings
 from axiom.security.deps import frce_route_auth
+from axiom.services.api_gateway.auth import optional_token_owner_id
 
 router = APIRouter(
     prefix="/frce",
@@ -44,6 +45,13 @@ def _engine() -> FrontierCampaignEngine:
     return FrontierCampaignEngine(settings.db_path)
 
 
+def _owned_campaign(campaign_id: str, owner_id: str):
+    campaign = _engine().get_campaign(campaign_id, owner_id=owner_id)
+    if not campaign:
+        raise HTTPException(status_code=404, detail=f"Campaign not found: {campaign_id}")
+    return campaign
+
+
 @router.get("/manifest")
 def get_manifest() -> dict[str, Any]:
     return _engine().manifest()
@@ -62,7 +70,10 @@ def get_roles() -> list[dict[str, Any]]:
 
 
 @router.post("/campaigns")
-def create_campaign(body: CreateCampaignRequest) -> dict[str, Any]:
+def create_campaign(
+    body: CreateCampaignRequest,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
     budget = ResourceBudget.from_dict(body.budget) if body.budget else None
     campaign = _engine().create_campaign(
         name=body.name,
@@ -74,26 +85,35 @@ def create_campaign(body: CreateCampaignRequest) -> dict[str, Any]:
         constraints=body.constraints,
         budget=budget,
         link_gcp=body.link_gcp,
+        owner_id=owner_id,
     )
     return campaign.to_dict()
 
 
 @router.get("/campaigns")
-def list_campaigns(phase: str | None = None, limit: int = 50) -> dict[str, Any]:
-    campaigns = _engine().list_campaigns(phase=phase, limit=limit)
+def list_campaigns(
+    phase: str | None = None,
+    limit: int = 50,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    campaigns = _engine().list_campaigns(phase=phase, limit=limit, owner_id=owner_id)
     return {"count": len(campaigns), "campaigns": [c.to_dict() for c in campaigns]}
 
 
 @router.get("/campaigns/{campaign_id}")
-def get_campaign(campaign_id: str) -> dict[str, Any]:
-    campaign = _engine().get_campaign(campaign_id)
-    if not campaign:
-        raise HTTPException(status_code=404, detail=f"Campaign not found: {campaign_id}")
-    return campaign.to_dict()
+def get_campaign(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    return _owned_campaign(campaign_id, owner_id).to_dict()
 
 
 @router.get("/campaigns/{campaign_id}/dashboard")
-def campaign_dashboard(campaign_id: str) -> dict[str, Any]:
+def campaign_dashboard(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().dashboard(campaign_id)
     except ValueError as exc:
@@ -101,7 +121,11 @@ def campaign_dashboard(campaign_id: str) -> dict[str, Any]:
 
 
 @router.post("/campaigns/{campaign_id}/scope")
-def scope_campaign(campaign_id: str) -> dict[str, Any]:
+def scope_campaign(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().scope(campaign_id).to_dict()
     except ValueError as exc:
@@ -109,7 +133,11 @@ def scope_campaign(campaign_id: str) -> dict[str, Any]:
 
 
 @router.post("/campaigns/{campaign_id}/plan")
-def plan_campaign(campaign_id: str) -> dict[str, Any]:
+def plan_campaign(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().plan(campaign_id).to_dict()
     except ValueError as exc:
@@ -117,7 +145,11 @@ def plan_campaign(campaign_id: str) -> dict[str, Any]:
 
 
 @router.post("/campaigns/{campaign_id}/cycle")
-def run_cycle(campaign_id: str) -> dict[str, Any]:
+def run_cycle(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().run_cycle(campaign_id)
     except ValueError as exc:
@@ -125,7 +157,12 @@ def run_cycle(campaign_id: str) -> dict[str, Any]:
 
 
 @router.post("/campaigns/{campaign_id}/checkpoint")
-def checkpoint_campaign(campaign_id: str, title: str = "Manual checkpoint") -> dict[str, Any]:
+def checkpoint_campaign(
+    campaign_id: str,
+    title: str = "Manual checkpoint",
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().checkpoint(campaign_id, title=title).to_dict()
     except ValueError as exc:
@@ -133,7 +170,13 @@ def checkpoint_campaign(campaign_id: str, title: str = "Manual checkpoint") -> d
 
 
 @router.post("/campaigns/{campaign_id}/gates/{gate_id}/resolve")
-def resolve_gate(campaign_id: str, gate_id: str, body: ResolveGateRequest) -> dict[str, Any]:
+def resolve_gate(
+    campaign_id: str,
+    gate_id: str,
+    body: ResolveGateRequest,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().resolve_human_gate(
             campaign_id, gate_id, approved=body.approved, notes=body.notes
@@ -143,7 +186,12 @@ def resolve_gate(campaign_id: str, gate_id: str, body: ResolveGateRequest) -> di
 
 
 @router.post("/campaigns/{campaign_id}/abandon")
-def abandon_campaign(campaign_id: str, body: AbandonRequest) -> dict[str, Any]:
+def abandon_campaign(
+    campaign_id: str,
+    body: AbandonRequest,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         return _engine().abandon(campaign_id, reason=body.reason).to_dict()
     except ValueError as exc:
@@ -151,7 +199,11 @@ def abandon_campaign(campaign_id: str, body: AbandonRequest) -> dict[str, Any]:
 
 
 @router.post("/campaigns/{campaign_id}/compound-memory")
-def compound_memory(campaign_id: str) -> dict[str, Any]:
+def compound_memory(
+    campaign_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_campaign(campaign_id, owner_id)
     try:
         entry_ids = _engine().compound_memory(campaign_id)
         return {"campaign_id": campaign_id, "global_memory_entry_ids": entry_ids}

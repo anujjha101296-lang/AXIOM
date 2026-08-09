@@ -13,7 +13,11 @@ services:
       - LOG_FORMAT=json
       - LOG_LEVEL=INFO
       - DB_PATH=/data/axiom.db
+      - RESEARCH_UPLOAD_DIR=/app/research_uploads
       - LEAN_OUTPUT_DIR=/tmp/axiom_proofs
+      - AXIOM_API_TOKEN=axiom-dev-token
+      - API_WORKERS=1
+      - API_RELOAD=false
     env_file:
       - .env
     volumes:
@@ -21,16 +25,18 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 30s
+      interval: 15s
       timeout: 5s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 20s
 
   # ── AXIOM Next.js Frontend ──────────────────────────────────────────────────
   ui:
     build:
       context: ./ui
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
     container_name: axiom-ui
     ports:
       - "3000:3000"
@@ -41,8 +47,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # ── Prometheus Metrics ──────────────────────────────────────────────────────
+  # ── Prometheus Metrics (optional: --profile observability) ──────────────────
   prometheus:
+    profiles: ["observability"]
     image: prom/prometheus:v2.50.0
     container_name: axiom-prometheus
     ports:
@@ -55,8 +62,9 @@ services:
       - "--storage.tsdb.retention.time=30d"
     restart: unless-stopped
 
-  # ── Grafana Dashboard ───────────────────────────────────────────────────────
+  # ── Grafana Dashboard (optional: --profile observability) ───────────────────
   grafana:
+    profiles: ["observability"]
     image: grafana/grafana:10.4.0
     container_name: axiom-grafana
     ports:

@@ -146,6 +146,7 @@ class Experiment:
     campaign_id: str | None = None
     claim_id: str | None = None
     hypothesis_id: str | None = None
+    owner_id: str | None = None
     environment: dict[str, Any] = field(default_factory=dict)
     results: dict[str, Any] = field(default_factory=dict)
     artifacts: list[str] = field(default_factory=list)
@@ -166,6 +167,7 @@ class Experiment:
             "campaign_id": self.campaign_id,
             "claim_id": self.claim_id,
             "hypothesis_id": self.hypothesis_id,
+            "owner_id": self.owner_id,
             "environment": self.environment,
             "results": self.results,
             "artifacts": self.artifacts,

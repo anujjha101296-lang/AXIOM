@@ -68,6 +68,7 @@ class FrontierCampaignEngine:
         constraints: list[str] | None = None,
         budget: ResourceBudget | None = None,
         link_gcp: bool = False,
+        owner_id: str | None = None,
     ) -> FrontierCampaign:
         campaign = FrontierCampaign(
             campaign_id=_new_id("camp"),
@@ -80,6 +81,7 @@ class FrontierCampaignEngine:
             constraints=constraints or [],
             budget=budget or ResourceBudget(),
             phase=CampaignPhase.PROPOSED,
+            owner_id=owner_id,
         )
 
         if link_gcp:
@@ -94,11 +96,26 @@ class FrontierCampaignEngine:
         self.store.save(campaign, archive_previous=False)
         return campaign
 
-    def get_campaign(self, campaign_id: str) -> FrontierCampaign | None:
-        return self.store.get(campaign_id)
+    def get_campaign(self, campaign_id: str, *, owner_id: str | None = None) -> FrontierCampaign | None:
+        campaign = self.store.get(campaign_id)
+        if campaign is None:
+            return None
+        if owner_id is not None and owner_id != "dev":
+            if campaign.owner_id != owner_id:
+                return None
+        return campaign
 
-    def list_campaigns(self, phase: str | None = None, limit: int = 50) -> list[FrontierCampaign]:
-        return self.store.list_campaigns(phase=phase, limit=limit)
+    def list_campaigns(
+        self,
+        phase: str | None = None,
+        limit: int = 50,
+        *,
+        owner_id: str | None = None,
+    ) -> list[FrontierCampaign]:
+        campaigns = self.store.list_campaigns(phase=phase, limit=limit if owner_id in (None, "dev") else max(limit * 3, 100))
+        if owner_id is None or owner_id == "dev":
+            return campaigns[:limit]
+        return [c for c in campaigns if c.owner_id == owner_id][:limit]
 
     def transition(self, campaign_id: str, to_phase: CampaignPhase) -> FrontierCampaign:
         campaign = self._load(campaign_id)

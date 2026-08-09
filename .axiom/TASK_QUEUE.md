@@ -18,12 +18,14 @@ P0 safety / integrity / false-claim / supported-build failures always win. Prefe
 | 6 | MVP-AGENTS-UI | Agent activity visibility | MVP-CAMPAIGN-UI | User sees what/why/found/uncertain | **Done** |
 | 7 | MVP-PERSIST-SMOKE | Logout/login preserves research state | Tip | `test_mvp_persistence` green + Log out UI | **Done** |
 | 8 | MVP-EXPERIMENTS-UI | Experiments create/run UI | SEC API | `/experiments` wired | **Done** |
-| 9 | MVP-DOCKER-SMOKE | Docker compose health on tip | Tip | compose up + health | **Next autonomous** |
-| 10 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
+| 9 | MVP-DOCKER-SMOKE | Docker compose health on tip | Tip | `scripts/docker_smoke.sh` passes | **Done** |
+| 10 | MVP-OWNER-FRCE-SEC | Per-user FRCE/SEC ownership | Tip | isolation tests green | **Done** |
+| 11 | MVP-WEB-RESEARCH | Controlled internet research polish | Tip | fetch/cite/store with untrusted marking | **Next autonomous** |
+| 12 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
 
 ## Historical (complete on tip)
 
-S0-E2, S0-E3, S0-E4, EM-001, GCP-1, OS-1, CEL-1, H1-OBS, TSS-1, E&R-1, SIMR-1, FMTP-1, SEC-1, FRCE-1, SKAI-1, MASTER-1, VFACTORY-1, MASTER-OS, P0-WEB, MVP-AUTH, MVP-EVIDENCE, MVP-CAMPAIGN-UI, MVP-AGENTS-UI, MVP-PERSIST-SMOKE, MVP-EXPERIMENTS-UI, MVP journey test.
+S0-E2 … VFACTORY-1, MASTER-OS, P0-WEB, MVP-AUTH, MVP-EVIDENCE, MVP-CAMPAIGN-UI, MVP-AGENTS-UI, MVP-PERSIST-SMOKE, MVP-EXPERIMENTS-UI, MVP-DOCKER-SMOKE, MVP-OWNER-FRCE-SEC, MVP journey test.
 
 ## Queue protocol
 

@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // Required for the production Docker image (standalone Node server).
+  output: "standalone",
+};
 
 export default nextConfig;

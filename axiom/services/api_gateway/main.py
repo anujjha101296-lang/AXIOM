@@ -60,7 +60,7 @@ async def lifespan(app: FastAPI):
                 "finding_id": finding.id,
                 "severity": finding.severity,
                 "component": finding.component,
-                "message": finding.message,
+                "finding_message": finding.message,
             },
         )
     # Run database migrations on startup

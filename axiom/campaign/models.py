@@ -549,6 +549,7 @@ class FrontierCampaign:
     proof_ids: list[str] = field(default_factory=list)
     routing_plan_id: str | None = None
     context: dict[str, Any] = field(default_factory=dict)
+    owner_id: str | None = None
     created_at: str = field(default_factory=_utc_now)
     updated_at: str = field(default_factory=_utc_now)
 
@@ -582,6 +583,7 @@ class FrontierCampaign:
             "proof_ids": self.proof_ids,
             "routing_plan_id": self.routing_plan_id,
             "context": self.context,
+            "owner_id": self.owner_id,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
@@ -617,6 +619,7 @@ class FrontierCampaign:
             proof_ids=list(data.get("proof_ids", [])),
             routing_plan_id=data.get("routing_plan_id"),
             context=dict(data.get("context", {})),
+            owner_id=data.get("owner_id"),
             created_at=data.get("created_at", _utc_now()),
             updated_at=data.get("updated_at", _utc_now()),
         )

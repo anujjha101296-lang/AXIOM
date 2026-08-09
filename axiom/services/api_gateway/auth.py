@@ -121,6 +121,26 @@ def token_owner_id(authorization: str | None = Header(None)) -> str:
     return payload.sub
 
 
+def optional_token_owner_id(authorization: str | None = Header(None)) -> str:
+    """Like token_owner_id, but returns 'anonymous' when auth header is absent."""
+    if not authorization:
+        return "anonymous"
+    try:
+        return token_owner_id(authorization)
+    except HTTPException:
+        return "anonymous"
+
+
+def actor_can_access(resource_owner_id: str | None, actor_id: str) -> bool:
+    """Static/dev token can access all; JWT users only their own resources."""
+    if actor_id == "dev":
+        return True
+    if resource_owner_id is None:
+        # Legacy unscoped rows — visible only to anonymous/dev for migration.
+        return actor_id in {"dev", "anonymous"}
+    return resource_owner_id == actor_id
+
+
 # ── JWT Utilities (production multi-user path) ────────────────────────────────
 
 def _encode_jwt(payload: dict) -> str:

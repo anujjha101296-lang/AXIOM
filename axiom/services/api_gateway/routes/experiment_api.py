@@ -29,6 +29,7 @@ from axiom.experiment.reproduction import compare_experiment_results
 from axiom.experiment.spec import validate_spec
 from axiom.experiment.store import get_experiment_store
 from axiom.security.deps import experiment_route_auth
+from axiom.services.api_gateway.auth import optional_token_owner_id
 
 router = APIRouter(
     prefix="/experiments",
@@ -39,6 +40,15 @@ router = APIRouter(
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _owned_experiment(experiment_id: str, owner_id: str):
+    experiment = get_experiment_store(settings.db_path).get(experiment_id)
+    if not experiment:
+        raise HTTPException(status_code=404, detail=f"Experiment not found: {experiment_id}")
+    if owner_id != "dev" and experiment.owner_id != owner_id:
+        raise HTTPException(status_code=404, detail=f"Experiment not found: {experiment_id}")
+    return experiment
 
 
 class CreateExperimentRequest(BaseModel):
@@ -84,7 +94,10 @@ class DatasetRequest(BaseModel):
 
 
 @router.post("/")
-def create_experiment(body: CreateExperimentRequest) -> dict[str, Any]:
+def create_experiment(
+    body: CreateExperimentRequest,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
     spec = ExperimentSpec(
         research_question=body.research_question,
         hypothesis=body.hypothesis,
@@ -104,15 +117,20 @@ def create_experiment(body: CreateExperimentRequest) -> dict[str, Any]:
         campaign_id=body.campaign_id,
         claim_id=body.claim_id,
         hypothesis_id=body.hypothesis_id,
+        owner_id=owner_id,
     )
     return experiment.to_dict()
 
 
 @router.get("/")
-def list_experiments(status: str | None = None, limit: int = 50) -> dict[str, Any]:
+def list_experiments(
+    status: str | None = None,
+    limit: int = 50,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
     store = get_experiment_store(settings.db_path)
     exp_status = ExperimentStatus(status) if status else None
-    experiments = store.list_experiments(status=exp_status, limit=limit)
+    experiments = store.list_experiments(status=exp_status, limit=limit, owner_id=owner_id)
     return {"count": len(experiments), "experiments": [e.to_dict() for e in experiments]}
 
 
@@ -205,15 +223,19 @@ def experiment_dashboard() -> dict[str, Any]:
 
 
 @router.get("/{experiment_id}")
-def get_experiment(experiment_id: str) -> dict[str, Any]:
-    experiment = get_experiment_store(settings.db_path).get(experiment_id)
-    if not experiment:
-        raise HTTPException(status_code=404, detail=f"Experiment not found: {experiment_id}")
-    return experiment.to_dict()
+def get_experiment(
+    experiment_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    return _owned_experiment(experiment_id, owner_id).to_dict()
 
 
 @router.post("/{experiment_id}/run")
-def run_experiment(experiment_id: str) -> dict[str, Any]:
+def run_experiment(
+    experiment_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_experiment(experiment_id, owner_id)
     try:
         return execute_experiment(get_experiment_store(settings.db_path), experiment_id)
     except KeyError:
@@ -223,7 +245,12 @@ def run_experiment(experiment_id: str) -> dict[str, Any]:
 
 
 @router.post("/{experiment_id}/transition")
-def transition_experiment(experiment_id: str, status: str) -> dict[str, Any]:
+def transition_experiment(
+    experiment_id: str,
+    status: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    _owned_experiment(experiment_id, owner_id)
     try:
         experiment = get_experiment_store(settings.db_path).transition(
             experiment_id, ExperimentStatus(status)
@@ -236,17 +263,19 @@ def transition_experiment(experiment_id: str, status: str) -> dict[str, Any]:
 
 
 @router.get("/{experiment_id}/integrity")
-def check_integrity(experiment_id: str) -> dict[str, Any]:
-    experiment = get_experiment_store(settings.db_path).get(experiment_id)
-    if not experiment:
-        raise HTTPException(status_code=404, detail=f"Experiment not found: {experiment_id}")
+def check_integrity(
+    experiment_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    experiment = _owned_experiment(experiment_id, owner_id)
     return check_experiment_integrity(experiment).to_dict()
 
 
 @router.get("/{experiment_id}/signals")
-def get_discovery_signals(experiment_id: str) -> dict[str, Any]:
-    experiment = get_experiment_store(settings.db_path).get(experiment_id)
-    if not experiment:
-        raise HTTPException(status_code=404, detail=f"Experiment not found: {experiment_id}")
+def get_discovery_signals(
+    experiment_id: str,
+    owner_id: str = Depends(optional_token_owner_id),
+) -> dict[str, Any]:
+    experiment = _owned_experiment(experiment_id, owner_id)
     signals = detect_discovery_signals(experiment.results)
     return {"signals": signals, "auto_discovery": False}
