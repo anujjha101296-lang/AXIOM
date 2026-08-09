@@ -365,7 +365,7 @@ export default function ResearchPage() {
           <p>
             Projects · PDFs · Notes · Q&amp;A · Search ·{" "}
             <a href="/campaigns">Campaigns</a> · <a href="/experiments">Experiments</a> ·{" "}
-            <a href="/login">Sign in</a>
+            <a href="/sources">Sources</a> · <a href="/login">Sign in</a>
           </p>
         </div>
         <div className="research-token">

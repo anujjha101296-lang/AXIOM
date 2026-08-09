@@ -140,6 +140,25 @@ class SkaiStore:
         self._release_conn(conn)
         return SourceProvenance.from_dict(json.loads(row["json_data"])) if row else None
 
+    def find_source_by_content_hash(self, content_hash: str) -> SourceProvenance | None:
+        if not content_hash:
+            return None
+        for source in self.list_sources(limit=500):
+            if source.content_hash == content_hash:
+                return source
+        return None
+
+    def find_source_by_location(self, location: str) -> SourceProvenance | None:
+        if not location:
+            return None
+        normalized = location.strip().rstrip("/")
+        for source in self.list_sources(limit=500):
+            loc = (source.location or "").strip().rstrip("/")
+            meta_url = str((source.metadata or {}).get("url", "")).strip().rstrip("/")
+            if loc == normalized or meta_url == normalized:
+                return source
+        return None
+
     def list_sources(self, *, scope: str | None = None, campaign_id: str | None = None, limit: int = 100) -> list[SourceProvenance]:
         conn = self._conn()
         query = "SELECT json_data FROM skai_sources WHERE 1=1"

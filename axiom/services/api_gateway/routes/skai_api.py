@@ -32,6 +32,15 @@ class AcquireTextRequest(BaseModel):
     bridge_to_er: bool = True
 
 
+class AcquireUrlRequest(BaseModel):
+    url: str = Field(..., min_length=8, max_length=2000)
+    research_question: str = ""
+    campaign_id: str | None = None
+    scope: str = "global"
+    bridge_to_egs: bool = True
+    bridge_to_er: bool = True
+
+
 class SynthesizeRequest(BaseModel):
     research_question: str
     campaign_id: str | None = None
@@ -71,6 +80,42 @@ def acquire_from_text(body: AcquireTextRequest) -> dict[str, Any]:
         return result.to_dict()
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/acquire-url")
+def acquire_from_url(body: AcquireUrlRequest) -> dict[str, Any]:
+    """Controlled HTTPS fetch → parse → cite/store as UNTRUSTED web source."""
+    from axiom.research.web_fetch import WebFetchError
+
+    try:
+        result = _orchestrator().acquire_from_url(
+            body.url,
+            research_question=body.research_question,
+            campaign_id=body.campaign_id,
+            scope=KnowledgeScope(body.scope),
+            bridge_to_egs=body.bridge_to_egs,
+            bridge_to_er=body.bridge_to_er,
+        )
+        return result.to_dict()
+    except WebFetchError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.get("/allowed-hosts")
+def list_allowed_hosts() -> dict[str, Any]:
+    from axiom.research.web_fetch import DEFAULT_ALLOWED_HOSTS
+
+    return {
+        "allowed_hosts": sorted(DEFAULT_ALLOWED_HOSTS),
+        "scheme": "https",
+        "notes": [
+            "Fetched content is always treated as UNTRUSTED.",
+            "Private/link-local DNS resolutions are blocked (SSRF guard).",
+            "Duplicates are detected by content hash and final URL.",
+        ],
+    }
 
 
 @router.post("/synthesize")

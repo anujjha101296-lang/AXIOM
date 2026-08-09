@@ -23,7 +23,7 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 | Experiments UI | GREEN | `/experiments` create→run→inspect | — | P5 | Soft |
 | FRCE/SEC ownership | GREEN | JWT isolation tests | anonymous/dev still broad | P4 | Soft |
 | Formal math | YELLOW | API + compilation gate | Lean optional; no UI | P7 | No |
-| Internet research | YELLOW | arXiv ingest exists | Controlled web search limited | P2 | Later |
+| Internet research | GREEN | `/skai/acquire-url` + `/sources` UI | Allowlist only; no open web search | P2 | Soft |
 | Docker compose | GREEN | `scripts/docker_smoke.sh` passed (api+ui healthy) | Observability profile optional; nested overlay may need vfs | P0 | No |
 | CI | YELLOW | Runs; 3 SCEP doc fails | E2E not required check | P0 | Soft |
 | E2E product journey | GREEN | journey + persistence tests | Playwright still pending | P1 | Soft |

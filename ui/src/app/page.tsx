@@ -64,7 +64,8 @@ const earlyAccess: Capability[] = [
     name: "Knowledge Acquisition (SKAI)",
     status: "partial",
     description:
-      "Knowledge graph, conflict/gap detection, and literature synthesis. Regex extraction; arXiv not fully wired.",
+      "Knowledge graph plus controlled HTTPS source fetch (allowlisted hosts, UNTRUSTED marking, duplicate detection).",
+    href: "/sources",
   },
   {
     name: "Graph Workspace",
@@ -161,6 +162,7 @@ export default function Home() {
           <Link href="/login">Sign in</Link>
           <Link href="/campaigns">Campaigns</Link>
           <Link href="/experiments">Experiments</Link>
+          <Link href="/sources">Sources</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>

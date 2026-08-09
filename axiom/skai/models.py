@@ -434,6 +434,11 @@ class AcquisitionResult:
     coverage: LiteratureCoverage | None = None
     expanded_questions: list[str] = field(default_factory=list)
     status: str = "completed"
+    duplicate: bool = False
+    untrusted: bool = False
+    retrieved_at: str | None = None
+    source_url: str | None = None
+    instruction_pattern_hits: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_utc_now)
 
     def to_dict(self) -> dict[str, Any]:
@@ -448,5 +453,10 @@ class AcquisitionResult:
             "coverage": self.coverage.to_dict() if self.coverage else None,
             "expanded_questions": self.expanded_questions,
             "status": self.status,
+            "duplicate": self.duplicate,
+            "untrusted": self.untrusted,
+            "retrieved_at": self.retrieved_at,
+            "source_url": self.source_url,
+            "instruction_pattern_hits": self.instruction_pattern_hits,
             "created_at": self.created_at,
         }

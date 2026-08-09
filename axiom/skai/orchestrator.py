@@ -114,6 +114,80 @@ class SkaiOrchestrator:
         )
         return result
 
+    def acquire_from_url(
+        self,
+        url: str,
+        *,
+        research_question: str = "",
+        campaign_id: str | None = None,
+        scope: KnowledgeScope = KnowledgeScope.GLOBAL,
+        bridge_to_egs: bool = True,
+        bridge_to_er: bool = True,
+        session=None,
+    ) -> AcquisitionResult:
+        """Fetch an allowlisted HTTPS URL and acquire it as an UNTRUSTED web source."""
+        from axiom.research.web_fetch import fetch_research_url
+        from axiom.security.content_trust import detect_instruction_like_patterns
+        from axiom.skai.extractor import content_hash
+
+        fetched = fetch_research_url(url, session=session)
+        hits = detect_instruction_like_patterns(fetched.text)
+        digest = fetched.content_hash or content_hash(fetched.text)
+
+        existing = self.store.find_source_by_content_hash(digest) or self.store.find_source_by_location(
+            fetched.final_url
+        )
+        if existing:
+            return AcquisitionResult(
+                acquisition_id=_new_id("acq"),
+                research_question=research_question or existing.title,
+                sources=[existing.source_id],
+                status="duplicate",
+                duplicate=True,
+                untrusted=True,
+                retrieved_at=fetched.retrieved_at,
+                source_url=fetched.final_url,
+                instruction_pattern_hits=hits,
+            )
+
+        is_latex = "latex" in fetched.content_type or fetched.text.lstrip().startswith("\\")
+        result = self.acquire_from_text(
+            fetched.title,
+            fetched.text,
+            research_question=research_question or fetched.title,
+            source_type=SourceType.WEB,
+            identifier=fetched.final_url,
+            is_latex=is_latex,
+            campaign_id=campaign_id,
+            scope=scope,
+            bridge_to_egs=bridge_to_egs,
+            bridge_to_er=bridge_to_er,
+        )
+
+        # Enrich persisted source with retrieval provenance + untrusted marking.
+        if result.sources:
+            source = self.store.get_source(result.sources[0])
+            if source:
+                source.location = fetched.final_url
+                source.metadata = {
+                    **(source.metadata or {}),
+                    "url": fetched.url,
+                    "final_url": fetched.final_url,
+                    "retrieved_at": fetched.retrieved_at,
+                    "content_type": fetched.content_type,
+                    "bytes_read": fetched.bytes_read,
+                    "untrusted": True,
+                    "trust_class": "EXTERNAL",
+                    "instruction_pattern_hits": hits,
+                }
+                self.store.save_source(source, archive=False)
+
+        result.untrusted = True
+        result.retrieved_at = fetched.retrieved_at
+        result.source_url = fetched.final_url
+        result.instruction_pattern_hits = hits
+        return result
+
     def acquire_for_campaign(
         self,
         research_question: str,
