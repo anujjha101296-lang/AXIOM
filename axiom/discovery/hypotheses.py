@@ -108,9 +108,15 @@ def quality_check(hypothesis: HypothesisRecord) -> HypothesisRecord:
         hypothesis.rejected = True
         hypothesis.rejection_reason = "Untestable — no predictions"
         return hypothesis
-    if "already disproven" in stmt.lower() or "known false" in stmt.lower():
+    # Only reject the affirmative primary when the claim itself is labeled known-false.
+    # Do not reject null / scoped / abstention hypotheses just because the research
+    # question embeds a "(known false)" meta-marker — that would disable counterexample search.
+    lower = stmt.lower()
+    if stmt.startswith("H1") and (
+        "already disproven" in lower or "known false" in lower or "always false" in lower
+    ):
         hypothesis.rejected = True
-        hypothesis.rejection_reason = "Marked as already disproven"
+        hypothesis.rejection_reason = "Marked as already disproven — do not pursue as affirmative discovery"
         return hypothesis
     return hypothesis
 

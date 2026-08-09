@@ -127,6 +127,7 @@
 | Discovery query `/query` | **SCAFFOLD** | Returns `[]` always | Needs SKAI retrieval |
 | **Scientific Discovery Engine** | **PARTIAL** | `axiom/discovery/`, `/discovery/*`, `/discovery` UI, 8 benchmarks | External novelty search; formal bridge in-cycle; full discovery graph |
 | **Research Benchmark Arena** | **PARTIAL** | `axiom/evaluation/arena/`, `/arena/*`, `/arena` UI, `arena_v1` 60 cases | Long-horizon suite; held-out rotating sets; model-provider matrix |
+| **Open Problem Research Lab** | **PARTIAL** | `axiom/open_problems/`, `/open-problems/*`, Level-1 campaign | External literature map; Level 2–8 staged evidence |
 | Self-improvement loop | **PARTIAL** | `self_improvement.py` | Audit only |
 
 ---

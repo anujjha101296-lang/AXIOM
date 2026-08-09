@@ -24,6 +24,7 @@
 | cap_vfactory | Verification Factory | infrastructure | UNTESTED | vfactory-health | test_vfactory |
 | cap_discovery | Scientific Discovery Engine | research | PARTIAL | /discovery/manifest | test_discovery_engine |
 | cap_arena | Research Benchmark Arena | research | PARTIAL | /arena/manifest | test_benchmark_arena |
+| cap_oplab | Open Problem Research Lab | research | PARTIAL | /open-problems/manifest | test_open_problem_lab |
 
 ## Test pyramid coverage
 

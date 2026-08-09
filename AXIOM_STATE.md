@@ -6,24 +6,23 @@
 
 ## One-line status
 
-Tip has Arena v1 + security/LH extension (Tier 8 unlocked with measured evidence), SCEP CI path fixes green; founder merge of PR #29 still required.
+Tip includes Open Problem Research Lab v1 (Level-1 counterexample-first campaign), Arena Tier 9 evidence, Discovery Engine; founder merge of PR #29 still required.
 
 ## What works
 
 | Area | Status |
 |------|--------|
-| Discovery Engine `/discovery` | Partial live |
-| Arena `arena_v1` (60) | Live |
-| Arena ext security + long-horizon (13) | Live — Tier 8 with measured LH |
-| SCEP eval tests from `/tmp` cwd | Green |
+| Discovery / Arena / FRCE / SKAI / SEC / FMTP | Live / partial as before |
+| **Open Problem Lab** `/open-problems` | **v1 live** — intake→map→decompose→strategies→FRCE+Discovery cycle |
 
 ## Next
 
 1. **Founder merges PR #29 to `main`**
-2. Broader discovery novelty / allowlisted literature search
-3. Expand held-out / rotating arena tasks
+2. OPLAB-1 literature enrichment + Level-2/3 staged runs
+3. Broader discovery novelty search
 
 ## Evidence
 
-- `docs/BENCHMARK_ARENA_STATUS.md`, `docs/ARENA_EXT_SEC_LH.json`
+- `docs/OPEN_PROBLEM_LAB_STATUS.md`, `docs/OPEN_PROBLEM_LEVEL1_RUN.json`
+- `tests/test_open_problem_lab.py` green
 - PR: https://github.com/anujjha101296-lang/AXIOM/pull/29

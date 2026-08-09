@@ -41,6 +41,7 @@ from axiom.services.api_gateway.routes.vfactory_api import router as vfactory_ro
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
 from axiom.services.api_gateway.routes.discovery_api import router as discovery_router
 from axiom.services.api_gateway.routes.arena_api import router as arena_router
+from axiom.services.api_gateway.routes.open_problems_api import router as open_problems_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -138,6 +139,9 @@ app.include_router(discovery_router)
 
 # ── Research Benchmark Arena ──────────────────────────────────────────────────
 app.include_router(arena_router)
+
+# ── Open Problem Research Lab ─────────────────────────────────────────────────
+app.include_router(open_problems_router)
 
 # ── Workflow Engine (multi-agent orchestration) ──────────────────────────────
 app.include_router(workflow_router)

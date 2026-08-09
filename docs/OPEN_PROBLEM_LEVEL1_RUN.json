@@ -1,0 +1,54 @@
+{
+  "title": "Known false primes",
+  "research_status": "REFUTED",
+  "verification_state": "REFUTED_BY_COUNTEREXAMPLE",
+  "stage_level": 1,
+  "stages_executed": [
+    "map_knowledge",
+    "decompose",
+    "strategies",
+    "start_campaign",
+    "start_discovery",
+    "frce_scope",
+    "frce_plan",
+    "frce_cycle",
+    "discovery_cycle"
+  ],
+  "strategy_kinds": [
+    "COUNTEREXAMPLE",
+    "ANALYTICAL",
+    "LITERATURE",
+    "COMPUTATIONAL",
+    "FORMAL"
+  ],
+  "subproblem_count": 9,
+  "campaign_ids": [
+    "camp_be42fb65bf74"
+  ],
+  "discovery_ids": [
+    "disc_a443b36eff41"
+  ],
+  "counterexample_ids": [
+    "cex_1ed25a5e00b8"
+  ],
+  "is_millennium_attempt": false,
+  "is_scientific_discovery_claim": false,
+  "limitations": [
+    "Computational evidence is not proof.",
+    "Missing literature retrieval is not novelty.",
+    "RESOLVED requires explicit verification gate.",
+    "Millennium campaigns are not auto-started."
+  ],
+  "recommended_next_action": "Verify counterexample independently; archive REFUTED; do not resurrect.",
+  "timeline_event_types": [
+    "SOURCE_FOUND",
+    "KNOWLEDGE_EXTRACTED",
+    "GAP_IDENTIFIED",
+    "GAP_IDENTIFIED",
+    "STRATEGY_STARTED",
+    "STRATEGY_STARTED",
+    "HYPOTHESIS_CREATED",
+    "EXPERIMENT_COMPLETED",
+    "COUNTEREXAMPLE_FOUND"
+  ]
+}

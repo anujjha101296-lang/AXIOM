@@ -19,8 +19,10 @@ P0 safety / integrity / false-claim / supported-build failures always win. Prefe
 | 14 | DISCOVERY-ENGINE-1 | External novelty search + formal bridge in cycle | DISCOVERY-ENGINE-0 | broader novelty ≠ INSUFFICIENT_SEARCH only | **Partial** |
 | 15 | ARENA-0 | Research Benchmark Arena v1 (60 cases + baseline) | Tip | 60-case run + readiness + UI | **Done** |
 | 16 | ARENA-1 | Long-horizon + dedicated security suite (Tier 8+) | ARENA-0 | unlock Tier 8 with measured long-horizon evidence | **Done** |
-| 17 | DISCOVERY-ENGINE-1b | Broader novelty / allowlisted literature search | DISCOVERY-ENGINE-1 | novelty beyond local-only | **Next autonomous** |
-| 18 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
+| 17 | DISCOVERY-ENGINE-1b | Broader novelty / allowlisted literature search | DISCOVERY-ENGINE-1 | novelty beyond local-only | **Queued** |
+| 18 | OPLAB-0 | Open Problem Research Lab v1 | Arena+Discovery+FRCE | intake→map→strategies→campaign cycle + Level-1 | **Done** |
+| 19 | OPLAB-1 | Literature enrichment + Level-2/3 staged campaigns | OPLAB-0 | richer maps; historical conjecture run | **Next autonomous** |
+| 20 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
 
 ## Historical (complete on tip)
 
