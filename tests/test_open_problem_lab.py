@@ -106,6 +106,31 @@ def client(tmp_path, monkeypatch):
     return TestClient(app)
 
 
+def test_literature_enrichment_and_level2_formal(tmp_path):
+    lab = OpenProblemLab(str(tmp_path / "l2.db"))
+    p = lab.create(
+        "Nat add commutative",
+        "Prove the known theorem: for natural numbers a,b, a+b=b+a (add_comm).",
+        known_info="Standard Nat.add_comm theorem / lemma in algebra. Proven in formal libraries.",
+        domain="algebra",
+        stage_level=2,
+        research_objective="Formalize known add_comm without claiming discovery",
+        formal_statement="∀ a b : ℕ, a + b = b + a",
+    )
+    provenances = {e.provenance for e in p.literature}
+    assert "formal_library" in provenances
+    assert "placeholder" not in provenances
+    assert any(r.bucket.value == "WHAT_IS_PROVEN" for r in p.known_results)
+    result = lab.run_investigation_cycle(p.problem_id)
+    assert result["is_scientific_discovery_claim"] is False
+    final = lab.store.get(p.problem_id)
+    assert final is not None
+    assert any(e.event_type == "PROOF_ATTEMPTED" for e in final.timeline)
+    # Formalization attempted is not RESOLVED / not VERIFIED discovery
+    assert final.research_status != ResearchStatus.RESOLVED
+    assert final.verification_state != "VERIFIED"
+
+
 def test_open_problems_api(client: TestClient):
     headers = {"Authorization": "Bearer axiom-dev-token"}
     created = client.post(

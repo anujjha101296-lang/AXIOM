@@ -2,17 +2,17 @@
 
 Read `CONSTITUTION.md`, `MASTER_DIRECTIVE.md`, `OPERATING_SYSTEM.md`, `../AXIOM_STATE.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first.
 
-**Last updated:** 2026-08-09 (Open Problem Lab v1 + Level-1 REFUTED)  
+**Last updated:** 2026-08-09 (OPLAB v1 + OPLAB-1 literature/Level-2)  
 **Active horizon:** Land integrated tip on `main`
 
 ## Where we are today
 
-Tip includes Open Problem Research Lab v1 (`axiom/open_problems/`, `/open-problems`), Arena v1 + `arena_ext_sec_lh_v1` (73/73), Discovery Engine. Level-1 known-false campaign ends **REFUTED** with counterexample artifact. Tier 10/Millennium blocked. SCEP tests green from `/tmp`.
+Tip includes Open Problem Research Lab (`/open-problems`) with Level-1 **REFUTED** and Level-2 formalization-attempted (unverified). Literature maps enriched via SKAI + formal library. Arena 73/73. Tier 10/Millennium blocked.
 
 ## Highest priority next
 
 1. Founder merges PR #29
-2. OPLAB-1: literature enrichment + Level-2/3 staged campaigns
+2. OPLAB-2: Level-3 historical conjecture reproduction
 3. Broader discovery novelty / allowlisted literature search
 
 ## Worktree integrity

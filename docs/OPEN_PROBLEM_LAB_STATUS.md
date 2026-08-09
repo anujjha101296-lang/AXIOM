@@ -33,6 +33,10 @@
 
 See `docs/OPEN_PROBLEM_LEVEL1_RUN.json`. Status `REFUTED` / `REFUTED_BY_COUNTEREXAMPLE`. Not a scientific discovery claim. Not Millennium.
 
+## Level-2 evidence
+
+See `docs/OPEN_PROBLEM_LEVEL2_RUN.json`. Known theorem (`add_comm`) → literature enrichment (SKAI + formal library) → `PROOF_ATTEMPTED` → `FORMALIZATION_ATTEMPTED_UNVERIFIED`. Not RESOLVED.
+
 ## Failure fixed this cycle
 
 Discovery `quality_check` rejected **all** hypotheses when the research question embedded `(known false)`, which skipped counterexample search. Affirmative H1 rejection retained; null/scoped/abstention survive; trap + small-case odd-composite probe restored.
@@ -57,6 +61,12 @@ Discovery `quality_check` rejected **all** hypotheses when the research question
 | Formal tools | FMTP bridge via Discovery when available |
 | Benchmark | `cd /tmp && pytest /workspace/tests/test_open_problem_lab.py -q` |
 
-## Next (OPLAB-1)
+## OPLAB-1 progress
 
-Richer literature maps (allowlisted SKAI/web); Level-2/3 staged campaigns with measured advancement gates.
+- `enrich_literature_map`: SKAI acquire/synthesize/survey + allowlisted HTTPS URLs + formal `search_library`
+- Level-2 known-theorem campaign with formal bridge timeline events
+- Still missing: broader external prior-art crawl; Level-3 historical conjecture reproduction gate
+
+## Next (OPLAB-1 continued / OPLAB-2)
+
+Level-3 historical conjecture run; stronger independent verification of formalization.

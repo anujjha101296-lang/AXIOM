@@ -13,7 +13,9 @@ from axiom.open_problems.intake import understand_problem
 from axiom.open_problems.maps import (
     build_known_result_map,
     build_literature_map,
+    enrich_literature_map,
     known_results_by_bucket,
+    literature_summary,
 )
 from axiom.open_problems.models import (
     OpenProblem,
@@ -92,12 +94,24 @@ class OpenProblemLab:
         seed = "\n".join([known_info, *(sources or [])])
         problem.known_results = build_known_result_map(problem, seed)
         problem.literature = build_literature_map(problem, seed)
-        problem.research_gaps = [
+        # Persist first so SKAI shares the same db_path, then enrich.
+        problem = self.store.save(problem)
+        urls = [s for s in (sources or []) if isinstance(s, str) and s.startswith("https://")]
+        lit, extra_kr, gaps = enrich_literature_map(
+            problem, db_path=self.db_path, seed_text=seed, source_urls=urls
+        )
+        problem.literature = lit
+        problem.known_results.extend(extra_kr)
+        problem.research_gaps = gaps or [
             "External literature coverage incomplete",
-            "Formal library search incomplete",
         ]
         self._event(problem, "SOURCE_FOUND", "Intake seed / known_info recorded")
         self._event(problem, "KNOWLEDGE_EXTRACTED", "Problem understanding parsed")
+        self._event(
+            problem,
+            "SOURCE_FOUND",
+            f"Literature enriched: {literature_summary(problem.literature)}",
+        )
         return self.store.save(problem)
 
     def transition(
@@ -128,13 +142,31 @@ class OpenProblemLab:
         # Refresh maps from existing understanding (idempotent enrichment)
         if not p.known_results:
             p.known_results = build_known_result_map(p)
-        if not p.literature:
-            p.literature = build_literature_map(p)
+        seed = "\n".join(
+            [p.known_status or "", *(e.title for e in (p.literature or [])[:2])]
+        )
+        lit, extra_kr, gaps = enrich_literature_map(
+            p, db_path=self.db_path, seed_text=seed or p.informal_statement
+        )
+        p.literature = lit
+        # Avoid duplicating formal-library known results on remaps
+        existing_stmts = {r.statement for r in p.known_results}
+        for kr in extra_kr:
+            if kr.statement not in existing_stmts:
+                p.known_results.append(kr)
+        for g in gaps:
+            if g not in p.research_gaps:
+                p.research_gaps.append(g)
         buckets = known_results_by_bucket(p.known_results)
         self._event(
             p,
             "GAP_IDENTIFIED",
             f"Known-result buckets populated; unknown={len(buckets.get('WHAT_IS_UNKNOWN', []))}",
+        )
+        self._event(
+            p,
+            "SOURCE_FOUND",
+            f"Literature map: {literature_summary(p.literature)}",
         )
         if p.research_status == ResearchStatus.UNKNOWN:
             p.research_status = ResearchStatus.MAPPED
@@ -284,6 +316,25 @@ class OpenProblemLab:
                     self._event(p, "EXPERIMENT_COMPLETED", "Discovery pilot supported (computational only)")
                     if p.research_status == ResearchStatus.UNDER_INVESTIGATION:
                         p.research_status = ResearchStatus.PARTIALLY_PROGRESSING
+                # Level-2+: record formalization attempts without claiming VERIFIED
+                formal = (final.report or {}).get("formal_bridge") or {}
+                if formal.get("attempted"):
+                    self._event(
+                        p,
+                        "PROOF_ATTEMPTED",
+                        "Formal bridge attempted (prose ≠ verified proof)",
+                    )
+                    if formal.get("compiled_verified"):
+                        self._event(p, "PROOF_VERIFIED", "Independent prover recheck recorded")
+                    elif formal.get("error") or str(formal.get("status", "")).lower() in {
+                        "failed",
+                        "error",
+                        "ambiguous",
+                    }:
+                        self._event(p, "PROOF_FAILED", str(formal.get("error") or formal.get("status") or "failed")[:200])
+                    if p.stage_level >= 2 and p.research_status == ResearchStatus.UNDER_INVESTIGATION:
+                        p.research_status = ResearchStatus.PARTIALLY_PROGRESSING
+                        p.verification_state = "FORMALIZATION_ATTEMPTED_UNVERIFIED"
         except Exception as exc:  # noqa: BLE001
             disc_out = {"error": str(exc)[:300]}
 
