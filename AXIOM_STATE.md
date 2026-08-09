@@ -6,27 +6,23 @@
 
 ## One-line status
 
-Integrated tip is MVP-ready for founder merge: auth, ownership, research, campaigns, experiments, docker smoke green.
+Integrated tip is MVP-ready for founder merge, including controlled UNTRUSTED web source acquisition.
 
 ## What works
 
 | Area | Status |
 |------|--------|
-| Research `/research` | Live |
-| Auth + logout/login persistence | Live |
-| Project / FRCE / SEC ownership | Live |
-| Campaigns + agent activity | Live |
-| Experiments UI | Live |
-| Docker compose api+ui | Live (`scripts/docker_smoke.sh`) |
+| Research / auth / ownership / campaigns / experiments | Live |
+| Docker compose api+ui smoke | Live |
+| Controlled web acquire `/sources` + `/skai/acquire-url` | Live (allowlisted HTTPS, UNTRUSTED, dedupe) |
 
 ## Next
 
 1. **Founder merges PR #29 to `main`**
-2. Controlled internet research polish
+2. Fix remaining SCEP CI doc failures
 3. Close superseded draft PRs after merge
 
 ## Evidence
 
-- Resource ownership tests green
-- `DOCKER_SMOKE_PASSED` (api healthy + ui reachable)
+- `tests/test_mvp_web_research.py` green
 - PR: https://github.com/anujjha101296-lang/AXIOM/pull/29

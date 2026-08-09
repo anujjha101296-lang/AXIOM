@@ -30,9 +30,9 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 
 ## Build order (next cycle)
 
-1. **P2** Controlled internet research polish  
+1. **P0** Fix remaining SCEP CI doc failures  
 2. **P1** Playwright browser E2E (optional)  
-3. **P0** Fix remaining SCEP CI doc failures  
+3. **P2** Expand allowlist carefully / rate limits  
 
 ## Explicit mocks / limitations
 
