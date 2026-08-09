@@ -6,7 +6,7 @@ import json
 import sqlite3
 from typing import Any
 
-from axiom.discovery.models import Discovery, DiscoveryStatus, _utc_now
+from axiom.discovery.models import Discovery, _utc_now
 
 
 class DiscoveryStore:

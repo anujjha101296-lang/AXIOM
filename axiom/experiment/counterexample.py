@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from axiom.experiment.sandbox import execute_sandboxed
 from axiom.experiment.models import ResourceBudget
+from axiom.experiment.sandbox import execute_sandboxed
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def search_computational_counterexample(

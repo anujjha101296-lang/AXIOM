@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 _DISCOVERY_SIGNALS = frozenset({
     "unexpected_pattern",
     "counterexample",

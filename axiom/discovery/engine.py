@@ -11,18 +11,17 @@ from axiom.discovery.models import (
     DiscoveryStatus,
     StatusTransition,
     _new_id,
-    _utc_now,
     can_transition,
 )
 from axiom.discovery.novelty import assess_novelty
 from axiom.discovery.opportunity import rank_opportunities
 from axiom.discovery.predictions import predictions_from_hypothesis
 from axiom.discovery.skeptical import skeptical_review
-from axiom.discovery.store import DiscoveryStore, get_discovery_store
+from axiom.discovery.store import get_discovery_store
 from axiom.experiment.counterexample import search_computational_counterexample
+from axiom.experiment.executor import execute_experiment
 from axiom.experiment.models import ExperimentSpec, ResourceBudget
 from axiom.experiment.store import get_experiment_store
-from axiom.experiment.executor import execute_experiment
 from axiom.skai.gaps import detect_gaps
 from axiom.skai.orchestrator import SkaiOrchestrator
 from axiom.skai.store import get_skai_store

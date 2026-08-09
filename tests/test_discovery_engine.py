@@ -115,8 +115,8 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("AXIOM_DB_PATH", db)
     from axiom.config import settings
     from axiom.discovery import store as dstore
-    from axiom.skai import store as sstore
     from axiom.experiment import store as estore
+    from axiom.skai import store as sstore
 
     monkeypatch.setattr(settings, "db_path", db)
     dstore._cache.pop(db, None)

@@ -7,14 +7,15 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
+from datetime import UTC
 from enum import Enum
 from typing import Any
 
 
 def _utc_now() -> str:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _new_id(prefix: str = "disc") -> str:
@@ -417,17 +418,17 @@ class Discovery:
 
 
 __all__ = [
+    "AttackRecord",
     "Discovery",
     "DiscoveryStatus",
-    "NoveltyStatus",
-    "ResearchOpportunity",
     "HypothesisRecord",
-    "PredictionRecord",
     "NoveltyAssessment",
-    "AttackRecord",
+    "NoveltyStatus",
+    "PredictionRecord",
+    "ResearchOpportunity",
     "ScientificConfidence",
     "StatusTransition",
-    "can_transition",
     "_new_id",
     "_utc_now",
+    "can_transition",
 ]

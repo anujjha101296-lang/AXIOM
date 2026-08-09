@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from axiom.discovery.models import HypothesisRecord, ResearchOpportunity, _new_id
 
-
 _TAUTOLOGY_MARKERS = ("equals itself", "is always itself", "all x are x")
 
 
@@ -91,7 +90,7 @@ def generate_competing_hypotheses(
         for h in candidates:
             h.supporting_evidence_notes.append(f"Context snippet: {context.strip()[:240]}")
 
-    return [h for h in (quality_check(h) for h in candidates)]
+    return [quality_check(h) for h in candidates]
 
 
 def quality_check(hypothesis: HypothesisRecord) -> HypothesisRecord:
