@@ -56,7 +56,8 @@ const earlyAccess: Capability[] = [
     name: "Research Campaigns (FRCE)",
     status: "partial",
     description:
-      "Campaign orchestration across research loops. API-complete; no dashboard UI yet.",
+      "Campaign orchestration across research loops. Create, scope, plan, and run cycles from the web UI.",
+    href: "/campaigns",
   },
   {
     name: "Knowledge Acquisition (SKAI)",
@@ -162,6 +163,7 @@ export default function Home() {
           <a href="#available">Capabilities</a>
           <a href="#honesty">Honesty</a>
           <Link href="/login">Sign in</Link>
+          <Link href="/campaigns">Campaigns</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>

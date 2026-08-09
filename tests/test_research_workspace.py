@@ -147,9 +147,15 @@ class TestPaperQA:
         uploaded_at="2026-01-01T00:00:00+00:00",
       )
     ]
-    answer, sources = qa.answer("What does the paper discuss?", docs)
+    answer, sources, citations, provider_mode, uncertainty = qa.answer(
+      "What does the paper discuss?", docs
+    )
     assert len(answer) >= 20
     assert sources == ["paper.pdf"]
+    assert citations
+    assert citations[0].filename == "paper.pdf"
+    assert provider_mode in {"real", "mock", "extractive"}
+    assert isinstance(uncertainty, str)
 
 
 class TestResearchAPI:

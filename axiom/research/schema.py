@@ -12,6 +12,7 @@ class ResearchProject(BaseModel):
     id: str
     name: str
     description: str = ""
+    owner_id: Optional[str] = None
     created_at: str
     updated_at: str
     last_session_at: Optional[str] = None
@@ -82,11 +83,22 @@ class AskQuestionRequest(BaseModel):
     conversation_id: Optional[str] = None
 
 
+class Citation(BaseModel):
+    document_id: str
+    filename: str
+    snippet: str = ""
+    claim: str = ""
+    evidence_mode: str = "document_extract"
+
+
 class AskQuestionResponse(BaseModel):
     answer: str
     conversation_id: str
     message_id: str
     sources: List[str] = Field(default_factory=list)
+    citations: List[Citation] = Field(default_factory=list)
+    provider_mode: str = "unknown"  # real | mock | extractive
+    uncertainty: str = ""
 
 
 class SearchResult(BaseModel):

@@ -99,6 +99,28 @@ def verify_token(authorization: str = Header(None)) -> str:
         ) from None
 
 
+def token_owner_id(authorization: str | None = Header(None)) -> str:
+    """Resolve acting user id from static token (dev) or JWT sub."""
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header must follow format: Bearer <token>",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = parts[1]
+    if token == SECRET_TOKEN:
+        return "dev"
+    payload = decode_jwt_token(token)
+    return payload.sub
+
+
 # ── JWT Utilities (production multi-user path) ────────────────────────────────
 
 def _encode_jwt(payload: dict) -> str:

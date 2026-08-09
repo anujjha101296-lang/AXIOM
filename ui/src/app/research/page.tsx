@@ -31,6 +31,24 @@ interface ResearchNote {
   updated_at: string;
 }
 
+interface Citation {
+  document_id: string;
+  filename: string;
+  snippet: string;
+  claim: string;
+  evidence_mode: string;
+}
+
+interface AskResult {
+  answer: string;
+  conversation_id: string;
+  message_id: string;
+  sources: string[];
+  citations: Citation[];
+  provider_mode: string;
+  uncertainty: string;
+}
+
 interface ResearchMessage {
   id: string;
   role: string;
@@ -74,6 +92,7 @@ export default function ResearchPage() {
   const [projects, setProjects] = useState<ResearchProject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ProjectDetail | null>(null);
+  const [lastAsk, setLastAsk] = useState<AskResult | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDesc, setNewProjectDesc] = useState("");
   const [editProjectName, setEditProjectName] = useState("");
@@ -288,9 +307,16 @@ export default function ResearchPage() {
         }),
       });
       if (!res.ok) throw new Error(await res.text());
+      const askResult: AskResult = await res.json();
+      setLastAsk(askResult);
       setChatQuestion("");
       await loadProject(selectedId);
-      setStatus("Question answered");
+      const mode = askResult.provider_mode || "unknown";
+      setStatus(
+        askResult.uncertainty
+          ? `Answered (${mode}): ${askResult.uncertainty}`
+          : `Question answered (${mode})`
+      );
     } catch (e) {
       setStatus(`Q&A failed: ${e}`);
     } finally {
@@ -336,7 +362,10 @@ export default function ResearchPage() {
         <div>
           <a href="/" className="research-back">← AXIOM</a>
           <h1>Research Workspace</h1>
-          <p>Projects · PDFs · Notes · Q&amp;A · Search · Sessions</p>
+          <p>
+            Projects · PDFs · Notes · Q&amp;A · Search ·{" "}
+            <a href="/campaigns">Campaigns</a> · <a href="/login">Sign in</a>
+          </p>
         </div>
         <div className="research-token">
           <label htmlFor="api-token">API Token</label>
@@ -484,6 +513,28 @@ export default function ResearchPage() {
                     </div>
                   ))}
                 </div>
+                {lastAsk && (
+                  <div className="research-evidence" style={{ marginTop: 12 }}>
+                    <p className="research-muted">
+                      Provider: <strong>{lastAsk.provider_mode}</strong>
+                      {lastAsk.uncertainty ? ` — ${lastAsk.uncertainty}` : ""}
+                    </p>
+                    {lastAsk.citations?.length > 0 && (
+                      <ul className="research-notes">
+                        {lastAsk.citations.map((c) => (
+                          <li key={`${c.document_id}-${c.filename}`}>
+                            <strong>{c.filename}</strong>
+                            <span className="research-muted"> · {c.evidence_mode}</span>
+                            {c.claim && <p>{c.claim}</p>}
+                            {c.snippet && (
+                              <small className="research-muted">{c.snippet.slice(0, 280)}</small>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
                 <textarea
                   placeholder="What does this paper say about the critical line?"
                   value={chatQuestion}
