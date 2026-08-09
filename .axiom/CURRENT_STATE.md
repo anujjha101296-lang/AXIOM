@@ -2,7 +2,7 @@
 
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
-**Last updated:** 2026-08-09 (Master Build & Evolution Loop audit)
+**Last updated:** 2026-08-09 (Verification Factory)
 **Active horizon:** AXIOM Operating System v1.0 — Continuous Evolution Loop
 
 ## Where we are today
@@ -48,6 +48,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **FRCE-1:** Frontier Research Campaign Engine — orchestrates E&R, SIMR, FMTP, SEC, GCP into long-running research missions — `FRONTIER_CAMPAIGN_ENGINE.md`.
 - **SKAI-1:** Scientific Knowledge Acquisition & Intelligence — knowledge graph, source quality, conflict/gap detection, `/skai/*` API — `KNOWLEDGE_ACQUISITION.md`.
 - **MASTER-AUDIT:** Capability matrix, target architecture, httpx test harness fix (278/281 core tests), workflow API mounted, `/query` wired to SKAI — `AXIOM_CAPABILITY_MATRIX.md`.
+- **VFACTORY-1:** Verification Factory — capability registry, test pyramid, user journeys A–D, verification scoring, `/vfactory/*` API — `VERIFICATION_STATUS.md`.
 
 ## Blocked
 

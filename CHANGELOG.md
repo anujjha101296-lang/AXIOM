@@ -8,6 +8,25 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### VFACTORY — Verification Factory (2026-08-09)
+- **VFACTORY v1:** Capability registry (15 capabilities), test pyramid runners, verification scoring
+- **User journeys:** A (research workspace), B (campaign), C (formal math), D (sandbox recovery)
+- **Multi-agent roles:** 12 logical verification roles (controlled workers, not unlimited agents)
+- **Orchestrator:** discover → test → score → update registry continuous loop
+- **API:** `/vfactory/*` routes with optional authentication
+- **Health check:** `scripts/vfactory_health_check.py`, `make vfactory-health`
+- **Governance:** `VERIFICATION_STATUS.md`, `VERIFICATION_MATRIX.md`, `REGRESSION_LOG.md`, `E2E_STATUS.md`
+- **Tests:** `tests/test_vfactory.py` (14 tests)
+
+### MASTER — Build & Evolution Loop Audit (2026-08-09)
+- **Capability matrix:** `AXIOM_CAPABILITY_MATRIX.md` — full implementation truth audit
+- **Target architecture:** `AXIOM_TARGET_ARCHITECTURE.md`
+- **Master loop directive:** `.axiom/MASTER_LOOP.md`
+- **httpx pin fix:** TestClient compatibility restored (281 core tests pass)
+- **Workflow API mounted:** `/workflows/*` with optional auth
+- **Discovery query:** `/query` wired to SKAI synthesis (no longer empty stub)
+- **CEL health:** PASS (281 tests)
+
 ### SKAI — Scientific Knowledge Acquisition & Intelligence Loop (2026-08-09)
 - **SKAI v1:** `.axiom/SKAI.md`, knowledge acquisition docs, graph spec
 - **Knowledge graph:** entities, relations, conflicts, gaps with full provenance

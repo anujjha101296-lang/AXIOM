@@ -27,6 +27,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 17 | FRCE-1 | Frontier Research Campaign Engine — connect all loops. | SEC-1, E&R-1, SIMR-1, FMTP-1, GCP-1 | Campaign orchestrator, `/frce/*`, `make frce-health` passes. | **Complete** — see `FRONTIER_CAMPAIGN_ENGINE.md` |
 | 18 | SKAI-1 | Scientific Knowledge Acquisition & Intelligence Loop. | FRCE-1, E&R-1 | Knowledge graph, acquisition, `/skai/*`, `make skai-health` passes. | **Complete** — see `KNOWLEDGE_ACQUISITION.md` |
 | 19 | MASTER-1 | Master Build audit + integration fixes. | SKAI-1 | Capability matrix, httpx fix, workflow mount, CEL 278 pass. | **Complete** — see `AXIOM_CAPABILITY_MATRIX.md` |
+| 20 | VFACTORY-1 | Verification Factory — permanent autonomous verification. | MASTER-1 | Registry, pyramid, journeys A–D, scoring, `/vfactory/*`, `make vfactory-health` passes. | **Complete** — see `VERIFICATION_STATUS.md` |
 
 ## Queue protocol
 

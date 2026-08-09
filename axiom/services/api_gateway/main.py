@@ -36,6 +36,7 @@ from axiom.services.api_gateway.routes.formal_math_api import router as formal_m
 from axiom.services.api_gateway.routes.experiment_api import router as experiment_router
 from axiom.services.api_gateway.routes.frce_api import router as frce_router
 from axiom.services.api_gateway.routes.skai_api import router as skai_router
+from axiom.services.api_gateway.routes.vfactory_api import router as vfactory_router
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
 
 # Initialise structured logging from settings
@@ -122,6 +123,9 @@ app.include_router(frce_router)
 
 # ── SKAI Scientific Knowledge Acquisition & Intelligence ─────────────────────
 app.include_router(skai_router)
+
+# ── VFACTORY Verification Factory ────────────────────────────────────────────
+app.include_router(vfactory_router)
 
 # ── Workflow Engine (multi-agent orchestration) ──────────────────────────────
 app.include_router(workflow_router)

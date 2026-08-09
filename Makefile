@@ -142,6 +142,9 @@ frce-health: ## Run FRCE frontier research campaign health check
 skai-health: ## Run SKAI knowledge acquisition health check
 	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/skai_health_check.py; else python3 scripts/skai_health_check.py; fi
 
+vfactory-health: ## Run VFACTORY verification factory health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/vfactory_health_check.py; else python3 scripts/vfactory_health_check.py; fi
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \
