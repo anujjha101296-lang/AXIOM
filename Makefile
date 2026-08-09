@@ -139,6 +139,9 @@ sec-health: ## Run SEC experiment & compute health check
 frce-health: ## Run FRCE frontier research campaign health check
 	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/frce_health_check.py; else python3 scripts/frce_health_check.py; fi
 
+skai-health: ## Run SKAI knowledge acquisition health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/skai_health_check.py; else python3 scripts/skai_health_check.py; fi
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

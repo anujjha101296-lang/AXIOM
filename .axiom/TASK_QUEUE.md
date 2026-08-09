@@ -25,6 +25,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 15 | FMTP-1 | Formal Mathematics & Theorem-Proving Loop. | SIMR-1, MIP | Prover registry, formalization, proof search, `/formal/*`, `make fmtp-health` passes. | **Complete** — see `FORMAL_MATH_STATUS.md` |
 | 16 | SEC-1 | Scientific Experimentation & Compute Loop. | FMTP-1, TSS | Experiment kernel, sandbox, `/experiments/*`, `make sec-health` passes. | **Complete** — see `EXPERIMENT_ENGINE.md` |
 | 17 | FRCE-1 | Frontier Research Campaign Engine — connect all loops. | SEC-1, E&R-1, SIMR-1, FMTP-1, GCP-1 | Campaign orchestrator, `/frce/*`, `make frce-health` passes. | **Complete** — see `FRONTIER_CAMPAIGN_ENGINE.md` |
+| 18 | SKAI-1 | Scientific Knowledge Acquisition & Intelligence Loop. | FRCE-1, E&R-1 | Knowledge graph, acquisition, `/skai/*`, `make skai-health` passes. | **Complete** — see `KNOWLEDGE_ACQUISITION.md` |
 
 ## Queue protocol
 

@@ -8,6 +8,21 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### SKAI — Scientific Knowledge Acquisition & Intelligence Loop (2026-08-09)
+- **SKAI v1:** `.axiom/SKAI.md`, knowledge acquisition docs, graph spec
+- **Knowledge graph:** entities, relations, conflicts, gaps with full provenance
+- **Source quality engine:** explicit tier ranking and reliability scores
+- **Structure extraction:** LaTeX environments and text patterns
+- **Bridge:** EGS ↔ E&R ↔ SKAI unified acquisition
+- **Conflict detection:** opposing positions with resolution tracking
+- **Gap detection:** research opportunities from graph analysis
+- **Literature saturation:** honest coverage estimation
+- **Reasoning-aware retrieval:** by research requirements, not embeddings
+- **FRCE integration:** literature track wired to SKAI orchestrator
+- **API:** `/skai/*` routes with optional authentication
+- **Health check:** `scripts/skai_health_check.py`, `make skai-health`
+- **Tests:** `tests/test_skai_knowledge.py` (12 tests)
+
 ### FRCE — Frontier Research Campaign Engine (2026-08-09)
 - **FRCE v1:** `.axiom/FRCE.md`, campaign engine docs, orchestration architecture
 - **Campaign kernel:** state machine, research graph, graduated contribution levels

@@ -36,6 +36,7 @@ from axiom.experiment.store import ExperimentStore
 from axiom.formal_math.formalization import formalize_informal
 from axiom.grand_challenge.engine import GrandChallengeEngine
 from axiom.grand_challenge.models import ChallengeTier
+from axiom.skai.orchestrator import SkaiOrchestrator
 
 
 class FrontierCampaignEngine:
@@ -51,6 +52,7 @@ class FrontierCampaignEngine:
         self._claims = ClaimRegistry(db_path)
         self._experiments = ExperimentStore(db_path)
         self._gcp = GrandChallengeEngine(db_path)
+        self._skai = SkaiOrchestrator(db_path)
 
     # ── Campaign lifecycle ────────────────────────────────────────────────
 
@@ -219,9 +221,39 @@ class FrontierCampaignEngine:
         if strategy_type in ("formal", "symbolic", "proof"):
             return self._run_formal_track(campaign, strategy, cycle)
 
-        # Literature / general — recorded as observation
-        cycle.learned.append(f"Literature track for {strategy.name}: mapping required")
-        return {"track": "literature", "strategy": strategy.name, "status": "recorded"}
+        return self._run_literature_track(campaign, strategy, cycle)
+
+    def _run_literature_track(
+        self,
+        campaign: FrontierCampaign,
+        strategy: Any,
+        cycle: CycleRecord,
+    ) -> dict[str, Any]:
+        """SKAI literature acquisition and knowledge synthesis."""
+        result = self._skai.acquire_for_campaign(
+            campaign.objective,
+            campaign_id=campaign.campaign_id,
+        )
+        cycle.learned.append(
+            f"Literature synthesis: {len(result.expanded_questions)} sub-questions, "
+            f"{len(result.gaps)} gaps identified"
+        )
+        if result.coverage:
+            cycle.learned.append(
+                f"Estimated coverage: {result.coverage.coverage_fraction:.0%}"
+            )
+        bottleneck = find_bottleneck(campaign)
+        if bottleneck and result.gaps:
+            bottleneck.next_action = f"Investigate gap: {result.gaps[0]}"
+        return {
+            "track": "literature",
+            "strategy": strategy.name,
+            "status": "completed",
+            "acquisition_id": result.acquisition_id,
+            "gaps_found": len(result.gaps),
+            "expanded_questions": result.expanded_questions[:3],
+            "not_established_fact": True,
+        }
 
     def _run_computational_track(
         self,
@@ -386,7 +418,7 @@ class FrontierCampaignEngine:
         return {
             "name": "AXIOM Frontier Research Campaign Engine",
             "version": "1.0",
-            "loops_integrated": ["E&R", "SIMR", "FMTP", "SEC", "GCP"],
+            "loops_integrated": ["E&R", "SIMR", "FMTP", "SEC", "GCP", "SKAI"],
             "roles": list_roles(),
             "ladder": ladder_manifest(),
             "principles": [

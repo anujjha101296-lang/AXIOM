@@ -46,6 +46,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **FMTP-1:** Formal Mathematics & Theorem-Proving — prover registry, formalization pipelines, proof search, compilation gate, `/formal/*` API — `FORMAL_MATH_STATUS.md`.
 - **SEC-1:** Scientific Experimentation & Compute — experiment kernel, sandbox, lifecycle, `/experiments/*` API — `EXPERIMENT_ENGINE.md`.
 - **FRCE-1:** Frontier Research Campaign Engine — orchestrates E&R, SIMR, FMTP, SEC, GCP into long-running research missions — `FRONTIER_CAMPAIGN_ENGINE.md`.
+- **SKAI-1:** Scientific Knowledge Acquisition & Intelligence — knowledge graph, source quality, conflict/gap detection, `/skai/*` API — `KNOWLEDGE_ACQUISITION.md`.
 
 ## Blocked
 

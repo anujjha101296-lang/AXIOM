@@ -84,6 +84,10 @@ class AxiomSettings(BaseSettings):
         default=False,
         description="Require bearer token for /frce/* (recommended in production)",
     )
+    require_auth_for_skai_routes: bool = Field(
+        default=False,
+        description="Require bearer token for /skai/* (recommended in production)",
+    )
     block_insecure_production_config: bool = Field(
         default=True,
         description="Refuse startup in production when critical security misconfig is detected",

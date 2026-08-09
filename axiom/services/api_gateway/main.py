@@ -35,6 +35,7 @@ from axiom.services.api_gateway.routes.routing_api import router as routing_rout
 from axiom.services.api_gateway.routes.formal_math_api import router as formal_math_router
 from axiom.services.api_gateway.routes.experiment_api import router as experiment_router
 from axiom.services.api_gateway.routes.frce_api import router as frce_router
+from axiom.services.api_gateway.routes.skai_api import router as skai_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -117,6 +118,9 @@ app.include_router(experiment_router)
 
 # ── FRCE Frontier Research Campaign Engine ───────────────────────────────────
 app.include_router(frce_router)
+
+# ── SKAI Scientific Knowledge Acquisition & Intelligence ─────────────────────
+app.include_router(skai_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
