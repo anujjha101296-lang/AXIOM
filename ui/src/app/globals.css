@@ -518,6 +518,63 @@ h1 {
 }
 .health-pass { color: var(--emerald); }
 
+/* ── Auth page ───────────────────────────────────────────────────── */
+.auth-page { min-height: 100vh; }
+.auth-panel {
+  max-width: 440px;
+  margin: 64px auto;
+  padding: 0 clamp(20px, 5vw, 48px) 80px;
+}
+.auth-panel h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.auth-lead {
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-tab.active {
+  background: rgba(99,102,241,0.12);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-field { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.auth-field input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.auth-error { color: var(--rose); font-size: 14px; }
+.auth-submit { width: 100%; justify-content: center; display: inline-flex; }
+.auth-footnote { margin-top: 24px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
 /* ── Waitlist Input (legacy — removed from landing) ────────────── */
 .waitlist-form {
   display: flex; gap: 8px; max-width: 420px; margin: 0 auto;

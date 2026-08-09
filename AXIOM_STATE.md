@@ -82,17 +82,18 @@ P0-WEB (#27) — independent of research loops; can merge anytime
 
 **FOUNDER-MERGE** (founder gate) — authorize research-loop PR stack onto `main`.
 
-**Next autonomous (no gate):** **MVP-AUTH** — real signup/login so `/research` is a multi-user product surface.
+**Next autonomous:** **MVP-AUTH continued** — project ownership isolation (`owner_id` on research projects).
 
-Immediate progress this cycle:
+This cycle completed:
 
 1. Install Master Directive ✅
 2. Land P0-WEB onto OS branch ✅
 3. Publish merge order ✅
+4. MVP signup/login + JWT research access ✅ (ownership isolation remaining)
 
 ## Why this is next
 
-Unmerged research loops cannot unlock YC demos on `main`. Auth is the highest-leverage product gap once the honest landing + OS are on the merge path.
+Unmerged research loops cannot unlock YC demos on `main`. Auth accounts exist; without owner isolation, multi-user is incomplete.
 
 ## Current commit
 

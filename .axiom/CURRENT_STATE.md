@@ -17,6 +17,7 @@ AXIOM on **`main`** has a production-quality **Research Workspace** vertical sli
 - **EM-001 Research Workspace:** Projects, PDFs, notes, FTS, Q&A, sessions — API + UI
 - **AXIOM-MASTER-001:** Continuous execution directive installed
 - **P0-WEB:** Honest public landing (capability tiers; no fake metrics / dead waitlist) — on this branch
+- **MVP-AUTH (partial):** Signup/login JWT (`/auth/*`), `/login` UI, JWT accepted by research API; static token still works
 
 ## Completed (draft PRs — not on `main`)
 
@@ -29,7 +30,8 @@ See `AXIOM_STATE.md` open PR stack (#17–#26 research loops; #27 superseded by 
 
 ## Highest priority (autonomous)
 
-**LAND-1 (partial):** Master Directive + P0-WEB on merge path. Next: founder merge authorization, then **MVP-AUTH**.
+**MVP-AUTH (continue):** Project ownership isolation + onboarding polish.  
+**FOUNDER-MERGE:** Authorize research-loop PR stack onto `main`.
 
 ## Worktree integrity
 

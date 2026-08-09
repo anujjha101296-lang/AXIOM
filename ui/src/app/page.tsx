@@ -161,7 +161,7 @@ export default function Home() {
         <nav aria-label="Primary navigation">
           <a href="#available">Capabilities</a>
           <a href="#honesty">Honesty</a>
-          <a href="#health">Health</a>
+          <Link href="/login">Sign in</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>
@@ -185,8 +185,8 @@ export default function Home() {
             <Link className="btn btn-primary" href="/research">
               Open Research Workspace →
             </Link>
-            <Link className="btn btn-secondary" href="/workspace">
-              Graph Workspace (prototype)
+            <Link className="btn btn-secondary" href="/login">
+              Sign up / Sign in
             </Link>
             <a
               className="btn btn-secondary"
