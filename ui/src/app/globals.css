@@ -418,8 +418,164 @@ h1 {
 .cta-card h2 { font-size: clamp(28px, 4vw, 52px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 20px; }
 .cta-card p { font-size: 18px; color: var(--text-secondary); max-width: 560px; margin: 0 auto 40px; line-height: 1.7; }
 .cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta-footnote {
+  margin-top: 24px; font-size: 13px; color: var(--text-muted); line-height: 1.6;
+}
 
-/* ── Waitlist Input ──────────────────────────────────────────────── */
+.inline-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-accent);
+}
+
+/* ── Capability cards (P0-WEB honest landing) ───────────────────── */
+.cap-section-label {
+  font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin: 40px 0 16px;
+}
+.cap-section-label:first-of-type { margin-top: 0; }
+
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.cap-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  text-decoration: none; color: inherit;
+  transition: border-color .2s, transform .2s;
+}
+.cap-card-clickable:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+.cap-card-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.cap-card-title {
+  font-size: 16px; font-weight: 700; color: var(--text-primary);
+}
+.cap-card-desc {
+  font-size: 14px; color: var(--text-secondary); line-height: 1.6; flex: 1;
+}
+.cap-card-link {
+  font-size: 13px; font-weight: 600; color: var(--text-accent);
+}
+
+.cap-pill {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; padding: 4px 8px; border-radius: 6px;
+  white-space: nowrap;
+}
+.cap-pill-live {
+  background: rgba(16,185,129,0.15); color: var(--emerald);
+  border: 1px solid rgba(16,185,129,0.3);
+}
+.cap-pill-partial {
+  background: rgba(245,158,11,0.12); color: var(--amber);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+.cap-pill-planned {
+  background: rgba(90,90,128,0.15); color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* ── Health gate grid ────────────────────────────────────────────── */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.health-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.health-card-name {
+  font-size: 18px; font-weight: 800; color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.health-card-target {
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.health-card-status {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.health-pass { color: var(--emerald); }
+
+/* ── Auth page ───────────────────────────────────────────────────── */
+.auth-page { min-height: 100vh; }
+.auth-panel {
+  max-width: 440px;
+  margin: 64px auto;
+  padding: 0 clamp(20px, 5vw, 48px) 80px;
+}
+.auth-panel h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.auth-lead {
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-tab.active {
+  background: rgba(99,102,241,0.12);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-field { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.auth-field input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+.auth-error { color: var(--rose); font-size: 14px; }
+.auth-submit { width: 100%; justify-content: center; display: inline-flex; }
+.auth-footnote { margin-top: 24px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+/* ── Waitlist Input (legacy — removed from landing) ────────────── */
 .waitlist-form {
   display: flex; gap: 8px; max-width: 420px; margin: 0 auto;
   background: rgba(255,255,255,0.04);

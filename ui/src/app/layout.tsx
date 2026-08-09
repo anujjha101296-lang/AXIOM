@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AXIOM Labs — AI Workspace for Frontier Mathematical Research",
+  title: "AXIOM — AI Research Platform (Early Access)",
   description:
-    "AXIOM is the AI workspace for frontier mathematical and scientific research. Visualize knowledge graphs, verify proofs, search counterexamples, and track prize problem readiness.",
-  keywords: ["AI research", "mathematical reasoning", "proof verification", "scientific discovery", "knowledge graph"],
+    "AXIOM is an AI research platform in active development. Start with the research workspace — projects, PDFs, notes, search, and Q&A. Honest capability disclosure.",
+  keywords: ["AI research", "research workspace", "scientific discovery", "evidence", "reproducibility"],
   openGraph: {
-    title: "AXIOM Labs — AI Workspace for Frontier Research",
-    description: "The AI workspace for frontier mathematical and scientific research.",
+    title: "AXIOM — AI Research Platform",
+    description: "An honest workspace for scientific research. Early access — see what actually works today.",
     type: "website",
   },
 };

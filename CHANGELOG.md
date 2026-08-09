@@ -8,6 +8,27 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### AXIOM-MASTER-001 — Continuous Autonomous Execution (2026-08-09)
+- Installed `.axiom/MASTER_DIRECTIVE.md` as binding engineering execution law
+- Wired `AGENTS.md` and `.axiom/CONSTITUTION.md` to continuous-loop operation
+- Added `AXIOM_STATE.md` honest system snapshot and `.axiom/MERGE_ORDER.md`
+- Competitive wedge documented: scientific research loop, not coding-agent clone
+- Queue reordered: LAND-1 / FOUNDER-MERGE before new research-loop sprawl
+
+### P0-WEB — Honest Public Landing Page (2026-08-09)
+- Replaced mock metrics and fake terminal output with verified platform facts
+- Capability disclosure: Available now / Early access / Planned tiers
+- Removed dead waitlist form; primary CTA links to `/research` workspace
+- Static server component builds cleanly on Next.js 16
+
+### MVP-AUTH — Signup / Login (2026-08-09)
+- `axiom/identity/` user store with PBKDF2 password hashing
+- API: `POST /auth/signup`, `POST /auth/login`, `GET /auth/me`, `GET /auth/health`
+- JWT tokens accepted by existing `verify_token` (research API works for signed-up users)
+- UI: `/login` page; landing links to sign-in; research workspace reads JWT from localStorage
+- Tests: `tests/test_mvp_auth.py` (7 passed)
+- Limitation: projects not yet scoped by owner_id (tenant isolation next)
+
 ### Sprint 0 — Production Foundation
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)

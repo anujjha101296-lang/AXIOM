@@ -1,32 +1,37 @@
 # Current State
 
-Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
+Read `CONSTITUTION.md`, `MASTER_DIRECTIVE.md`, `../AXIOM_STATE.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first.
 
-**Last updated:** 2026-08-06
-**Active horizon:** Three-track foundation — research, product, and company
+**Last updated:** 2026-08-09 (AXIOM-MASTER-001 installed)  
+**Active horizon:** Continuous execution under Master Directive — YC-ready MVP + research loop
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. EPIC-001 (MIP) and EPIC-002 (SCEP) are committed. Sprint 0 test baseline (S0-E2) and verification truthfulness audit (S0-E3) are **complete for the core suite**. **Engineering Milestone 001 — Research Workspace** delivers a production-ready researcher workflow.
+AXIOM on **`main`** has a production-quality **Research Workspace** vertical slice and verification truthfulness controls. A large stack of research-loop draft PRs (TSS → E&R → … → VFACTORY) and an honest landing page (P0-WEB) exist on GitHub but are **not merged**. Organizational priority is continuous autonomous execution under `.axiom/MASTER_DIRECTIVE.md`, not isolated feature prompts.
 
-## Completed
+## Completed (on `main`)
 
-- Operating contract committed as `6dca714` (`VISION.md`, root engineering/architecture contract, and Sprint 0 roadmap).
-- AXIOM Operating System initialized under `.axiom/`.
-- Three-track execution initiated: Research capability, researcher-workspace product, and company/PMO foundation now progress in parallel.
-- **S0-E2 (core):** Test toolchain restored — `pytest.py` moved to `scripts/standalone_test_runner.py`, `prize_readiness.py` syntax fixed, ruff config consolidated in `pyproject.toml`, CORS origins parsing fixed, httpx pinned `<0.28`, MDE router mounted.
-- **Test baseline (2026-08-06):** `159/159` core tests pass (`pytest tests/ --ignore=tests/e2e`). Full suite: `334/360`; 26 e2e failures documented (MDE API surface gap).
-- **Research Workspace v1:** End-to-end vertical slice — create projects, upload PDFs, extract text, generate summaries, save structured notes, FTS search, resume sessions. API `/research/*`, UI `/research`, demo script `scripts/demo_research_workspace.sh`.
-- **S0-E3:** Verification truthfulness audit — `axiom/core/verification/truthfulness.py`; API responses expose `evidence_mode` and `formally_proven`; simulated/SMT/heuristic paths cannot claim `TIER_2_PROVEN`.
-- **EM-001 Research Workspace (production):** Projects CRUD, PDF upload/parse/store, notes with tags, FTS search, paper Q&A with saved conversations, session resume. UI at `/research`.
+- Operating contract + AXIOM OS foundation under `.axiom/`
+- **S0-E2 (core):** Test toolchain restored; core suite green historically
+- **S0-E3:** Verification truthfulness audit
+- **EM-001 Research Workspace:** Projects, PDFs, notes, FTS, Q&A, sessions — API + UI
+- **AXIOM-MASTER-001:** Continuous execution directive installed
+- **P0-WEB:** Honest public landing (capability tiers; no fake metrics / dead waitlist) — on this branch
+- **MVP-AUTH (partial):** Signup/login JWT (`/auth/*`), `/login` UI, JWT accepted by research API; static token still works
 
-## Blocked
+## Completed (draft PRs — not on `main`)
 
-- None for core engineering baseline.
+See `AXIOM_STATE.md` open PR stack (#17–#26 research loops; #27 superseded by this branch for landing).
 
-## Highest priority
+## Blocked / founder gates
 
-**S0-E4: EPIC-002 integration gate** — integrate capability framework with evidence state, benchmark count, and limitations tested and documented.
+- **Merge strategy for draft research-loop PR stack** — required so GitHub `main` reflects built capabilities
+- **GCP-2 / public deploy / publication** — remain founder-gated when relevant
+
+## Highest priority (autonomous)
+
+**MVP-AUTH (continue):** Project ownership isolation + onboarding polish.  
+**FOUNDER-MERGE:** Authorize research-loop PR stack onto `main`.
 
 ## Worktree integrity
 
