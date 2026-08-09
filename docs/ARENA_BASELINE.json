@@ -1,0 +1,72 @@
+{
+  "run_id": "arena_b4366a5b3ac5",
+  "git_commit": "c209cdacf1dbb0db066b17736dbbc43549c2f8f5",
+  "dataset_version": "arena_v1",
+  "summary": {
+    "total": 60,
+    "passed": 59,
+    "failed": 1,
+    "mean_score": 0.9917
+  },
+  "dimension_scores": {
+    "correctness": 0.9917,
+    "evidence": 1.0,
+    "citation": 1.0,
+    "reasoning": 1.0,
+    "research_depth": 0.0,
+    "research_breadth": 1.0,
+    "novelty_assessment": 0.5,
+    "counterexample_detection": 1.0,
+    "reproduction": 1.0,
+    "formal_verification": 0.9,
+    "scientific_honesty": 1.0,
+    "reliability": 0.9833,
+    "cost": 0.7,
+    "latency": 1.0,
+    "security": 0.5,
+    "false_discovery_rate": 0.0,
+    "false_confidence_rate": 0.0,
+    "hallucination_rate": 0.0,
+    "unsupported_claim_rate": 0.0
+  },
+  "readiness": {
+    "highest_unlocked_tier": 7,
+    "domains": {
+      "basic_research": 0.9917,
+      "advanced_research": 0.6667,
+      "mathematics": 0.9959,
+      "formal_mathematics": 0.9,
+      "experimentation": 1.0,
+      "autonomy": 0.4916,
+      "long_horizon_research": 0.2458,
+      "scientific_reliability": 1.0
+    },
+    "millennium_ready": false
+  },
+  "weaknesses": [
+    {
+      "kind": "dimension",
+      "name": "research_depth",
+      "severity": 1.0,
+      "value": 0.0,
+      "direction": "lower_is_worse"
+    },
+    {
+      "kind": "dimension",
+      "name": "security",
+      "severity": 0.5,
+      "value": 0.5,
+      "direction": "lower_is_worse"
+    },
+    {
+      "kind": "dimension",
+      "name": "novelty_assessment",
+      "severity": 0.5,
+      "value": 0.5,
+      "direction": "lower_is_worse"
+    }
+  ],
+  "failures": [
+    "fm_04"
+  ]
+}

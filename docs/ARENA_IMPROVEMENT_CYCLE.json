@@ -1,0 +1,109 @@
+{
+  "run": {
+    "run_id": "arena_1a537ce47d75",
+    "git_commit": "c209cdacf1dbb0db066b17736dbbc43549c2f8f5",
+    "summary": {
+      "total": 60,
+      "passed": 60,
+      "failed": 0,
+      "mean_score": 1.0
+    },
+    "dimension_scores": {
+      "correctness": 1.0,
+      "evidence": 1.0,
+      "citation": 1.0,
+      "reasoning": 1.0,
+      "research_depth": 1.0,
+      "research_breadth": 1.0,
+      "novelty_assessment": 1.0,
+      "counterexample_detection": 1.0,
+      "reproduction": 1.0,
+      "formal_verification": 1.0,
+      "scientific_honesty": 1.0,
+      "reliability": 1.0,
+      "cost": 0.7,
+      "latency": 1.0,
+      "security": 1.0,
+      "false_discovery_rate": 0.0,
+      "false_confidence_rate": 0.0,
+      "hallucination_rate": 0.0,
+      "unsupported_claim_rate": 0.0
+    },
+    "readiness": {
+      "highest_unlocked_tier": 7,
+      "domains": {
+        "basic_research": 1.0,
+        "advanced_research": 1.0,
+        "mathematics": 1.0,
+        "formal_mathematics": 1.0,
+        "experimentation": 1.0,
+        "autonomy": 1.0,
+        "long_horizon_research": 0.35,
+        "scientific_reliability": 1.0
+      },
+      "millennium_ready": false
+    },
+    "weaknesses": [
+      {
+        "kind": "dimension",
+        "name": "cost",
+        "severity": 0.3,
+        "value": 0.7,
+        "direction": "lower_is_worse"
+      },
+      {
+        "kind": "dimension",
+        "name": "unsupported_claim_rate",
+        "severity": 0.0,
+        "value": 0.0,
+        "direction": "higher_is_worse"
+      },
+      {
+        "kind": "dimension",
+        "name": "security",
+        "severity": 0.0,
+        "value": 1.0,
+        "direction": "lower_is_worse"
+      }
+    ],
+    "failures": []
+  },
+  "comparison_to_baseline": {
+    "mean_score_delta": 0.0083,
+    "prev_failures": [
+      "fm_04"
+    ],
+    "curr_failures": [],
+    "prev_research_depth": 0.0,
+    "curr_research_depth": 1.0,
+    "prev_security": 0.5,
+    "curr_security": 1.0,
+    "prev_tier": 7,
+    "curr_tier": 7,
+    "passed": 60,
+    "total": 60,
+    "weaknesses": [
+      {
+        "kind": "dimension",
+        "name": "cost",
+        "severity": 0.3,
+        "value": 0.7,
+        "direction": "lower_is_worse"
+      },
+      {
+        "kind": "dimension",
+        "name": "unsupported_claim_rate",
+        "severity": 0.0,
+        "value": 0.0,
+        "direction": "higher_is_worse"
+      },
+      {
+        "kind": "dimension",
+        "name": "security",
+        "severity": 0.0,
+        "value": 1.0,
+        "direction": "lower_is_worse"
+      }
+    ]
+  }
+}

@@ -17,7 +17,10 @@ P0 safety / integrity / false-claim / supported-build failures always win. Prefe
 | 12 | DISCOVERY-ENGINE-0 | Scientific Discovery Engine core + benchmarks | Tip | cycle + FDR=0 + API/UI | **Done (v0.1)** |
 | 13 | MVP-CI-SCEP | Fix remaining SCEP CI doc failures | Tip | CI green on required checks | **Next autonomous** |
 | 14 | DISCOVERY-ENGINE-1 | External novelty search + formal bridge in cycle | DISCOVERY-ENGINE-0 | broader novelty ≠ INSUFFICIENT_SEARCH only | **Partial** (FMTP formalize + quality scorecard landed; external novelty still local) |
-| 15 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
+| 15 | ARENA-0 | Research Benchmark Arena v1 (60 cases + baseline) | Tip | 60-case run + readiness + UI | **Done** |
+| 16 | ARENA-1 | Long-horizon + dedicated security suite (Tier 8+) | ARENA-0 | unlock Tier 8 with measured long-horizon evidence | **Queued** |
+| 17 | MVP-CI-SCEP | Fix remaining SCEP CI doc failures | Tip | CI green on required checks | **Next autonomous** |
+| 18 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
 
 ## Historical (complete on tip)
 

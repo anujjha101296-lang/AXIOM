@@ -40,6 +40,7 @@ from axiom.services.api_gateway.routes.skai_api import router as skai_router
 from axiom.services.api_gateway.routes.vfactory_api import router as vfactory_router
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
 from axiom.services.api_gateway.routes.discovery_api import router as discovery_router
+from axiom.services.api_gateway.routes.arena_api import router as arena_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -134,6 +135,9 @@ app.include_router(vfactory_router)
 
 # ── Scientific Discovery Engine ───────────────────────────────────────────────
 app.include_router(discovery_router)
+
+# ── Research Benchmark Arena ──────────────────────────────────────────────────
+app.include_router(arena_router)
 
 # ── Workflow Engine (multi-agent orchestration) ──────────────────────────────
 app.include_router(workflow_router)

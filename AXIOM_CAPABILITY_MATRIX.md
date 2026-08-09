@@ -126,6 +126,7 @@
 | Campaign planner | **PARTIAL** | FRCE `planner.py` | — |
 | Discovery query `/query` | **SCAFFOLD** | Returns `[]` always | Needs SKAI retrieval |
 | **Scientific Discovery Engine** | **PARTIAL** | `axiom/discovery/`, `/discovery/*`, `/discovery` UI, 8 benchmarks | External novelty search; formal bridge in-cycle; full discovery graph |
+| **Research Benchmark Arena** | **PARTIAL** | `axiom/evaluation/arena/`, `/arena/*`, `/arena` UI, `arena_v1` 60 cases | Long-horizon suite; held-out rotating sets; model-provider matrix |
 | Self-improvement loop | **PARTIAL** | `self_improvement.py` | Audit only |
 
 ---

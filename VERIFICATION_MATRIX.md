@@ -23,6 +23,7 @@
 | cap_landing | Public Landing Page | product | UNTESTED | — | — |
 | cap_vfactory | Verification Factory | infrastructure | UNTESTED | vfactory-health | test_vfactory |
 | cap_discovery | Scientific Discovery Engine | research | PARTIAL | /discovery/manifest | test_discovery_engine |
+| cap_arena | Research Benchmark Arena | research | PARTIAL | /arena/manifest | test_benchmark_arena |
 
 ## Test pyramid coverage
 

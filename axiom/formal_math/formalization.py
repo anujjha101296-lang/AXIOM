@@ -20,7 +20,7 @@ def structure_statement(informal: str) -> tuple[str, list[str]]:
     ambiguities: list[str] = []
     text = informal.strip()
 
-    if re.search(r"\b(some|many|often|usually|probably)\b", text, re.I):
+    if re.search(r"\b(some|sometimes|many|often|usually|probably|maybe|might)\b", text, re.I):
         ambiguities.append("Vague quantifier or hedging language detected")
 
     if "?" in text and not text.endswith("?"):
@@ -48,17 +48,19 @@ def formalize_informal(
     structured, ambiguities = structure_statement(informal_statement)
     selected_prover = prover or recommended_prover("algebra")
 
-    if ambiguities and len(ambiguities) >= 2:
-        return FormalizationResult(
-            result_id=f"frm_{uuid.uuid4().hex[:12]}",
-            informal_statement=informal_statement,
-            structured_statement=structured,
-            formal_spec=None,
-            status=FormalizationStatus.AMBIGUOUS,
-            prover=selected_prover,
-            ambiguities=ambiguities,
-            created_at=_utc_now(),
-        )
+    if ambiguities:
+        hedging = any("vague" in a.lower() or "hedging" in a.lower() for a in ambiguities)
+        if hedging or len(ambiguities) >= 2:
+            return FormalizationResult(
+                result_id=f"frm_{uuid.uuid4().hex[:12]}",
+                informal_statement=informal_statement,
+                structured_statement=structured,
+                formal_spec=None,
+                status=FormalizationStatus.AMBIGUOUS,
+                prover=selected_prover,
+                ambiguities=ambiguities,
+                created_at=_utc_now(),
+            )
 
     exporter = LeanExporter()
     vars_dict = variables or {"n": "Nat"}

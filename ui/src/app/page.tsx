@@ -171,6 +171,7 @@ export default function Home() {
           <Link href="/experiments">Experiments</Link>
           <Link href="/sources">Sources</Link>
           <Link href="/discovery">Discovery</Link>
+          <Link href="/arena">Arena</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>
