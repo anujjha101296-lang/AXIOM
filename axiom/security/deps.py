@@ -23,3 +23,4 @@ provenance_route_auth = _make_optional_auth("require_auth_for_provenance_routes"
 evidence_route_auth = _make_optional_auth("require_auth_for_evidence_routes")
 routing_route_auth = _make_optional_auth("require_auth_for_routing_routes")
 formal_math_route_auth = _make_optional_auth("require_auth_for_formal_math_routes")
+experiment_route_auth = _make_optional_auth("require_auth_for_experiment_routes")

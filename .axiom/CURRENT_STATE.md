@@ -44,6 +44,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **E&R-1:** Evidence & Reproducibility Loop — claim registry, discovery gate, provenance graph, reproduction engine, `/evidence/*` API — `EVIDENCE_STATUS.md`.
 - **SIMR-1:** Scientific Intelligence & Model Routing — model/tool registries, capability graph, router, research compiler, `/routing/*` API — `MODEL_REGISTRY.md`.
 - **FMTP-1:** Formal Mathematics & Theorem-Proving — prover registry, formalization pipelines, proof search, compilation gate, `/formal/*` API — `FORMAL_MATH_STATUS.md`.
+- **SEC-1:** Scientific Experimentation & Compute — experiment kernel, sandbox, lifecycle, `/experiments/*` API — `EXPERIMENT_ENGINE.md`.
 
 ## Blocked
 

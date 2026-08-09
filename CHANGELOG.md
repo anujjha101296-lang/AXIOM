@@ -8,6 +8,16 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### SEC — Scientific Experimentation & Compute Loop (2026-08-09)
+- **SEC v1:** `.axiom/SEC.md`, experiment engine docs, sandbox security
+- **Experiment kernel:** lifecycle, versioned store, hypothesis linking
+- **Sandbox:** static analysis, subprocess isolation, timeouts
+- **Integrity gate:** computational evidence ≠ proof or scientific fact
+- **API:** `/experiments/*` routes with optional authentication
+- **Plugins:** VLSI research interface stub
+- **Health check:** `scripts/sec_health_check.py`, `make sec-health`
+- **Tests:** `tests/test_experiment_sec.py` (13 tests)
+
 ### FMTP — Formal Mathematics & Theorem-Proving Loop (2026-08-09)
 - **FMTP v1:** `.axiom/FMTP.md`, formal math status reports, millennium readiness update
 - **Prover registry:** Lean4, Coq, Isabelle, SMT, SymPy with installation status
