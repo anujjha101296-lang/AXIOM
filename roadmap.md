@@ -23,13 +23,15 @@ This is an evidence-led roadmap, not an automatic commitment. Re-rank work after
 - Replace the obsolete auto-generated roadmap with an explicit, ranked engineering roadmap.
 - Document safe autonomy and human-decision boundaries.
 
-#### S0-E2: Supported runtime baseline
+#### S0-E2: Supported runtime baseline — **core complete (2026-08-06)**
 
 - Provide a Python 3.10+ development and CI runtime.
 - Make the local setup and Docker configuration agree on the supported runtime.
 - Run the complete suite under the supported runtime and record the result.
 
 **Acceptance criterion:** all test collection errors caused by Python 3.9 compatibility are eliminated without weakening type annotations or validation semantics.
+
+**Result:** Core suite green (`134/134` with `--ignore=tests/e2e`). Full suite `334/360`; 26 e2e failures documented (MDE API surface gap).
 
 #### S0-E3: Verification truthfulness audit
 
@@ -38,6 +40,8 @@ This is an evidence-led roadmap, not an automatic commitment. Re-rank work after
 - Add regression tests for status labeling and unsupported-prover behavior.
 
 **Acceptance criterion:** no API response can label a fallback/simulated verification as a formal proof.
+
+**Result:** `axiom/core/verification/truthfulness.py` centralizes evidence modes; `/verify/conjecture`, `/verify/proof`, `/mip/formal/compile`, and `/mip/verify/claim` expose `evidence_mode` and `formally_proven`. Core suite `154/154`.
 
 #### S0-E4: EPIC-002 integration gate
 

@@ -8,6 +8,38 @@ Record decisions, experiments, failures, benchmarks, architecture changes, commi
 
 ## Entries
 
+### 2026-08-06 — Product milestone — EM-001 Research Workspace (production)
+
+- **Summary:** Shipped production-ready researcher workflow: project organization, PDF pipeline, notes with tags, FTS search, paper Q&A with persisted conversations, session resume.
+- **Artifacts:** `axiom/research/qa.py`, conversation tables, `/research/projects/{id}/ask`, UI chat at `/research`.
+- **Evidence:** `159/159` core tests; `scripts/demo_research_workspace.sh` completes full workflow including Q&A.
+- **Next:** S0-E4 EPIC-002 integration gate.
+
+### 2026-08-06 — Engineering — S0-E3 verification truthfulness audit
+
+- **Summary:** Centralized evidence-mode labeling so simulated, SMT-bounded, heuristic, and compiler-backed verification cannot claim formal proof status.
+- **Artifacts:** `axiom/core/verification/truthfulness.py`; updated `/verify/*` and `/mip/formal/compile`, `/mip/verify/claim` responses; `tests/test_verification_truthfulness.py`.
+- **Evidence:** `pytest tests/ --ignore=tests/e2e` → 154 passed; regression tests assert `formally_proven: false` for simulated Lean and SMT modular paths.
+- **Limitation:** MIP consensus `final_verdict` may still be `VERIFIED` from heuristic checks; `formally_proven` flag distinguishes formal proof.
+- **Next:** S0-E4 EPIC-002 integration gate.
+
+### 2026-08-06 — Product milestone — Research Workspace v1
+
+- **Summary:** Shipped first complete researcher vertical slice: projects, PDF upload/extraction, summaries, structured notes, FTS search, session resume.
+- **Artifacts:** `axiom/research/`, `/research` API routes, `ui/src/app/research/page.tsx`, `tests/test_research_workspace.py`, `scripts/demo_research_workspace.sh`, `docs/api.md` Research section.
+- **Evidence:** `pytest tests/test_research_workspace.py` → 10 passed; core suite `144/144`; demo script completes end-to-end against live API.
+- **Fixes:** Reserved `LogRecord` keys (`name`, `filename`) in structured logging caused 500/404 on create/upload; corrected to `project_name` / `document_filename`.
+- **Limitation:** Summaries use model gateway with extractive fallback; blank/scanned PDFs return 422; UI requires bearer token in dev.
+- **Next:** S0-E3 verification truthfulness audit.
+
+### 2026-08-06 — Engineering baseline — S0-E2 core complete
+
+- **Summary:** Restored trustworthy core test baseline after three P0 toolchain defects.
+- **Changes:** Moved `pytest.py` → `scripts/standalone_test_runner.py`; fixed `prize_readiness.py` syntax; consolidated ruff config in `pyproject.toml`; fixed CORS comma-separated env parsing; pinned `httpx<0.28`; mounted MDE router; fixed e2e TestClient auth headers.
+- **Evidence:** `pytest tests/ --ignore=tests/e2e` → 134 passed, 0 failed (Python 3.12.3). Full suite: 334 passed, 26 e2e failed.
+- **Limitation:** 26 e2e tests fail because MDE conjecture/counterexample endpoints exist only in test modules, not production API. Coverage ~54%.
+- **Next:** S0-E3 verification truthfulness audit.
+
 ### 2026-08-05 — Architecture decision — operating contract
 
 - **Summary:** AXIOM moved from prompt-led execution toward a repository-native operating system.

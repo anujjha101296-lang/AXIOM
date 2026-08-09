@@ -1,0 +1,25 @@
+{
+  "name": "AXIOM",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "user": "ubuntu",
+  "install": "bash scripts/cloud-agent-install.sh",
+  "ports": [
+    {"name": "api", "port": 8000},
+    {"name": "ui", "port": 3000}
+  ],
+  "terminals": [
+    {
+      "name": "api",
+      "command": "source .venv/bin/activate && make dev",
+      "description": "FastAPI API gateway (port 8000)"
+    },
+    {
+      "name": "ui",
+      "command": "cd ui && npm run dev -- --hostname 0.0.0.0 --port 3000",
+      "description": "Next.js research workspace (port 3000)"
+    }
+  ]
+}

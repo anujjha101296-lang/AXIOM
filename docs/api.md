@@ -82,6 +82,18 @@ Response:
 
 ## Verification
 
+All verification responses include `evidence_mode` and `formally_proven` (or `formally_verified` for compile endpoints) so simulated, heuristic, and compiler-backed outcomes are never conflated.
+
+| `evidence_mode` | Meaning |
+|---|---|
+| `formal_compiler` | Subprocess prover/compiler succeeded (exit code 0) |
+| `smt_finite` | Exhaustive/bounded SMT check over a finite domain |
+| `heuristic` | Pattern/sanity-based check |
+| `simulated` | Structural simulation when prover binary is absent |
+| `unverified` | Check failed or could not run |
+
+`formally_proven: true` is returned **only** when `evidence_mode` is `formal_compiler` and the check succeeded.
+
 ### `POST /verify/conjecture`
 Run a Z3 SMT counterexample sweep on a modular arithmetic conjecture.
 ```json
@@ -92,6 +104,7 @@ Run a Z3 SMT counterexample sweep on a modular arithmetic conjecture.
   "variables": ["x", "y", "z"]
 }
 ```
+Response includes `evidence_mode: "smt_finite"` and `formally_proven: false` even when `is_valid: true`.
 
 ### `POST /verify/proof`
 Run MCTS proof search and export Lean 4 file.
@@ -103,6 +116,7 @@ Run MCTS proof search and export Lean 4 file.
   "variables": {"x": "Nat"}
 }
 ```
+When the Lean compiler is unavailable, `compiler_status` contains `simulated`, `formally_proven` is `false`, and `verification_tier` is `1` (not `2`).
 
 ---
 
@@ -126,6 +140,88 @@ Set the active research problem.
 
 ### `GET /benchmark/prize-readiness`
 Return AXIOM's current capability scores against Millennium Prize Problems.
+
+---
+
+## Research Workspace
+
+Base path: `/research` — all endpoints require authentication.
+
+### `POST /research/projects`
+Create a research project.
+```json
+{"name": "RH Literature Review", "description": "Survey of zeta zero results"}
+```
+
+### `GET /research/projects`
+List all projects (most recently active first).
+
+### `GET /research/projects/{project_id}`
+Get project detail including documents, notes, conversations, active conversation messages, and current session.
+
+### `PUT /research/projects/{project_id}`
+Update project name and/or description.
+```json
+{"name": "Updated title", "description": "Updated description"}
+```
+
+### `POST /research/projects/{project_id}/documents/upload`
+Upload a PDF (`multipart/form-data`, field `file`). Extracts text automatically.
+
+### `POST /research/projects/{project_id}/documents/{document_id}/summarize`
+Generate an LLM summary (or extractive fallback) for an uploaded document.
+
+### `GET /research/projects/{project_id}/documents`
+List documents in a project.
+
+### `POST /research/projects/{project_id}/notes`
+Create a structured note.
+```json
+{"title": "Key insight", "body": "...", "document_id": "optional-uuid", "tags": ["zeta"]}
+```
+
+### `PUT /research/projects/{project_id}/notes/{note_id}`
+Update a note (`title`, `body`, `tags` — all optional).
+
+### `GET /research/projects/{project_id}/notes`
+List notes for a project. Query param `tag` filters by tag.
+
+### `DELETE /research/projects/{project_id}/notes/{note_id}`
+Delete a note.
+
+### `POST /research/projects/{project_id}/ask`
+Ask a question about uploaded papers. Creates or continues a saved conversation.
+```json
+{
+  "question": "What is the main theorem?",
+  "document_id": "optional-uuid",
+  "conversation_id": "optional-uuid-to-continue"
+}
+```
+Response:
+```json
+{
+  "answer": "...",
+  "conversation_id": "uuid",
+  "message_id": "uuid",
+  "sources": ["paper.pdf"]
+}
+```
+
+### `GET /research/projects/{project_id}/conversations`
+List saved Q&A conversations for a project.
+
+### `GET /research/projects/{project_id}/conversations/{conversation_id}`
+Get a conversation with full message history. Sets it as the active conversation.
+
+### `GET /research/search?q=...&project_id=...`
+Full-text search across documents and notes. Optional `project_id` scopes to one project.
+
+### `POST /research/projects/{project_id}/sessions/resume`
+Resume or create a research session. Query param: `active_document_id` (optional).
+
+### `GET /research/projects/{project_id}/sessions/current`
+Get the current session for a project (creates one if missing).
 
 ---
 

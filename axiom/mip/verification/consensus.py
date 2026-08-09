@@ -113,12 +113,26 @@ def _run_formal_verification(claim: str, proof_script: str | None = None) -> Ver
         success, output = compile_lean4(proof_script)
         elapsed = (time.perf_counter() - start) * 1000
 
-        verdict = Verdict.VERIFIED if success else Verdict.INCONCLUSIVE
+        from axiom.core.verification.truthfulness import is_simulated_compiler_output
+
+        if is_simulated_compiler_output(output):
+            verdict = Verdict.INCONCLUSIVE
+            evidence = f"Simulated compiler check only: {output[:500]}"
+            confidence = 0.2
+        elif success:
+            verdict = Verdict.VERIFIED
+            evidence = output[:500]
+            confidence = 0.9
+        else:
+            verdict = Verdict.INCONCLUSIVE
+            evidence = output[:500]
+            confidence = 0.2
+
         return VerifierResult(
             verifier_name="Formal/Lean4",
             verdict=verdict,
-            confidence=0.9 if success else 0.2,
-            evidence=output[:500],
+            confidence=confidence,
+            evidence=evidence,
             execution_time_ms=elapsed,
         )
     except Exception as exc:
