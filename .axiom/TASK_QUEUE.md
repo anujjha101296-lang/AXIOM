@@ -22,7 +22,7 @@ P0 safety / integrity / false-claim / supported-build failures always win. Prefe
 
 ## Historical (complete on tip)
 
-S0-E2, S0-E3, S0-E4, EM-001, GCP-1, OS-1, CEL-1, H1-OBS, TSS-1, E&R-1, SIMR-1, FMTP-1, SEC-1, FRCE-1, SKAI-1, MASTER-1, VFACTORY-1, MASTER-OS, P0-WEB, MVP-AUTH (signup/login + ownership), MVP-EVIDENCE, MVP-CAMPAIGN-UI, MVP journey test.
+S0-E2, S0-E3, S0-E4, EM-001, GCP-1, OS-1, CEL-1, H1-OBS, TSS-1, E&R-1, SIMR-1, FMTP-1, SEC-1, FRCE-1, SKAI-1, MASTER-1, VFACTORY-1, MASTER-OS, P0-WEB, MVP-AUTH (signup/login + ownership), MVP-EVIDENCE, MVP-CAMPAIGN-UI, MVP-AGENTS-UI, MVP journey test.
 
 ## Queue protocol
 

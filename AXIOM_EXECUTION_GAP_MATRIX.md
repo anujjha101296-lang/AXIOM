@@ -17,7 +17,7 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 | Q&A | YELLOW | Works; citations + provider_mode | Real LLM needs API key | P1 | Soft |
 | Evidence in answers | GREEN | Citations + snippet + mode in API/UI | Not yet claim-registry linked | P1 | Soft |
 | Campaign API (FRCE) | GREEN | `/frce/*` | — | P4 | No |
-| Campaign UI | GREEN | `/campaigns` create→scope→plan→cycle | No agent activity panel yet | P1 | No |
+| Campaign UI | GREEN | `/campaigns` create→scope→plan→cycle | Agent panel included | P1 | No |
 | Agent visibility UI | GREEN | Campaign dashboard what/why/found/uncertain | Live streaming of tool calls later | P3 | Soft |
 | Experiments API | GREEN | `/experiments/*` | — | P5 | No |
 | Experiments UI | RED | None | — | P5 | Later |
@@ -29,10 +29,10 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 
 ## Build order (next cycle)
 
-1. **P3** Agent activity visibility in campaign/research UI  
-2. **P1** Browser/manual persistence smoke (signup→logout→login)  
-3. **P0** Docker compose smoke on tip  
-4. **P5** Experiments UI (create → run → artifacts)
+1. **P1** Browser/manual persistence smoke (signup→logout→login)  
+2. **P0** Docker compose smoke on tip  
+3. **P5** Experiments UI (create → run → artifacts)  
+4. **P4** Per-user FRCE campaign ownership
 
 ## Explicit mocks / limitations
 
