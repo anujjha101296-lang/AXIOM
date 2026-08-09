@@ -15,10 +15,12 @@ AXIOM on **`main`** has a production-quality **Research Workspace** vertical sli
 - **S0-E2 (core):** Test toolchain restored; core suite green historically
 - **S0-E3:** Verification truthfulness audit
 - **EM-001 Research Workspace:** Projects, PDFs, notes, FTS, Q&A, sessions — API + UI
+- **AXIOM-MASTER-001:** Continuous execution directive installed
+- **P0-WEB:** Honest public landing (capability tiers; no fake metrics / dead waitlist) — on this branch
 
 ## Completed (draft PRs — not on `main`)
 
-See `AXIOM_STATE.md` open PR stack (#17–#27): GCP/OS, TSS, E&R, SIMR, FMTP, SEC, FRCE, SKAI, MASTER audit, VFACTORY, P0-WEB.
+See `AXIOM_STATE.md` open PR stack (#17–#26 research loops; #27 superseded by this branch for landing).
 
 ## Blocked / founder gates
 
@@ -27,7 +29,7 @@ See `AXIOM_STATE.md` open PR stack (#17–#27): GCP/OS, TSS, E&R, SIMR, FMTP, SE
 
 ## Highest priority (autonomous)
 
-**LAND-1:** Stop orphan feature sprawl; land Master Directive + P0-WEB; prepare bottom-up merge of research stack after founder authorization.
+**LAND-1 (partial):** Master Directive + P0-WEB on merge path. Next: founder merge authorization, then **MVP-AUTH**.
 
 ## Worktree integrity
 

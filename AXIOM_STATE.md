@@ -80,21 +80,19 @@ P0-WEB (#27) — independent of research loops; can merge anytime
 
 ## Next highest-value initiative
 
-**LAND-1 — Land product + OS on `main`, then consolidate the research stack.**
+**FOUNDER-MERGE** (founder gate) — authorize research-loop PR stack onto `main`.
 
-Immediate autonomous work (no founder gate):
+**Next autonomous (no gate):** **MVP-AUTH** — real signup/login so `/research` is a multi-user product surface.
 
-1. Install Master Directive (this cycle) ✅
-2. Land P0-WEB honest landing onto the merge path
-3. Prepare explicit merge order + stop creating parallel orphan feature PRs
+Immediate progress this cycle:
 
-Requires founder:
-
-- Approve merging draft PR chain onto `main` (or authorize one squash integration branch)
+1. Install Master Directive ✅
+2. Land P0-WEB onto OS branch ✅
+3. Publish merge order ✅
 
 ## Why this is next
 
-Under MASTER_DIRECTIVE product-first + “GitHub is source of truth”: unmerged work has near-zero company value. A usable MVP on `main` beats another unmerged research loop.
+Unmerged research loops cannot unlock YC demos on `main`. Auth is the highest-leverage product gap once the honest landing + OS are on the merge path.
 
 ## Current commit
 

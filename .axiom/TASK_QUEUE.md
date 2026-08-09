@@ -10,10 +10,10 @@ P0 safety / integrity / false-claim / supported-build failures always win. Other
 
 | Rank | ID | Task | Dependencies | Acceptance signal | Status |
 |---:|---|---|---|---|---|
-| 1 | MASTER-OS | Install AXIOM-MASTER-001; wire AGENTS/CONSTITUTION; create AXIOM_STATE | — | Directive readable; sessions start with continuous loop | **In progress (this cycle)** |
-| 2 | LAND-1 | Land P0-WEB + Master OS on `main`; document merge order for research stack | MASTER-OS | Honest `/` on mainline path; merge order published | Ready |
+| 1 | MASTER-OS | Install AXIOM-MASTER-001; wire AGENTS/CONSTITUTION; create AXIOM_STATE | — | Directive readable; sessions start with continuous loop | **Complete** |
+| 2 | LAND-1 | Land P0-WEB + Master OS on `main`; document merge order for research stack | MASTER-OS | Honest `/` on mainline path; merge order published | **Partial** — on branch; awaiting merge to main |
 | 3 | FOUNDER-MERGE | Authorize bottom-up merge of draft PRs #17→#26 (or squash tip) | LAND-1 | `main` contains research loops or explicit decline | **Founder gate** |
-| 4 | MVP-AUTH | Real user signup/login + session for research workspace | LAND-1 | User can create account and own projects | Ready after LAND-1 |
+| 4 | MVP-AUTH | Real user signup/login + session for research workspace | LAND-1 | User can create account and own projects | **Next autonomous** |
 | 5 | MVP-EVIDENCE | Show evidence/citations in research Q&A UI (no fake sources) | MVP-AUTH or workspace | Answers display provenance when available | Ready |
 | 6 | S0-E4 | EPIC-002 evidence gate integration | S0-E3 | Evidence state on eval APIs documented + tested | Ready on main; also on draft stacks |
 | 7 | R0-PLAN | Researcher workflow + benchmark program + monthly evidence review | Existing evidence | Plan names measurement and non-claims | In progress |
@@ -27,7 +27,7 @@ P0 safety / integrity / false-claim / supported-build failures always win. Other
 | S0-E2 | Complete (core) |
 | S0-E3 | Complete |
 | EM-001 | Complete on main |
-| P0-WEB | Complete on draft PR #27 — land via LAND-1 |
+| P0-WEB | **Complete** on this branch / draft #27 — land via merge to main |
 
 ## Queue protocol
 

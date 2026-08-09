@@ -15,6 +15,12 @@ Format: [Semantic Versioning](https://semver.org/)
 - Competitive wedge documented: scientific research loop, not coding-agent clone
 - Queue reordered: LAND-1 / FOUNDER-MERGE before new research-loop sprawl
 
+### P0-WEB — Honest Public Landing Page (2026-08-09)
+- Replaced mock metrics and fake terminal output with verified platform facts
+- Capability disclosure: Available now / Early access / Planned tiers
+- Removed dead waitlist form; primary CTA links to `/research` workspace
+- Static server component builds cleanly on Next.js 16
+
 ### Sprint 0 — Production Foundation
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)
