@@ -20,19 +20,19 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 | Campaign UI | GREEN | `/campaigns` create→scope→plan→cycle | Agent panel included | P1 | No |
 | Agent visibility UI | GREEN | Campaign dashboard what/why/found/uncertain | Live streaming of tool calls later | P3 | Soft |
 | Experiments API | GREEN | `/experiments/*` | — | P5 | No |
-| Experiments UI | RED | None | — | P5 | Later |
+| Experiments UI | GREEN | `/experiments` create→run→inspect | Not user-scoped list | P5 | Soft |
 | Formal math | YELLOW | API + compilation gate | Lean optional; no UI | P7 | No |
 | Internet research | YELLOW | arXiv ingest exists | Controlled web search limited | P2 | Later |
 | Docker compose | YELLOW | Exists | Needs smoke on tip | P0 | Soft |
 | CI | YELLOW | Runs; 3 SCEP doc fails | E2E not required check | P0 | Soft |
-| E2E product journey | GREEN | `tests/test_mvp_journey.py` | Browser E2E still pending | P1 | Soft |
+| E2E product journey | GREEN | `tests/test_mvp_journey.py` + persistence | Browser Playwright still pending | P1 | Soft |
 
 ## Build order (next cycle)
 
-1. **P1** Browser/manual persistence smoke (signup→logout→login)  
-2. **P0** Docker compose smoke on tip  
-3. **P5** Experiments UI (create → run → artifacts)  
-4. **P4** Per-user FRCE campaign ownership
+1. **P0** Docker compose smoke on tip  
+2. **P4** Per-user FRCE / SEC ownership  
+3. **P2** Controlled internet research polish  
+4. **P1** Playwright browser E2E (optional after Docker)
 
 ## Explicit mocks / limitations
 
