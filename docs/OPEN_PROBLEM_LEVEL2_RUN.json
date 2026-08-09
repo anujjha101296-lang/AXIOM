@@ -1,0 +1,57 @@
+{
+  "title": "Nat add commutative",
+  "stage_level": 2,
+  "research_status": "PARTIALLY_PROGRESSING",
+  "verification_state": "FORMALIZATION_ATTEMPTED_UNVERIFIED",
+  "literature": {
+    "count": 4,
+    "by_provenance": {
+      "formal_library": 2,
+      "intake_seed": 1,
+      "skai_coverage": 1
+    },
+    "untrusted_count": 2,
+    "has_formal_library": true,
+    "has_skai": true,
+    "placeholder_remaining": false
+  },
+  "formal_library_titles": [
+    "Formal library: add_comm",
+    "Formal library: mul_comm"
+  ],
+  "stages_executed": [
+    "map_knowledge",
+    "decompose",
+    "strategies",
+    "start_campaign",
+    "start_discovery",
+    "frce_scope",
+    "frce_plan",
+    "frce_cycle",
+    "discovery_cycle"
+  ],
+  "proof_attempt_ids": [
+    "frm_e473e66bb786"
+  ],
+  "timeline_event_types": [
+    "SOURCE_FOUND",
+    "KNOWLEDGE_EXTRACTED",
+    "SOURCE_FOUND",
+    "GAP_IDENTIFIED",
+    "SOURCE_FOUND",
+    "GAP_IDENTIFIED",
+    "STRATEGY_STARTED",
+    "STRATEGY_STARTED",
+    "HYPOTHESIS_CREATED",
+    "EXPERIMENT_COMPLETED",
+    "PROOF_ATTEMPTED"
+  ],
+  "is_millennium_attempt": false,
+  "is_scientific_discovery_claim": false,
+  "limitations": [
+    "Computational evidence is not proof.",
+    "Missing literature retrieval is not novelty.",
+    "RESOLVED requires explicit verification gate.",
+    "Millennium campaigns are not auto-started."
+  ]
+}

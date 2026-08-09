@@ -28,7 +28,7 @@ from axiom.research.schema import (
 from axiom.research.store import ResearchStore
 from axiom.research.summarizer import DocumentSummarizer
 from axiom.research.qa import PaperQA
-from axiom.services.api_gateway.auth import verify_token
+from axiom.services.api_gateway.auth import token_owner_id, verify_token
 from axiom.services.model_gateway.client import ModelClient
 
 logger = get_logger("axiom.api.research")
@@ -69,14 +69,22 @@ def _not_found(resource: str, identifier: str) -> HTTPException:
     )
 
 
+def _owned_project(store: ResearchStore, project_id: str, owner_id: str) -> ResearchProject:
+    try:
+        return store.get_project(project_id, owner_id=owner_id)
+    except KeyError:
+        raise _not_found("Project", project_id) from None
+
+
 @router.post("/projects", response_model=ResearchProject, status_code=status.HTTP_201_CREATED)
 def create_project(
     payload: CreateProjectRequest,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchProject:
     try:
-        return store.create_project(payload.name, payload.description)
+        return store.create_project(payload.name, payload.description, owner_id=owner_id)
     except Exception as exc:
         logger.error("Failed to create project", extra={"error": str(exc)}, exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to create project") from exc
@@ -85,9 +93,10 @@ def create_project(
 @router.get("/projects", response_model=List[ResearchProject])
 def list_projects(
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchProject]:
-    return store.list_projects()
+    return store.list_projects(owner_id=owner_id)
 
 
 @router.put("/projects/{project_id}", response_model=ResearchProject)
@@ -95,10 +104,12 @@ def update_project(
     project_id: str,
     payload: UpdateProjectRequest,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchProject:
     if payload.name is None and payload.description is None:
         raise HTTPException(status_code=400, detail="At least one field required to update")
+    _owned_project(store, project_id, owner_id)
     try:
         return store.update_project(project_id, name=payload.name, description=payload.description)
     except KeyError:
@@ -109,10 +120,11 @@ def update_project(
 def get_project(
     project_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ProjectDetail:
     try:
-        return store.get_project_detail(project_id)
+        return store.get_project_detail(project_id, owner_id=owner_id)
     except KeyError:
         raise _not_found("Project", project_id)
 
@@ -126,8 +138,10 @@ def upload_document(
     project_id: str,
     file: UploadFile = File(...),
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchDocument:
+    _owned_project(store, project_id, owner_id)
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -191,9 +205,11 @@ def summarize_document(
     project_id: str,
     document_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
     summarizer: DocumentSummarizer = Depends(get_summarizer),
 ) -> ResearchDocument:
+    _owned_project(store, project_id, owner_id)
     try:
         doc = store.get_document(document_id)
         if doc.project_id != project_id:
@@ -213,8 +229,10 @@ def summarize_document(
 def list_documents(
     project_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchDocument]:
+    _owned_project(store, project_id, owner_id)
     try:
         store.get_project(project_id)
         return store.list_documents(project_id)
@@ -231,8 +249,10 @@ def create_note(
     project_id: str,
     payload: CreateNoteRequest,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchNote:
+    _owned_project(store, project_id, owner_id)
     try:
         return store.create_note(
             project_id=project_id,
@@ -250,8 +270,10 @@ def list_notes(
     project_id: str,
     tag: Optional[str] = Query(None, description="Filter notes by tag"),
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchNote]:
+    _owned_project(store, project_id, owner_id)
     try:
         store.get_project(project_id)
         return store.list_notes(project_id, tag=tag)
@@ -264,8 +286,10 @@ def delete_note(
     project_id: str,
     note_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ):
+    _owned_project(store, project_id, owner_id)
     try:
         note = store.get_note(note_id)
         if note.project_id != project_id:
@@ -282,8 +306,10 @@ def update_note(
     note_id: str,
     payload: UpdateNoteRequest,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchNote:
+    _owned_project(store, project_id, owner_id)
     try:
         note = store.get_note(note_id)
         if note.project_id != project_id:
@@ -304,14 +330,20 @@ def search_research(
     project_id: Optional[str] = Query(None, description="Limit to project"),
     limit: int = Query(20, ge=1, le=100),
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[SearchResult]:
     if project_id:
-        try:
-            store.get_project(project_id)
-        except KeyError:
-            raise _not_found("Project", project_id)
-    return store.search(q, project_id=project_id, limit=limit)
+        _owned_project(store, project_id, owner_id)
+        return store.search(q, project_id=project_id, limit=limit)
+
+    # Cross-project search: only return hits from projects the caller owns.
+    owned_ids = {p.id for p in store.list_projects(owner_id=owner_id)}
+    if not owned_ids:
+        return []
+    results = store.search(q, project_id=None, limit=max(limit * 3, 60))
+    filtered = [r for r in results if r.project_id in owned_ids]
+    return filtered[:limit]
 
 
 @router.post("/projects/{project_id}/ask", response_model=AskQuestionResponse)
@@ -319,11 +351,13 @@ def ask_about_papers(
     project_id: str,
     payload: AskQuestionRequest,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
     qa: PaperQA = Depends(get_paper_qa),
 ) -> AskQuestionResponse:
+    _owned_project(store, project_id, owner_id)
     try:
-        store.get_project(project_id)
+        store.get_project(project_id, owner_id=owner_id)
 
         if payload.conversation_id:
             conversation = store.get_conversation(payload.conversation_id)
@@ -352,7 +386,9 @@ def ask_about_papers(
             )
 
         store.add_message(conversation.id, "user", payload.question)
-        answer, sources = qa.answer(payload.question, documents)
+        answer, sources, citations, provider_mode, uncertainty = qa.answer(
+            payload.question, documents
+        )
         assistant_msg = store.add_message(conversation.id, "assistant", answer, sources)
         store.set_active_conversation(project_id, conversation.id)
 
@@ -362,6 +398,7 @@ def ask_about_papers(
                 "project_id": project_id,
                 "conversation_id": conversation.id,
                 "document_scope": payload.document_id or "all",
+                "provider_mode": provider_mode,
             },
         )
         return AskQuestionResponse(
@@ -369,6 +406,9 @@ def ask_about_papers(
             conversation_id=conversation.id,
             message_id=assistant_msg.id,
             sources=sources,
+            citations=citations,
+            provider_mode=provider_mode,
+            uncertainty=uncertainty,
         )
     except KeyError as exc:
         detail = str(exc)
@@ -390,8 +430,10 @@ def ask_about_papers(
 def list_conversations(
     project_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> List[ResearchConversation]:
+    _owned_project(store, project_id, owner_id)
     try:
         store.get_project(project_id)
         return store.list_conversations(project_id)
@@ -407,8 +449,10 @@ def get_conversation(
     project_id: str,
     conversation_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ConversationDetail:
+    _owned_project(store, project_id, owner_id)
     try:
         detail = store.get_conversation_detail(conversation_id)
         if detail.conversation.project_id != project_id:
@@ -424,8 +468,10 @@ def resume_session(
     project_id: str,
     active_document_id: Optional[str] = Query(None),
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchSession:
+    _owned_project(store, project_id, owner_id)
     try:
         return store.resume_session(project_id, active_document_id=active_document_id)
     except KeyError as exc:
@@ -436,10 +482,12 @@ def resume_session(
 def get_current_session(
     project_id: str,
     token: str = Depends(verify_token),
+    owner_id: str = Depends(token_owner_id),
     store: ResearchStore = Depends(get_research_store),
 ) -> ResearchSession:
+    _owned_project(store, project_id, owner_id)
     try:
-        store.get_project(project_id)
+        store.get_project(project_id, owner_id=owner_id)
         session = store.get_session(project_id)
         if not session:
             session = store.resume_session(project_id)

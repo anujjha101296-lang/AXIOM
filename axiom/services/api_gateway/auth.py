@@ -20,7 +20,6 @@ Usage:
 
 from __future__ import annotations
 
-import os
 import time
 from enum import Enum
 from typing import Optional
@@ -28,12 +27,14 @@ from typing import Optional
 from fastapi import Depends, Header, HTTPException, status
 from pydantic import BaseModel
 
+from axiom.config import settings
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-SECRET_TOKEN = os.getenv("AXIOM_API_TOKEN", "axiom-dev-token")
-JWT_SECRET   = os.getenv("JWT_SECRET_KEY",  "CHANGE-ME-IN-PRODUCTION")
-JWT_ALGO     = "HS256"
-JWT_EXPIRY   = int(os.getenv("JWT_EXPIRY_MINUTES", "60")) * 60  # seconds
+
+# ── Configuration (sourced from settings / environment) ───────────────────────
+SECRET_TOKEN = settings.axiom_api_token
+JWT_SECRET = settings.jwt_secret_key
+JWT_ALGO = settings.jwt_algorithm
+JWT_EXPIRY = settings.jwt_expiry_minutes * 60  # seconds
 
 
 # ── Roles ─────────────────────────────────────────────────────────────────────
@@ -61,7 +62,12 @@ class TokenPayload(BaseModel):
 def verify_token(authorization: str = Header(None)) -> str:
     """
     FastAPI dependency: verifies the `Authorization: Bearer <token>` header.
-    Used on every protected endpoint. Returns the raw token string.
+
+    Accepts:
+      1. Static MVP token (`AXIOM_API_TOKEN`) — single-tenant / local dev
+      2. Signed JWT from `/auth/signup` or `/auth/login` — multi-user path
+
+    Returns the raw token string (static or JWT).
     """
     if not authorization:
         raise HTTPException(
@@ -77,13 +83,62 @@ def verify_token(authorization: str = Header(None)) -> str:
             headers={"WWW-Authenticate": "Bearer"},
         )
     token = parts[1]
-    if token != SECRET_TOKEN:
+    if token == SECRET_TOKEN:
+        return token
+    # Multi-user JWT path
+    try:
+        decode_jwt_token(token)
+        return token
+    except HTTPException:
+        raise
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token",
             headers={"WWW-Authenticate": "Bearer"},
+        ) from None
+
+
+def token_owner_id(authorization: str | None = Header(None)) -> str:
+    """Resolve acting user id from static token (dev) or JWT sub."""
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-    return token
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header must follow format: Bearer <token>",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = parts[1]
+    if token == SECRET_TOKEN:
+        return "dev"
+    payload = decode_jwt_token(token)
+    return payload.sub
+
+
+def optional_token_owner_id(authorization: str | None = Header(None)) -> str:
+    """Like token_owner_id, but returns 'anonymous' when auth header is absent."""
+    if not authorization:
+        return "anonymous"
+    try:
+        return token_owner_id(authorization)
+    except HTTPException:
+        return "anonymous"
+
+
+def actor_can_access(resource_owner_id: str | None, actor_id: str) -> bool:
+    """Static/dev token can access all; JWT users only their own resources."""
+    if actor_id == "dev":
+        return True
+    if resource_owner_id is None:
+        # Legacy unscoped rows — visible only to anonymous/dev for migration.
+        return actor_id in {"dev", "anonymous"}
+    return resource_owner_id == actor_id
 
 
 # ── JWT Utilities (production multi-user path) ────────────────────────────────

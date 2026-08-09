@@ -18,11 +18,20 @@ def ensure_research_schema(conn: sqlite3.Connection) -> None:
             id              TEXT PRIMARY KEY,
             name            TEXT NOT NULL,
             description     TEXT NOT NULL DEFAULT '',
+            owner_id        TEXT,
             created_at      TEXT NOT NULL,
             updated_at      TEXT NOT NULL,
             last_session_at TEXT
         );
     """)
+    # Additive migration for existing DBs created before owner_id
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(research_projects)").fetchall()}
+    if "owner_id" not in cols:
+        conn.execute("ALTER TABLE research_projects ADD COLUMN owner_id TEXT;")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_research_projects_owner "
+        "ON research_projects(owner_id);"
+    )
 
     conn.execute("""
         CREATE TABLE IF NOT EXISTS research_documents (

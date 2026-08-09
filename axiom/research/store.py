@@ -51,15 +51,17 @@ class ResearchStore:
 
     # ── Projects ──────────────────────────────────────────────────────────────
 
-    def create_project(self, name: str, description: str = "") -> ResearchProject:
+    def create_project(
+        self, name: str, description: str = "", *, owner_id: str | None = None
+    ) -> ResearchProject:
         now = _utc_now()
         project_id = _new_id()
         self.conn.execute(
             """
-            INSERT INTO research_projects (id, name, description, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO research_projects (id, name, description, owner_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (project_id, name.strip(), description.strip(), now, now),
+            (project_id, name.strip(), description.strip(), owner_id, now, now),
         )
         self.conn.execute(
             """
@@ -72,23 +74,40 @@ class ResearchStore:
         self.conn.commit()
         logger.info(
             "Research project created",
-            extra={"project_id": project_id, "project_name": name},
+            extra={"project_id": project_id, "project_name": name, "owner_id": owner_id},
         )
         return self.get_project(project_id)
 
-    def list_projects(self) -> List[ResearchProject]:
-        rows = self.conn.execute(
-            """
-            SELECT p.*,
-                   (SELECT COUNT(*) FROM research_documents d WHERE d.project_id = p.id) AS document_count,
-                   (SELECT COUNT(*) FROM research_notes n WHERE n.project_id = p.id) AS note_count
-            FROM research_projects p
-            ORDER BY COALESCE(p.last_session_at, p.updated_at) DESC
-            """
-        ).fetchall()
+    def list_projects(self, *, owner_id: str | None = None) -> List[ResearchProject]:
+        if owner_id is None:
+            rows = self.conn.execute(
+                """
+                SELECT p.*,
+                       (SELECT COUNT(*) FROM research_documents d WHERE d.project_id = p.id) AS document_count,
+                       (SELECT COUNT(*) FROM research_notes n WHERE n.project_id = p.id) AS note_count
+                FROM research_projects p
+                ORDER BY COALESCE(p.last_session_at, p.updated_at) DESC
+                """
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                """
+                SELECT p.*,
+                       (SELECT COUNT(*) FROM research_documents d WHERE d.project_id = p.id) AS document_count,
+                       (SELECT COUNT(*) FROM research_notes n WHERE n.project_id = p.id) AS note_count
+                FROM research_projects p
+                WHERE p.owner_id = ? OR p.owner_id IS NULL
+                ORDER BY COALESCE(p.last_session_at, p.updated_at) DESC
+                """,
+                (owner_id,),
+            ).fetchall()
+            # Strict isolation: only show owned projects for JWT users.
+            # NULL owner legacy rows remain visible only when listing as owner_id == "dev".
+            if owner_id != "dev":
+                rows = [r for r in rows if r["owner_id"] == owner_id]
         return [self._row_to_project(row) for row in rows]
 
-    def get_project(self, project_id: str) -> ResearchProject:
+    def get_project(self, project_id: str, *, owner_id: str | None = None) -> ResearchProject:
         row = self.conn.execute(
             """
             SELECT p.*,
@@ -100,10 +119,16 @@ class ResearchStore:
         ).fetchone()
         if not row:
             raise KeyError(f"Project not found: {project_id}")
-        return self._row_to_project(row)
+        project = self._row_to_project(row)
+        if owner_id is not None and owner_id != "dev":
+            if project.owner_id != owner_id:
+                raise KeyError(f"Project not found: {project_id}")
+        return project
 
-    def get_project_detail(self, project_id: str) -> ProjectDetail:
-        project = self.get_project(project_id)
+    def get_project_detail(
+        self, project_id: str, *, owner_id: str | None = None
+    ) -> ProjectDetail:
+        project = self.get_project(project_id, owner_id=owner_id)
         documents = self.list_documents(project_id)
         notes = self.list_notes(project_id)
         session = self.get_session(project_id)
@@ -658,6 +683,7 @@ class ResearchStore:
             id=row["id"],
             name=row["name"],
             description=row["description"],
+            owner_id=row["owner_id"] if "owner_id" in row.keys() else None,
             created_at=row["created_at"],
             updated_at=row["updated_at"],
             last_session_at=row["last_session_at"],

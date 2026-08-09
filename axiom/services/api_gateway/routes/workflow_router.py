@@ -11,16 +11,21 @@ import asyncio
 import logging
 from typing import Any, Optional
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from axiom.workflow import (
     WorkflowEngine, WorkflowStatus, Workflow, WorkflowResult,
     get_engine,
 )
+from axiom.security.deps import workflow_route_auth
 
 logger = logging.getLogger(__name__)
-workflow_router = APIRouter(prefix="/workflows", tags=["workflow"])
+workflow_router = APIRouter(
+    prefix="/workflows",
+    tags=["workflow"],
+    dependencies=[Depends(workflow_route_auth)],
+)
 
 
 # ─── Request / Response Models ────────────────────────────────────────────────

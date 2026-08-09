@@ -1,0 +1,44 @@
+{
+  "title": "Euler sum of powers (historical)",
+  "stage_level": 3,
+  "research_status": "REFUTED",
+  "verification_state": "HISTORICAL_RESOLUTION_REPRODUCED_COMPUTATIONAL",
+  "stages_executed": [
+    "map_knowledge",
+    "decompose",
+    "strategies",
+    "start_campaign",
+    "start_discovery",
+    "frce_scope",
+    "frce_plan",
+    "frce_cycle",
+    "discovery_cycle"
+  ],
+  "counterexample_ids": [
+    "cex_8f282e176878"
+  ],
+  "timeline_event_types": [
+    "SOURCE_FOUND",
+    "KNOWLEDGE_EXTRACTED",
+    "SOURCE_FOUND",
+    "GAP_IDENTIFIED",
+    "SOURCE_FOUND",
+    "GAP_IDENTIFIED",
+    "STRATEGY_STARTED",
+    "STRATEGY_STARTED",
+    "HYPOTHESIS_CREATED",
+    "EXPERIMENT_COMPLETED",
+    "COUNTEREXAMPLE_FOUND",
+    "RESULT_REPRODUCED",
+    "PROOF_ATTEMPTED"
+  ],
+  "is_millennium_attempt": false,
+  "is_scientific_discovery_claim": false,
+  "limitations": [
+    "Computational evidence is not proof.",
+    "Missing literature retrieval is not novelty.",
+    "RESOLVED requires explicit verification gate.",
+    "Millennium campaigns are not auto-started."
+  ],
+  "recommended_next_action": "Verify counterexample independently; archive REFUTED; do not resurrect."
+}

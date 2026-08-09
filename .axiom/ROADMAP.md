@@ -1,6 +1,17 @@
 # Adaptive Roadmap
 
-Read `CONSTITUTION.md`, `CURRENT_STATE.md`, `TASK_QUEUE.md`, `CAPABILITIES.md`, and root `roadmap.md`. The root roadmap contains the active engineering Sprint 0 plan; this document governs its evolution.
+Read `CONSTITUTION.md`, `OPERATING_SYSTEM.md`, `CURRENT_STATE.md`, `TASK_QUEUE.md`, `CAPABILITIES.md`, and root `roadmap.md`. The operating system defines how this roadmap evolves through the Continuous Evolution Loop.
+
+## Quarterly objectives (Q3 2026)
+
+Objectives set in Layer 1 strategic loop. Review monthly; revise only with evidence.
+
+| # | Objective | Success signal | Track |
+|---|-----------|----------------|-------|
+| 1 | **Trustworthy capability baseline** | SCEP composite measured; core tests green; evidence tiers honest | A |
+| 2 | **Research campaign infrastructure** | GCP Tier 0–1 campaigns executable with journals and gates | A |
+| 3 | **Researcher workflow MVP** | End-to-end `/research` workflow with documented limits | B |
+| 4 | **Operating cadence live** | Daily engineering loop + weekly reviews + monthly strategic review | C |
 
 ## Track A — Research (continuous)
 
@@ -13,6 +24,10 @@ Establish a supported Python 3.10+ runtime, achieve a reproducible test baseline
 Make ingest, knowledge representation, bounded hypothesis generation, counterexample search, formal verification, and evaluation reproducible with explicit provenance and metrics.
 
 ## Track B — Product (continuous)
+
+### Milestone 0 — Master Directive + land `main` (active)
+
+Operate under `MASTER_DIRECTIVE.md`. Land P0-WEB and research-loop draft stack onto `main` (see `MERGE_ORDER.md`). Stop orphan PR sprawl.
 
 ### Milestone 1 — Researcher workflow MVP (1–2 months)
 
@@ -42,4 +57,6 @@ Expand domain capabilities and pursue prize-adjacent work only when independent 
 
 ## Evolution rule
 
-At every completed task or sprint, retain completed outcomes, remove disproven assumptions, revise priorities using `DECISION_FRAMEWORK.md`, and update `CURRENT_STATE.md`, `TASK_QUEUE.md`, and `MEMORY.md`. A roadmap item without an evidence source, owner, or measurable next step is not actionable.
+At every completed cycle of the Continuous Evolution Loop, retain completed outcomes, remove disproven assumptions, revise priorities using `DECISION_FRAMEWORK.md`, and update `CURRENT_STATE.md`, `TASK_QUEUE.md`, `CAPABILITIES.md`, and `MEMORY.md`. A roadmap item without an evidence source, owner, or measurable next step is not actionable.
+
+Quarterly objectives are set in the monthly strategic review (Layer 1). Engineering work (Layer 2) advances objectives only through measured capability improvement — not feature count.
