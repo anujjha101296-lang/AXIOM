@@ -61,6 +61,26 @@ def test_discovery_cycle_end_to_end(tmp_path):
     }
 
 
+def test_quality_scorecard_and_formal_bridge(tmp_path):
+    engine = DiscoveryEngine(str(tmp_path / "qs.db"))
+    d = engine.create(
+        "Can n+0=n be formally verified for integers?",
+        seed_text="Standard arithmetic lemma suitable for formalization.",
+        knowledge_context="Standard arithmetic lemma.",
+    )
+    result = engine.run_cycle(d.discovery_id)
+    final = engine.store.get(d.discovery_id)
+    assert final is not None
+    card = final.report.get("quality_scorecard") or {}
+    assert "dimensions" in card
+    assert card.get("false_discovery_safe") is True
+    assert "scientific_honesty" in card["dimensions"]
+    bridge = final.report.get("formal_bridge") or {}
+    assert bridge.get("prose_is_not_proof") is True
+    assert bridge.get("compiled_verified") is not True
+    assert result["status"] != DiscoveryStatus.VERIFIED.value
+
+
 def test_human_can_pause_and_reject(tmp_path):
     engine = DiscoveryEngine(str(tmp_path / "human.db"))
     d = engine.create("Can humans pause a discovery investigation?")

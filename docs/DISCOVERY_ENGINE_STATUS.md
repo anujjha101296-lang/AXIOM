@@ -45,10 +45,14 @@
 ## What is still partial
 
 - External multi-engine literature novelty search (local SKAI only)
-- Full formal proof bridge inside discovery cycle (FRCE/FMTP available separately)
+- Full formal proof compilation inside discovery cycle (FMTP formalize hooked; compile→VERIFIED still gated)
 - Rich discovery graph edges in EGS (IDs linked; full ontology expansion later)
 - Live streaming of agent tool calls in UI
 - Resource allocator / multi-strategy competition (scaffolded via competing hypotheses + attacks)
+
+## Quality scorecard
+
+Each report includes `quality_scorecard` dimensions (planning, evidence, novelty honesty, counterexample, formal, etc.). Diagnostic only — not a discovery claim.
 
 ## Explicit honesty rules enforced
 

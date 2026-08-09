@@ -22,6 +22,7 @@
 | cap_cel | Continuous Evolution Loop | infrastructure | UNTESTED | cel-health | — |
 | cap_landing | Public Landing Page | product | UNTESTED | — | — |
 | cap_vfactory | Verification Factory | infrastructure | UNTESTED | vfactory-health | test_vfactory |
+| cap_discovery | Scientific Discovery Engine | research | PARTIAL | /discovery/manifest | test_discovery_engine |
 
 ## Test pyramid coverage
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from axiom.discovery.formal_bridge import attempt_formal_bridge, formal_attack_record
 from axiom.discovery.hypotheses import active_hypotheses, generate_competing_hypotheses
 from axiom.discovery.models import (
     AttackRecord,
@@ -16,6 +17,7 @@ from axiom.discovery.models import (
 from axiom.discovery.novelty import assess_novelty
 from axiom.discovery.opportunity import rank_opportunities
 from axiom.discovery.predictions import predictions_from_hypothesis
+from axiom.discovery.quality import score_discovery
 from axiom.discovery.skeptical import skeptical_review
 from axiom.discovery.store import get_discovery_store
 from axiom.experiment.counterexample import search_computational_counterexample
@@ -286,6 +288,15 @@ class DiscoveryEngine:
         )
         d.attacks.append(lit)
 
+        # Formal mathematics bridge (never auto-VERIFIED)
+        bridge = attempt_formal_bridge(d)
+        d.report = {**(d.report or {}), "formal_bridge": bridge}
+        if bridge.get("attempted") or bridge.get("reason"):
+            d.attacks.append(formal_attack_record(bridge))
+            if bridge.get("formalization", {}).get("result_id"):
+                d.proof_attempt_ids.append(str(bridge["formalization"]["result_id"]))
+        self.store.save(d)
+
         # If novelty says likely known or related work, challenge supporting path
         if d.novelty.status.value in {"LIKELY_KNOWN", "POSSIBLY_KNOWN", "RELATED_WORK_FOUND"}:
             if d.status in {DiscoveryStatus.SUPPORTED, DiscoveryStatus.UNDER_INVESTIGATION}:
@@ -314,7 +325,9 @@ class DiscoveryEngine:
     def synthesize_report(self, discovery_id: str) -> Discovery:
         d = self._load(discovery_id)
         active = active_hypotheses(d.hypotheses)
+        scorecard = score_discovery(d)
         d.report = {
+            **(d.report or {}),
             "research_question": d.research_question,
             "knowledge_gap": d.opportunity.to_dict() if d.opportunity else None,
             "hypotheses": [h.to_dict() for h in active],
@@ -326,10 +339,12 @@ class DiscoveryEngine:
             "attacks": [a.to_dict() for a in d.attacks],
             "status": d.status.value,
             "confidence": d.confidence.to_dict(),
+            "quality_scorecard": scorecard,
             "limitations": [
                 "Computational evidence is not proof.",
                 "Missing literature retrieval is not novelty.",
                 "Model confidence is not scientific verification.",
+                "Prose formalization is not formal verification.",
             ],
             "recommended_next_action": _next_action(d),
             "language": "conservative",
