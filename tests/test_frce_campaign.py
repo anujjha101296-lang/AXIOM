@@ -95,6 +95,8 @@ class TestCampaignEngine:
 
         assert result["cycle_number"] == 1
         assert "pivot_decision" in result
+        assert "agent_activity" in result
+        assert "what" in result["agent_activity"]
         updated = engine.get_campaign(campaign.campaign_id)
         assert updated is not None
         assert len(updated.cycles) == 1
@@ -111,6 +113,8 @@ class TestCampaignEngine:
         assert dash["campaign_id"] == campaign.campaign_id
         assert "next_compute" in dash
         assert "ladder_readiness" in dash
+        assert "agent_activity" in dash
+        assert dash["agent_activity"]["why"] == "Dashboard smoke test"
 
     def test_abandon_preserves_memory(self, tmp_path):
         engine = FrontierCampaignEngine(str(tmp_path / "abandon.db"))

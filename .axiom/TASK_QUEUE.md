@@ -15,8 +15,8 @@ P0 safety / integrity / false-claim / supported-build failures always win. Prefe
 | 3 | MVP-AUTH | Project ownership isolation for research workspace | Tip | Users only see own projects | **Done** |
 | 4 | MVP-EVIDENCE | Show evidence/citations in research Q&A UI | MVP-AUTH | Provenance visible when available | **Done** |
 | 5 | MVP-CAMPAIGN-UI | Campaign create/scope/plan/cycle UI | FRCE API | `/campaigns` wired | **Done** |
-| 6 | MVP-AGENTS-UI | Agent activity visibility | MVP-CAMPAIGN-UI | User sees what/why/found/uncertain | **Next autonomous** |
-| 7 | R0-PLAN | Researcher workflow + benchmark program | Existing evidence | Plan names measurement and non-claims | In progress |
+| 6 | MVP-AGENTS-UI | Agent activity visibility | MVP-CAMPAIGN-UI | User sees what/why/found/uncertain | **Done** |
+| 7 | MVP-PERSIST-SMOKE | Browser logout/login persistence | LAND-MAIN optional | Session survives return | **Next autonomous** |
 | 8 | C0-PMO | Daily/weekly PMO cadence | AOS | Operating answers for priorities/blockers | In progress |
 | 9 | GCP-2 | First Tier 1 campaign | Stack on main + Layer 1 approval | Bounded campaign journal | **Founder gate** |
 

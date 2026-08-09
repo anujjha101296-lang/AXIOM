@@ -203,6 +203,17 @@ class FrontierCampaignEngine:
         results["pivot_decision"] = cycle.pivot_decision.value if cycle.pivot_decision else None
         results["contribution_level"] = cycle.contribution_level.value
         results["phase"] = campaign.phase.value
+        results["agent_activity"] = {
+            "what": [t.get("track") for t in results["strategies_executed"]],
+            "why": [t.get("strategy") for t in results["strategies_executed"]],
+            "found": list(cycle.learned),
+            "uncertain": list(cycle.failed_approaches) or [
+                t.get("gaps_found") for t in results["strategies_executed"] if t.get("gaps_found")
+            ],
+            "not_established_fact": any(
+                t.get("not_established_fact") for t in results["strategies_executed"]
+            ),
+        }
         return results
 
     def _execute_strategy_track(
@@ -392,6 +403,31 @@ class FrontierCampaignEngine:
 
     def dashboard(self, campaign_id: str) -> dict[str, Any]:
         campaign = self._load(campaign_id)
+        recent_cycles = [c.to_dict() for c in campaign.cycles[-5:]]
+        recent_memory = [m.to_dict() for m in campaign.memory[-5:]]
+        last_cycle = recent_cycles[-1] if recent_cycles else None
+        agent_activity = {
+            "what": (
+                f"Phase {campaign.phase.value}; "
+                f"{len(campaign.strategies)} strategies; "
+                f"{len(campaign.cycles)} cycles completed"
+            ),
+            "why": campaign.objective,
+            "found": (
+                last_cycle.get("learned", [])
+                if last_cycle
+                else [m.get("what_learned", "") for m in recent_memory if m.get("what_learned")]
+            ),
+            "uncertain": (
+                last_cycle.get("failed_approaches", [])
+                if last_cycle
+                else [m.get("what_failed", "") for m in recent_memory if m.get("what_failed")]
+            )
+            or campaign.failed_approaches[:5],
+            "roles_available": [r["role"] for r in list_roles()[:8]],
+            "last_pivot": last_cycle.get("pivot_decision") if last_cycle else None,
+            "contribution_level": campaign.contribution_level.value,
+        }
         return {
             "campaign_id": campaign.campaign_id,
             "name": campaign.name,
@@ -412,6 +448,9 @@ class FrontierCampaignEngine:
             "next_compute": where_next_compute(campaign),
             "ladder_readiness": can_advance_ladder(campaign),
             "gcp_campaign_id": campaign.gcp_campaign_id,
+            "agent_activity": agent_activity,
+            "recent_cycles": recent_cycles,
+            "recent_memory": recent_memory,
         }
 
     def manifest(self) -> dict[str, Any]:

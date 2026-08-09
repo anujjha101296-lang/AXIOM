@@ -17,7 +17,23 @@ interface Dashboard {
   phase?: string;
   cycle_number?: number;
   next_compute?: string;
+  agent_activity?: {
+    what?: string | string[];
+    why?: string | string[];
+    found?: string[];
+    uncertain?: string[] | number[];
+    roles_available?: string[];
+    last_pivot?: string | null;
+    contribution_level?: string;
+  };
+  recent_cycles?: Array<Record<string, unknown>>;
   [key: string]: unknown;
+}
+
+function asLines(value: unknown): string[] {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  return [String(value)].filter(Boolean);
 }
 
 export default function CampaignsPage() {
@@ -102,7 +118,27 @@ export default function CampaignsPage() {
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
       if (step === "cycle") {
-        setStatus(`Cycle complete: ${JSON.stringify(data).slice(0, 200)}`);
+        const activity = data.agent_activity;
+        setStatus(
+          activity
+            ? `Cycle complete — tracks: ${asLines(activity.what).join(", ") || "none"}; pivot=${data.pivot_decision}`
+            : `Cycle complete: ${JSON.stringify(data).slice(0, 200)}`
+        );
+        if (activity) {
+          setDashboard((prev) => ({
+            ...(prev || {}),
+            phase: data.phase,
+            agent_activity: {
+              what: activity.what,
+              why: activity.why,
+              found: activity.found,
+              uncertain: activity.uncertain,
+              contribution_level: data.contribution_level,
+              last_pivot: data.pivot_decision,
+            },
+            last_cycle_result: data,
+          }));
+        }
       } else {
         setSelected(data);
         setStatus(`${step} complete`);
@@ -216,19 +252,58 @@ export default function CampaignsPage() {
               </button>
             </div>
             {dashboard && (
-              <pre
-                style={{
-                  marginTop: 20,
-                  padding: 16,
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 12,
-                  overflow: "auto",
-                  fontSize: 12,
-                }}
-              >
-                {JSON.stringify(dashboard, null, 2)}
-              </pre>
+              <div style={{ marginTop: 20 }}>
+                {dashboard.agent_activity && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                      gap: 16,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {(
+                      [
+                        ["What AXIOM is doing", dashboard.agent_activity.what],
+                        ["Why", dashboard.agent_activity.why],
+                        ["What it found", dashboard.agent_activity.found],
+                        ["Uncertainty / failures", dashboard.agent_activity.uncertain],
+                      ] as const
+                    ).map(([label, value]) => (
+                      <div
+                        key={label}
+                        style={{
+                          padding: 16,
+                          background: "var(--bg-card)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 12,
+                        }}
+                      >
+                        <h3 style={{ fontSize: 14, marginBottom: 8 }}>{label}</h3>
+                        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13 }}>
+                          {asLines(value).length === 0 && <li>None recorded yet</li>}
+                          {asLines(value).map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <pre
+                  style={{
+                    marginTop: 20,
+                    padding: 16,
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 12,
+                    overflow: "auto",
+                    fontSize: 12,
+                  }}
+                >
+                  {JSON.stringify(dashboard, null, 2)}
+                </pre>
+              </div>
             )}
           </div>
         )}

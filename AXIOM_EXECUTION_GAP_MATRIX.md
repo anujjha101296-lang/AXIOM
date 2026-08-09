@@ -18,7 +18,7 @@ Legend: GREEN = works with evidence · YELLOW = partial · RED = missing/broken 
 | Evidence in answers | GREEN | Citations + snippet + mode in API/UI | Not yet claim-registry linked | P1 | Soft |
 | Campaign API (FRCE) | GREEN | `/frce/*` | — | P4 | No |
 | Campaign UI | GREEN | `/campaigns` create→scope→plan→cycle | No agent activity panel yet | P1 | No |
-| Agent visibility UI | RED | No agent activity panel | — | P3 | Next |
+| Agent visibility UI | GREEN | Campaign dashboard what/why/found/uncertain | Live streaming of tool calls later | P3 | Soft |
 | Experiments API | GREEN | `/experiments/*` | — | P5 | No |
 | Experiments UI | RED | None | — | P5 | Later |
 | Formal math | YELLOW | API + compilation gate | Lean optional; no UI | P7 | No |

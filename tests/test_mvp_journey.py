@@ -131,10 +131,13 @@ def test_mvp_journey_signup_to_campaign(client: TestClient, tmp_path, monkeypatc
 
     cycle = client.post(f"/frce/campaigns/{campaign_id}/cycle", headers=headers)
     assert cycle.status_code == 200, cycle.text
+    assert "agent_activity" in cycle.json()
 
     dash = client.get(f"/frce/campaigns/{campaign_id}/dashboard", headers=headers)
     assert dash.status_code == 200, dash.text
     assert dash.json()["campaign_id"] == campaign_id
+    assert "agent_activity" in dash.json()
+    assert dash.json()["agent_activity"]["why"]
 
     # 13. Persistence — list projects and campaigns still present
     projects = client.get("/research/projects", headers=headers)
