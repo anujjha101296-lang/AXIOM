@@ -127,9 +127,29 @@ class DiscoveryStore:
         self._release(conn)
         return entry_id
 
-    def list_memory(self, *, kind: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
+    def list_memory(
+        self,
+        *,
+        kind: str | None = None,
+        discovery_id: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
         conn = self._conn()
-        if kind:
+        if kind and discovery_id:
+            rows = conn.execute(
+                """SELECT * FROM discovery_memory
+                   WHERE kind = ? AND discovery_id = ?
+                   ORDER BY created_at DESC LIMIT ?""",
+                (kind, discovery_id, limit),
+            ).fetchall()
+        elif discovery_id:
+            rows = conn.execute(
+                """SELECT * FROM discovery_memory
+                   WHERE discovery_id = ?
+                   ORDER BY created_at DESC LIMIT ?""",
+                (discovery_id, limit),
+            ).fetchall()
+        elif kind:
             rows = conn.execute(
                 "SELECT * FROM discovery_memory WHERE kind = ? ORDER BY created_at DESC LIMIT ?",
                 (kind, limit),

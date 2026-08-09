@@ -1,0 +1,15 @@
+{
+  "dataset": "arena_v1+arena_ext_sec_lh_v1",
+  "summary": {
+    "total": 73,
+    "passed": 73,
+    "failed": 0,
+    "mean_score": 1.0
+  },
+  "failures": [],
+  "tier": 9,
+  "long_horizon": 1.0,
+  "security": 1.0,
+  "lh_domain": 0.9,
+  "millennium_ready": false
+}

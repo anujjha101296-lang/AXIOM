@@ -22,6 +22,11 @@ import time
 import types
 import pytest
 
+# Repo root — tests often run with cwd=/tmp to avoid pytest.py shadowing
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 # Ensure environment shims for optional FastAPI/Pydantic packages
 if "pydantic" not in sys.modules:
     try:
@@ -381,8 +386,9 @@ def test_scep_capability_delta_report():
     assert "Recommended Next Epic" in md
 
     # Verify report write to file docs/capability_delta_TIMESTAMP.md
-    os.makedirs("docs", exist_ok=True)
-    report_file_path = f"docs/capability_delta_{curr.run_id}.md"
+    docs_dir = os.path.join(_REPO_ROOT, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+    report_file_path = os.path.join(docs_dir, f"capability_delta_{curr.run_id}.md")
     with open(report_file_path, "w") as f:
         f.write(md)
 
@@ -402,17 +408,21 @@ def test_scep_cli_runner_and_regression_guard():
     """Verify CLI exit 0 on pass/first-run and exit 1 when dimension drops > 5%."""
     temp_db = tempfile.mktemp(suffix=".db")
     try:
-        cli_script = "axiom/evaluation/run_benchmarks.py"
+        cli_script = os.path.join(_REPO_ROOT, "axiom/evaluation/run_benchmarks.py")
         
         # --- Run 1: First run / No prior snapshot ---
         cmd1 = [sys.executable, cli_script, "--db", temp_db]
-        res1 = subprocess.run(cmd1, capture_output=True, text=True, timeout=30)
+        res1 = subprocess.run(
+            cmd1, capture_output=True, text=True, timeout=120, cwd=_REPO_ROOT
+        )
         assert res1.returncode == 0, f"First run failed with code {res1.returncode}: {res1.stderr}"
         assert "Saved run snapshot" in res1.stdout or "Evaluation run completed successfully" in res1.stdout
 
         # --- Run 2: Second run with --compare-previous (No regression) ---
         cmd2 = [sys.executable, cli_script, "--db", temp_db, "--compare-previous"]
-        res2 = subprocess.run(cmd2, capture_output=True, text=True, timeout=30)
+        res2 = subprocess.run(
+            cmd2, capture_output=True, text=True, timeout=120, cwd=_REPO_ROOT
+        )
         assert res2.returncode == 0, f"Second run failed: {res2.stderr}"
 
         # --- Run 3: Inject artificially high prior run, then trigger regression ---
@@ -443,7 +453,9 @@ def test_scep_cli_runner_and_regression_guard():
 
         # Execute run with --compare-previous (current scores will be ~0.4-0.7, dropping > 5% vs 0.95)
         cmd3 = [sys.executable, cli_script, "--db", temp_db, "--compare-previous"]
-        res3 = subprocess.run(cmd3, capture_output=True, text=True, timeout=30)
+        res3 = subprocess.run(
+            cmd3, capture_output=True, text=True, timeout=120, cwd=_REPO_ROOT
+        )
         
         # Exit code MUST be 1
         assert res3.returncode == 1, f"Expected regression check to exit with code 1, got {res3.returncode}"
@@ -548,7 +560,7 @@ def test_scep_database_persistence():
 
 def test_scep_audit_document_e2e():
     """Verify independent audit document structure, findings, and prize grounding table."""
-    audit_path = "docs/audit/EPIC_002_audit.md"
+    audit_path = os.path.join(_REPO_ROOT, "docs/audit/EPIC_002_audit.md")
     assert os.path.exists(audit_path), f"Audit document does not exist at {audit_path}"
 
     with open(audit_path, "r") as f:

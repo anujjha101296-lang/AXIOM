@@ -61,3 +61,23 @@ def test_arena_api(tmp_path, monkeypatch):
 def test_public_catalog_helper():
     data = get_public_catalog()
     assert data["count"] == 60
+
+
+def test_arena_extension_security_long_horizon(tmp_path):
+    db = str(tmp_path / "arena_ext.db")
+    out = run_arena(db, include_extension=True, notes="ARENA-1 extension")
+    run = out["run"]
+    assert run["summary"]["total"] == 73  # 60 + 13
+    assert run["summary"]["failed"] == 0 or len(run["failures"]) < 5
+    assert "long_horizon" in run["dimension_scores"]
+    assert run["dimension_scores"]["long_horizon"] > 0
+    assert run["readiness"]["millennium_ready"] is False
+    # With dedicated LH evidence, Tier 8 should unlock when cases pass
+    if run["summary"]["failed"] == 0:
+        assert run["readiness"]["highest_unlocked_tier"] >= 8
+        assert run["readiness"]["highest_unlocked_tier"] < 10
+    # Catalog with extension
+    cat = get_public_catalog(include_extension=True)
+    assert cat["count"] == 73
+    assert cat["ground_truth_exposed"] is False
+    assert all("_grader" not in (c.get("inputs") or {}) for c in cat["benchmarks"])

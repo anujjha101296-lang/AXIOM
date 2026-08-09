@@ -255,6 +255,7 @@ class DiscoveryEngine:
                 (d.confidence.notes + " ").strip()
                 + " Pilot experiment produced computational evidence only."
             ).strip()
+            self.store.save(d)
             if d.status == DiscoveryStatus.UNDER_INVESTIGATION:
                 return self.transition(
                     d.discovery_id,

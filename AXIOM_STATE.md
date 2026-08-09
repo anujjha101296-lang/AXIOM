@@ -6,26 +6,24 @@
 
 ## One-line status
 
-Integrated tip includes Discovery Engine v0.1 and Research Benchmark Arena `arena_v1` (60 cases, baseline + 1 improvement cycle); ready for founder merge.
+Tip has Arena v1 + security/LH extension (Tier 8 unlocked with measured evidence), SCEP CI path fixes green; founder merge of PR #29 still required.
 
 ## What works
 
 | Area | Status |
 |------|--------|
-| Research / auth / ownership / campaigns / experiments | Live |
-| Docker compose api+ui smoke | Live |
-| Controlled web acquire `/sources` | Live |
-| Scientific Discovery Engine `/discovery` | Partial live |
-| **Research Benchmark Arena** `/arena` | **Partial live** — 60-case v1, baseline recorded, gates to Tier 7 |
+| Discovery Engine `/discovery` | Partial live |
+| Arena `arena_v1` (60) | Live |
+| Arena ext security + long-horizon (13) | Live — Tier 8 with measured LH |
+| SCEP eval tests from `/tmp` cwd | Green |
 
 ## Next
 
 1. **Founder merges PR #29 to `main`**
-2. Expand long-horizon / security dedicated arena cases (Tier 8+ gates)
-3. Fix remaining SCEP CI doc failures
+2. Broader discovery novelty / allowlisted literature search
+3. Expand held-out / rotating arena tasks
 
 ## Evidence
 
-- `docs/BENCHMARK_ARENA_STATUS.md`, `docs/ARENA_BASELINE.json`, `docs/ARENA_IMPROVEMENT_CYCLE.json`
-- `tests/test_benchmark_arena.py` green
+- `docs/BENCHMARK_ARENA_STATUS.md`, `docs/ARENA_EXT_SEC_LH.json`
 - PR: https://github.com/anujjha101296-lang/AXIOM/pull/29

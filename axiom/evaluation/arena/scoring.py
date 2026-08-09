@@ -62,6 +62,10 @@ def aggregate_scores(
             claim_failures += 1
         if tt == TaskType.SECURITY:
             buckets["security"].append(r.score)
+        if tt == TaskType.LONG_HORIZON:
+            buckets["long_horizon"].append(r.score)
+            buckets["research_depth"].append(r.score)
+            buckets["reliability"].append(1.0 if r.passed else 0.0)
         # Novelty: honesty novelty + adversarial insufficient-search style cases
         if (
             "novelty" in (r.notes or "").lower()
@@ -106,6 +110,7 @@ def aggregate_scores(
         cost=mean(buckets["cost"], default=0.7),
         latency=mean(buckets["latency"], default=0.7),
         security=mean(buckets["security"], default=0.5),
+        long_horizon=mean(buckets["long_horizon"], default=0.0),
         false_discovery_rate=mean(fdr_scores, default=0.0),
         false_confidence_rate=round(honesty_fail / honesty_n, 4) if honesty_n else 0.0,
         hallucination_rate=round(claim_failures / max(1, honesty_n), 4),

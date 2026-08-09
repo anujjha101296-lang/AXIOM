@@ -168,6 +168,7 @@ class DimensionScores:
     cost: float = 0.0
     latency: float = 0.0
     security: float = 0.0
+    long_horizon: float = 0.0
     false_discovery_rate: float = 0.0
     false_confidence_rate: float = 0.0
     hallucination_rate: float = 0.0

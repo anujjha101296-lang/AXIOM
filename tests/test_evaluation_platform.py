@@ -19,7 +19,10 @@ import time
 import types
 import pytest
 
-# Ensure environment shims for optional FastAPI/Pydantic packages
+# Repo root — tests often run with cwd=/tmp to avoid pytest.py shadowing
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 if "pydantic" not in sys.modules:
     try:
         import pydantic
@@ -452,7 +455,7 @@ def test_r5_database_persistence_and_queries():
 
 def test_r6_audit_document_structure_and_findings():
     """Verify docs/audit/EPIC_002_audit.md exists and contains required findings and verdicts."""
-    audit_file = "docs/audit/EPIC_002_audit.md"
+    audit_file = os.path.join(_REPO_ROOT, "docs/audit/EPIC_002_audit.md")
     assert os.path.exists(audit_file), f"Audit document missing at {audit_file}"
 
     with open(audit_file, "r") as f:

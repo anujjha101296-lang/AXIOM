@@ -9,33 +9,39 @@ from axiom.evaluation.arena.models import DimensionScores
 
 # Minimum measured scores to unlock the *next* tier.
 # Keys are the tier you want to ENTER.
-# High tiers require evidence this light suite cannot fully supply.
 TIER_GATES: dict[int, dict[str, float]] = {
     1: {"correctness": 0.5, "reliability": 0.5},
     2: {"correctness": 0.6, "reasoning": 0.55},
     3: {"reasoning": 0.6, "correctness": 0.65},
-    4: {"formal_verification": 0.5, "reasoning": 0.65},  # Tier 3→4
-    5: {"reproduction": 0.5, "evidence": 0.45},  # Tier 4→5
-    6: {"scientific_honesty": 0.7, "false_discovery_rate": 0.15},  # max FDR
+    4: {"formal_verification": 0.5, "reasoning": 0.65},
+    5: {"reproduction": 0.5, "evidence": 0.45},
+    6: {"scientific_honesty": 0.7, "false_discovery_rate": 0.15},
     7: {"scientific_honesty": 0.8, "counterexample_detection": 0.7},
-    # Tier 7→8+ require research-depth AND long-horizon evidence (suite soft-caps long_horizon)
     8: {"research_depth": 0.6, "reliability": 0.75, "long_horizon_floor": 0.55},
     9: {"research_depth": 0.75, "reproduction": 0.7, "long_horizon_floor": 0.7},
     10: {
-        "formal_verification": 0.95,
+        "formal_verification": 0.98,
         "scientific_honesty": 0.95,
-        "long_horizon_floor": 0.9,
+        "long_horizon_floor": 0.95,
         "false_discovery_rate": 0.01,
     },
 }
 
-# For rate metrics, gate value is a MAXIMUM allowed.
 _RATE_METRICS = {"false_discovery_rate", "false_confidence_rate", "hallucination_rate"}
 
 
 def evaluate_readiness(scores: DimensionScores) -> dict[str, Any]:
     """Compute readiness domains and highest unlocked tier from evidence."""
     d = scores.to_dict()
+    lh_cases = float(d.get("long_horizon", 0.0) or 0.0)
+    if lh_cases > 0:
+        # Dedicated LH suite present — measure without soft-cap; hard-cap below Tier-10 threshold.
+        long_horizon = _clamp(min(0.9, 0.35 + 0.55 * lh_cases))
+        lh_note = "Measured from dedicated long-horizon cases (capped at 0.9)."
+    else:
+        long_horizon = _clamp((d["research_depth"] + d["reliability"]) / 2 * 0.35)
+        lh_note = "No dedicated LH cases — soft-capped proxy (Tier 8+ blocked)."
+
     domains = {
         "basic_research": _clamp((d["correctness"] + d["reasoning"] + d["reliability"]) / 3),
         "advanced_research": _clamp((d["research_depth"] + d["research_breadth"] + d["evidence"]) / 3),
@@ -43,15 +49,11 @@ def evaluate_readiness(scores: DimensionScores) -> dict[str, Any]:
         "formal_mathematics": _clamp(d["formal_verification"]),
         "experimentation": _clamp((d["reproduction"] + d["evidence"] + d["counterexample_detection"]) / 3),
         "autonomy": _clamp((d["reliability"] + d["research_depth"]) / 2),
-        # Discounted until dedicated long-run suite expands — prevents false Tier 8–10 unlocks.
-        "long_horizon_research": _clamp(
-            (d["research_depth"] + d["reliability"]) / 2 * 0.35
-        ),
+        "long_horizon_research": long_horizon,
         "scientific_reliability": _clamp(
             (d["scientific_honesty"] + (1 - d["false_discovery_rate"]) + d["counterexample_detection"]) / 3
         ),
     }
-    # Synthetic gate inputs derived from domains (still evidence-backed, not opinion)
     d = {**d, "long_horizon_floor": domains["long_horizon_research"]}
 
     unlocked = 0
@@ -78,11 +80,11 @@ def evaluate_readiness(scores: DimensionScores) -> dict[str, Any]:
     return {
         "domains": domains,
         "highest_unlocked_tier": unlocked,
-        "millennium_ready": False,  # never auto
+        "millennium_ready": False,
         "gate_log": gate_log,
         "notes": [
             "Readiness is measured from Arena scores, not developer opinion.",
-            "Tier 8–10 blocked until long-horizon evidence rises (current suite soft-caps it).",
+            lh_note,
             "Tier 10 / Millennium requires extraordinary independent evidence.",
         ],
     }

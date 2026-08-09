@@ -18,6 +18,10 @@ class ArenaRunRequest(BaseModel):
     is_baseline: bool = False
     case_ids: list[str] | None = None
     notes: str = Field(default="", max_length=2000)
+    include_extension: bool = Field(
+        default=False,
+        description="Include arena_ext_sec_lh_v1 security + long-horizon cases",
+    )
 
 
 @router.get("/manifest")
@@ -25,6 +29,7 @@ def arena_manifest() -> dict[str, Any]:
     return {
         "name": "AXIOM Research Benchmark Arena",
         "dataset_version": "arena_v1",
+        "extension": "arena_ext_sec_lh_v1",
         "principle": "Measured scores only; no fabricated readiness; prose ≠ formal proof",
         "tiers": list(range(0, 11)),
         "ground_truth_exposed": False,
@@ -33,9 +38,9 @@ def arena_manifest() -> dict[str, Any]:
 
 
 @router.get("/catalog")
-def arena_catalog() -> dict[str, Any]:
+def arena_catalog(include_extension: bool = False) -> dict[str, Any]:
     """Public catalog — ground-truth answers intentionally omitted."""
-    return get_public_catalog()
+    return get_public_catalog(include_extension=include_extension)
 
 
 @router.post("/run")
@@ -46,6 +51,7 @@ def arena_run(body: ArenaRunRequest) -> dict[str, Any]:
         case_ids=body.case_ids,
         environment="api",
         notes=body.notes,
+        include_extension=body.include_extension,
     )
 
 

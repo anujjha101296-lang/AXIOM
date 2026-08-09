@@ -54,7 +54,7 @@ export default function ArenaPage() {
     refresh();
   }, [refresh]);
 
-  async function runSuite(isBaseline: boolean) {
+  async function runSuite(isBaseline: boolean, includeExtension: boolean) {
     setLoading(true);
     setStatus(null);
     try {
@@ -63,7 +63,8 @@ export default function ArenaPage() {
         headers: headers(),
         body: JSON.stringify({
           is_baseline: isBaseline,
-          notes: isBaseline ? "Recorded baseline" : "Arena run",
+          include_extension: includeExtension,
+          notes: isBaseline ? "Recorded baseline" : includeExtension ? "Arena+ext" : "Arena run",
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -78,7 +79,7 @@ export default function ArenaPage() {
         comparison: data.comparison,
       });
       setStatus(
-        `Run ${data.run?.run_id}: passed ${data.run?.summary?.passed}/${data.run?.summary?.total}`
+        `Run ${data.run?.run_id}: passed ${data.run?.summary?.passed}/${data.run?.summary?.total} · tier ${data.run?.readiness?.highest_unlocked_tier}`
       );
       await refresh();
     } catch (e) {
@@ -116,11 +117,14 @@ export default function ArenaPage() {
           <strong>{catalog?.count ?? "…"}</strong>
         </p>
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <button disabled={loading} onClick={() => runSuite(true)}>
-            Record baseline
+          <button disabled={loading} onClick={() => runSuite(true, false)}>
+            Record baseline (v1)
           </button>
-          <button disabled={loading} onClick={() => runSuite(false)}>
-            Run suite
+          <button disabled={loading} onClick={() => runSuite(false, false)}>
+            Run arena_v1
+          </button>
+          <button disabled={loading} onClick={() => runSuite(false, true)}>
+            Run v1 + security/LH
           </button>
         </div>
         {status && <p style={{ marginTop: "0.75rem" }}>{status}</p>}

@@ -1,8 +1,8 @@
 {
   "epic_name": "EPIC-002",
   "previous_run_id": "high_run_999",
-  "current_run_id": "b8285d7a",
-  "timestamp": "2026-08-06T10:54:45Z",
+  "current_run_id": "ad720d5e",
+  "timestamp": "2026-08-09T11:18:47Z",
   "dimension_deltas": {
     "mathematical_reasoning": {
       "prev_score": 0.95,
@@ -27,10 +27,10 @@
     },
     "knowledge_quality": {
       "prev_score": 0.95,
-      "curr_score": 0.6,
-      "delta_raw": -0.35,
-      "delta_pct": -35,
-      "curr_level": 3
+      "curr_score": 0.8,
+      "delta_raw": -0.15,
+      "delta_pct": -15,
+      "curr_level": 4
     },
     "counterexample_search": {
       "prev_score": 0.95,
@@ -48,10 +48,10 @@
     },
     "literature_synthesis": {
       "prev_score": 0.95,
-      "curr_score": 1.0,
-      "delta_raw": 0.05,
-      "delta_pct": 5,
-      "curr_level": 5
+      "curr_score": 0.6,
+      "delta_raw": -0.35,
+      "delta_pct": -35,
+      "curr_level": 2
     },
     "research_productivity": {
       "prev_score": 0.95,
@@ -65,8 +65,8 @@
     {
       "problem_id": "riemann_hypothesis",
       "problem_name": "Riemann Hypothesis",
-      "prev_points": 98,
-      "curr_points": 100,
+      "prev_points": 90,
+      "curr_points": 92,
       "delta_points": 2
     },
     {
@@ -105,11 +105,12 @@
       "delta_points": 2
     }
   ],
-  "weakest_capability": "Knowledge Quality",
-  "highest_priority": "Enforce Strict Ontological Domain Classifications",
+  "weakest_capability": "Literature Synthesis",
+  "highest_priority": "Expand arXiv Batch Parser & Reference Graph Builder",
   "recommended_next_epic": "EPIC-003",
   "regression_detected": true,
   "regression_details": [
-    "knowledge_quality dropped by 35% (0.950 \u2192 0.600)"
+    "knowledge_quality dropped by 15% (0.950 \u2192 0.800)",
+    "literature_synthesis dropped by 35% (0.950 \u2192 0.600)"
   ]
 }
