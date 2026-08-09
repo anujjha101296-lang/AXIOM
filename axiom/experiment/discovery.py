@@ -20,7 +20,11 @@ def detect_discovery_signals(results: dict[str, Any]) -> list[dict[str, Any]]:
     signals: list[dict[str, Any]] = []
 
     stdout = results.get("sandbox", {}).get("stdout", "")
-    if "COUNTEREXAMPLE" in stdout.upper():
+    stdout_u = stdout.upper()
+    # Do not treat NO_COUNTEREXAMPLE as a hit (substring trap).
+    if "COUNTEREXAMPLE_FOUND" in stdout_u or any(
+        line.strip() == "COUNTEREXAMPLE" for line in stdout_u.splitlines()
+    ):
         signals.append({
             "signal": "counterexample",
             "severity": "high",

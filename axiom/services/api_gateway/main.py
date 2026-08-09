@@ -39,6 +39,7 @@ from axiom.services.api_gateway.routes.frce_api import router as frce_router
 from axiom.services.api_gateway.routes.skai_api import router as skai_router
 from axiom.services.api_gateway.routes.vfactory_api import router as vfactory_router
 from axiom.services.api_gateway.routes.workflow_router import workflow_router
+from axiom.services.api_gateway.routes.discovery_api import router as discovery_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -130,6 +131,9 @@ app.include_router(skai_router)
 
 # ── VFACTORY Verification Factory ────────────────────────────────────────────
 app.include_router(vfactory_router)
+
+# ── Scientific Discovery Engine ───────────────────────────────────────────────
+app.include_router(discovery_router)
 
 # ── Workflow Engine (multi-agent orchestration) ──────────────────────────────
 app.include_router(workflow_router)

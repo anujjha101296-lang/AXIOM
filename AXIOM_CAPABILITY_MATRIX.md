@@ -125,6 +125,7 @@
 | Research compiler (SIMR) | **FULL** | `compile_research_plan()` | — |
 | Campaign planner | **PARTIAL** | FRCE `planner.py` | — |
 | Discovery query `/query` | **SCAFFOLD** | Returns `[]` always | Needs SKAI retrieval |
+| **Scientific Discovery Engine** | **PARTIAL** | `axiom/discovery/`, `/discovery/*`, `/discovery` UI, 8 benchmarks | External novelty search; formal bridge in-cycle; full discovery graph |
 | Self-improvement loop | **PARTIAL** | `self_improvement.py` | Audit only |
 
 ---

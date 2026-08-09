@@ -68,6 +68,13 @@ const earlyAccess: Capability[] = [
     href: "/sources",
   },
   {
+    name: "Scientific Discovery Engine",
+    status: "partial",
+    description:
+      "Gap → opportunity → competing hypotheses → predictions → sandboxed experiments → counterexample search → skeptical attack. Conservative: never claims discovery from missing retrieval.",
+    href: "/discovery",
+  },
+  {
     name: "Graph Workspace",
     status: "partial",
     description:
@@ -163,6 +170,7 @@ export default function Home() {
           <Link href="/campaigns">Campaigns</Link>
           <Link href="/experiments">Experiments</Link>
           <Link href="/sources">Sources</Link>
+          <Link href="/discovery">Discovery</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>

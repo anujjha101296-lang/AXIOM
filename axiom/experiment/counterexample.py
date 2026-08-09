@@ -25,7 +25,16 @@ def search_computational_counterexample(
     budget = budget or ResourceBudget(timeout_seconds=10.0)
     result = execute_sandboxed(test_code, budget=budget)
 
-    counterexample_found = result.success and "COUNTEREXAMPLE" in result.stdout.upper()
+    # Match positive hit only — do NOT treat NO_COUNTEREXAMPLE as a hit
+    # (substring "COUNTEREXAMPLE" appears inside NO_COUNTEREXAMPLE).
+    stdout_u = (result.stdout or "").upper()
+    counterexample_found = result.success and (
+        "COUNTEREXAMPLE_FOUND" in stdout_u
+        or any(
+            line.strip() == "COUNTEREXAMPLE"
+            for line in stdout_u.splitlines()
+        )
+    )
 
     return {
         "workflow_id": f"cex_{uuid.uuid4().hex[:12]}",
