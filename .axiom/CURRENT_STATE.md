@@ -2,30 +2,18 @@
 
 Read `CONSTITUTION.md`, `MASTER_DIRECTIVE.md`, `OPERATING_SYSTEM.md`, `../AXIOM_STATE.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first.
 
-**Last updated:** 2026-08-09 (execution cycle: Arena v1 baseline + improvement on tip)  
-**Active horizon:** Continuous execution under Master Directive — land integrated tip on `main`
+**Last updated:** 2026-08-09 (SCEP CI fix + ARENA-1 security/LH)  
+**Active horizon:** Land integrated tip on `main`
 
 ## Where we are today
 
-Integration tip includes research-loop stack, MVP product surfaces, Discovery Engine v0.1, and Research Benchmark Arena `arena_v1` (60 measured cases).
+Tip includes Arena v1 + `arena_ext_sec_lh_v1` (73/73), Tier 9 unlocked with measured long-horizon evidence, Tier 10/Millennium blocked. SCEP tests green from `/tmp`.
 
-## Completed (on this integration tip)
+## Highest priority next
 
-- Prior research loops + MASTER-OS + P0-WEB + MVP surfaces
-- **Discovery Engine** `/discovery`
-- **Research Benchmark Arena** `/arena` — baseline 59/60 → post-fix 60/60; unlocked tier 7
-
-## Blocked / founder gates
-
-- **Merge this integration PR to `main`**
-- **GCP-2** Tier 1 campaign — Layer 1 strategic approval
-- Public deploy / publication
-
-## Highest priority (autonomous after land)
-
-1. Long-horizon / security dedicated arena cases (Tier 8+ gates)
-2. Enrich discovery novelty search
-3. Fix remaining SCEP CI doc failures
+1. Founder merges PR #29
+2. Broader discovery novelty / allowlisted literature search
+3. Held-out / rotating arena tasks
 
 ## Worktree integrity
 

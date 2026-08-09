@@ -9,7 +9,10 @@
 | Suite | Passed | Tier unlocked | Notes |
 |-------|--------|---------------|-------|
 | arena_v1 baseline | 59/60 → 60/60 | 7 | Soft-capped LH |
-| arena_v1 + sec/LH | 73/73 | ≥8, <10 | Measured LH unlocks Tier 8; Tier 10 blocked |
+| arena_v1 + sec/LH | **73/73** | **9** (<10) | Measured LH; Millennium blocked |
+
+**Bug found by Arena:** pilot experiment IDs were wiped on status transition — fixed (save-before-transition).
+
 
 ## SCEP CI fix (this cycle)
 
