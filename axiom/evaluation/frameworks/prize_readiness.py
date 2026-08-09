@@ -8,6 +8,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from axiom.evaluation.frameworks.capability import (
+    CapabilityDimension,
+    EvidenceState,
+    classify_level,
+)
+
 
 @dataclass
 class CapabilityPrerequisite:
@@ -34,6 +40,9 @@ class PrizeReadinessScore:
     capability_gaps: list[str] = field(default_factory=list)
     estimated: bool = True     # True if any score lacks benchmark evidence
     evidence_sources: list[str] = field(default_factory=list)
+    benchmark_count: int = 0
+    evidence_tier: str = EvidenceState.BASELINE.value
+    limitations: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -43,6 +52,9 @@ class PrizeReadinessScore:
             "score": self.score,
             "confidence_interval": list(self.confidence_interval),
             "estimated": self.estimated,
+            "benchmark_count": self.benchmark_count,
+            "evidence_tier": self.evidence_tier,
+            "limitations": self.limitations,
             "milestones_achieved": self.milestones_achieved,
             "capability_gaps": self.capability_gaps,
             "evidence_sources": self.evidence_sources,
@@ -60,10 +72,33 @@ class PrizeReadinessScore:
         }
 
 
-from axiom.evaluation.frameworks.capability import (
-    CapabilityDimension,
-    classify_level,
-)
+def _enrich_prize_evidence(
+    score: PrizeReadinessScore, benchmark_scores: dict[str, float]
+) -> PrizeReadinessScore:
+    """Attach S0-E4 evidence metadata to a prize readiness score."""
+    count = len(benchmark_scores) if benchmark_scores else 0
+    if not benchmark_scores:
+        tier = EvidenceState.BASELINE.value
+        limits = ["No benchmark scores — prize readiness is a baseline placeholder."]
+    elif score.estimated:
+        tier = EvidenceState.ESTIMATED.value
+        limits = ["Partial benchmark coverage for this prize target."]
+    else:
+        tier = EvidenceState.MEASURED.value
+        limits = []
+
+    if benchmark_scores.get("proof_verification", 0) > 0:
+        limits.append(
+            "proof_verification prerequisite uses simulated formal verification — "
+            "not compiler-backed proof"
+        )
+        if tier == EvidenceState.MEASURED.value:
+            tier = EvidenceState.SIMULATED.value
+
+    score.benchmark_count = count
+    score.evidence_tier = tier
+    score.limitations = limits
+    return score
 
 
 # ═══════════════════════════════════════════════════════
@@ -367,7 +402,7 @@ class PrizeReadinessEngine:
         """Compute readiness scores for all 6 Millennium Problems from benchmark data."""
         results = []
         for pid, builder in self.PROBLEM_BUILDERS.items():
-            score = builder(benchmark_scores)
+            score = _enrich_prize_evidence(builder(benchmark_scores), benchmark_scores)
             results.append(score)
         return results
 

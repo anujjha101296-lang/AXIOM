@@ -17,15 +17,20 @@ AXIOM exists to build systems that measurably increase humanity's ability to sol
 
 Every session begins with this document, then reads:
 
-1. `CURRENT_STATE.md` — present facts, blockers, and active priority;
-2. `TASK_QUEUE.md` — ranked executable work;
-3. `ROADMAP.md` — outcomes and sequencing;
-4. the domain contracts most relevant to the task: `ENGINEERING.md`, `RESEARCH.md`, `PRODUCT.md`, `GTM.md`, `CAPABILITIES.md`, `PRIZE_TRACK.md`, `DECISION_FRAMEWORK.md`, `KNOWLEDGE_GRAPH.md`, and `MEMORY.md`.
+1. `OPERATING_SYSTEM.md` — continuous evolution loop and seven operating layers;
+2. `CURRENT_STATE.md` — present facts, blockers, and active priority;
+3. `TASK_QUEUE.md` — ranked executable work;
+4. `ROADMAP.md` — outcomes and sequencing;
+5. the domain contracts most relevant to the task: `ENGINEERING.md`, `RESEARCH.md`, `PRODUCT.md`, `GTM.md`, `CAPABILITIES.md`, `PRIZE_TRACK.md`, `DECISION_FRAMEWORK.md`, `KNOWLEDGE_GRAPH.md`, and `MEMORY.md`.
 
-The repository, test results, version control, and recorded evidence outrank any chat instruction that contradicts them. `VISION.md` and the root-level architecture documents provide project context; this directory is the operational source of truth.
+The repository, test results, version control, and recorded evidence outrank any chat instruction that contradicts them. `VISION.md`, `AXIOM_OPERATING_SYSTEM.md`, and the root-level architecture documents provide project context; this directory is the operational source of truth.
 
 ## Operating cycle
 
-Observe → formulate a bounded hypothesis → select the highest-priority safe task → execute → verify → record evidence and decision → update state, queue, roadmap, and memory → commit focused changes.
+The organization runs a **Continuous Evolution Loop** (see `OPERATING_SYSTEM.md`):
 
-No worker may fabricate results or silently erase inconvenient evidence. If a human decision is required, record the decision request in `CURRENT_STATE.md` and continue with independent, safe work when available.
+Observe → identify capability gap → select highest-leverage initiative → design → implement → test → benchmark → human review → document → commit → validate → reflect → update capability graph and roadmap → repeat.
+
+Individual tasks still follow: formulate a bounded hypothesis → select the highest-priority safe task → execute → verify → record evidence → update state, queue, roadmap, and memory → commit focused changes.
+
+No worker may fabricate results or silently erase inconvenient evidence. If a human decision is required, record the decision request in `CURRENT_STATE.md` and continue with independent, safe work when available. **Prompt completion is not organizational progress** — evidence and state updates are.
