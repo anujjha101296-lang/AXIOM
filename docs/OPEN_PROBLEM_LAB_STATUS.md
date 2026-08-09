@@ -65,12 +65,12 @@ Discovery `quality_check` rejected **all** hypotheses when the research question
 | Formal tools | FMTP bridge via Discovery when available |
 | Benchmark | `cd /tmp && pytest /workspace/tests/test_open_problem_lab.py -q` |
 
-## OPLAB-1 progress
+## OPLAB-1 / OPLAB-2 progress
 
 - `enrich_literature_map`: SKAI acquire/synthesize/survey + allowlisted HTTPS URLs + formal `search_library`
 - Level-2 known-theorem campaign with formal bridge timeline events
-- Still missing: broader external prior-art crawl; Level-3 historical conjecture reproduction gate
+- Level-3 historical known-false reproduction with `RESULT_REPRODUCED` (computational marker path)
 
-## Next (OPLAB-1 continued / OPLAB-2)
+## Next
 
-Level-3 historical conjecture run; stronger independent verification of formalization.
+Level-4 published-result reproduction; stronger independent verification; genuine historical counterexample artifacts (not only trap markers).

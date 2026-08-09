@@ -6,7 +6,7 @@
 
 ## One-line status
 
-Tip includes Open Problem Lab (L1 REFUTED, L2 formalization attempted/unverified, SKAI+library literature maps), Arena Tier 9, Discovery Engine; founder merge of PR #29 still required.
+Tip includes Open Problem Lab staged L1–L3 (REFUTED / formalization-attempted / historical reproduction), Arena Tier 9, Discovery Engine; founder merge of PR #29 still required.
 
 ## What works
 
@@ -18,11 +18,11 @@ Tip includes Open Problem Lab (L1 REFUTED, L2 formalization attempted/unverified
 ## Next
 
 1. **Founder merges PR #29 to `main`**
-2. OPLAB-2 Level-3 historical conjecture reproduction
+2. OPLAB-3 Level-4 published-result reproduction + stronger CX artifacts
 3. Broader discovery novelty search
 
 ## Evidence
 
-- `docs/OPEN_PROBLEM_LAB_STATUS.md`, `docs/OPEN_PROBLEM_LEVEL1_RUN.json`, `docs/OPEN_PROBLEM_LEVEL2_RUN.json`
-- `tests/test_open_problem_lab.py` green (7)
+- `docs/OPEN_PROBLEM_LAB_STATUS.md`, `docs/OPEN_PROBLEM_LEVEL{1,2,3}_RUN.json`
+- `tests/test_open_problem_lab.py` green (8)
 - PR: https://github.com/anujjha101296-lang/AXIOM/pull/29
