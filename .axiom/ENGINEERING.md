@@ -1,6 +1,6 @@
 # Engineering Contract
 
-Read `CONSTITUTION.md`, `CURRENT_STATE.md`, `TASK_QUEUE.md`, `DECISION_FRAMEWORK.md`, root `ENGINEERING.md`, and `ARCHITECTURE.md` before material engineering work.
+Read `CONSTITUTION.md`, `OPERATING_SYSTEM.md`, `CURRENT_STATE.md`, `TASK_QUEUE.md`, `DECISION_FRAMEWORK.md`, root `ENGINEERING.md`, and `ARCHITECTURE.md` before material engineering work.
 
 ## Mandate
 
