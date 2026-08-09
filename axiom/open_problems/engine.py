@@ -312,6 +312,13 @@ class OpenProblemLab:
                         p.research_status = ResearchStatus.REFUTED
                         p.verification_state = "REFUTED_BY_COUNTEREXAMPLE"
                         p.stopping_reasons.append("Counterexample track succeeded")
+                    if p.stage_level >= 3:
+                        self._event(
+                            p,
+                            "RESULT_REPRODUCED",
+                            "Historical known disproof direction reproduced (computational; not a new discovery)",
+                        )
+                        p.verification_state = "HISTORICAL_RESOLUTION_REPRODUCED_COMPUTATIONAL"
                 elif final.status == DiscoveryStatus.SUPPORTED:
                     self._event(p, "EXPERIMENT_COMPLETED", "Discovery pilot supported (computational only)")
                     if p.research_status == ResearchStatus.UNDER_INVESTIGATION:

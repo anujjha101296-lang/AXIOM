@@ -106,6 +106,31 @@ def client(tmp_path, monkeypatch):
     return TestClient(app)
 
 
+def test_level3_historical_conjecture_reproduction(tmp_path):
+    lab = OpenProblemLab(str(tmp_path / "l3.db"))
+    p = lab.create(
+        "Euler sum of powers (historical)",
+        "Euler's sum of powers conjecture (historically disproven / known false): "
+        "for every integer k>2, at least k kth-powers are needed to sum to another kth-power.",
+        known_info=(
+            "Classical conjecture later disproven. Known false / historically disproven. "
+            "Famous counterexamples exist (e.g. for fifth powers)."
+        ),
+        domain="number_theory",
+        stage_level=3,
+        research_objective="Reproduce historical disproof direction; do not claim novelty",
+    )
+    assert any(r.bucket.value == "WHAT_IS_DISPROVEN" for r in p.known_results)
+    result = lab.run_investigation_cycle(p.problem_id)
+    assert result["is_scientific_discovery_claim"] is False
+    assert result["is_millennium_attempt"] is False
+    final = lab.store.get(p.problem_id)
+    assert final is not None
+    assert final.research_status == ResearchStatus.REFUTED
+    assert any(e.event_type == "RESULT_REPRODUCED" for e in final.timeline)
+    assert any(e.event_type == "COUNTEREXAMPLE_FOUND" for e in final.timeline)
+
+
 def test_literature_enrichment_and_level2_formal(tmp_path):
     lab = OpenProblemLab(str(tmp_path / "l2.db"))
     p = lab.create(

@@ -37,6 +37,10 @@ See `docs/OPEN_PROBLEM_LEVEL1_RUN.json`. Status `REFUTED` / `REFUTED_BY_COUNTERE
 
 See `docs/OPEN_PROBLEM_LEVEL2_RUN.json`. Known theorem (`add_comm`) → literature enrichment (SKAI + formal library) → `PROOF_ATTEMPTED` → `FORMALIZATION_ATTEMPTED_UNVERIFIED`. Not RESOLVED.
 
+## Level-3 evidence
+
+See `docs/OPEN_PROBLEM_LEVEL3_RUN.json`. Historical Euler sum-of-powers (known false) → `REFUTED` + `RESULT_REPRODUCED` (`HISTORICAL_RESOLUTION_REPRODUCED_COMPUTATIONAL`). Trap/marker-driven computational reproduction — **not** a rediscovery of the classic numerical counterexample, and **not** a novelty claim.
+
 ## Failure fixed this cycle
 
 Discovery `quality_check` rejected **all** hypotheses when the research question embedded `(known false)`, which skipped counterexample search. Affirmative H1 rejection retained; null/scoped/abstention survive; trap + small-case odd-composite probe restored.

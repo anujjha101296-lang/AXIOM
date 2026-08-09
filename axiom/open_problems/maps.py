@@ -29,6 +29,16 @@ def build_known_result_map(problem: OpenProblem, seed_text: str = "") -> list[Kn
                 evidence_notes="Intake markers only — not independent verification yet",
             )
         )
+    if any(m in blob for m in ("historical", "historically", "classical conjecture")):
+        results.append(
+            KnownResult(
+                result_id=_new_id("kr"),
+                statement="Historical conjecture context — reproduce known resolution; do not claim novelty",
+                bucket=KnowledgeBucket.UNKNOWN,
+                kind=ResultKind.UNVERIFIED_CLAIM,
+                evidence_notes="Level-3+ campaigns target reproduction of known history, not discovery",
+            )
+        )
     if "conjecture" in blob or "open" in blob:
         results.append(
             KnownResult(
