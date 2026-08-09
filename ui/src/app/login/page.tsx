@@ -65,6 +65,8 @@ export default function LoginPage() {
         </Link>
         <nav aria-label="Primary navigation">
           <Link href="/">Home</Link>
+          <Link href="/campaigns">Campaigns</Link>
+          <Link href="/experiments">Experiments</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace
           </Link>

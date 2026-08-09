@@ -180,9 +180,25 @@ export default function CampaignsPage() {
         </Link>
         <nav aria-label="Primary navigation">
           <Link href="/research">Research</Link>
+          <Link href="/experiments">Experiments</Link>
           <Link className="nav-cta" href="/campaigns">
             Campaigns
           </Link>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => {
+              try {
+                localStorage.removeItem("axiom_access_token");
+                localStorage.removeItem("axiom_user");
+              } catch {
+                /* ignore */
+              }
+              window.location.href = "/login";
+            }}
+          >
+            Log out
+          </button>
         </nav>
       </header>
 

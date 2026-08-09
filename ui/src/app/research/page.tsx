@@ -364,7 +364,8 @@ export default function ResearchPage() {
           <h1>Research Workspace</h1>
           <p>
             Projects · PDFs · Notes · Q&amp;A · Search ·{" "}
-            <a href="/campaigns">Campaigns</a> · <a href="/login">Sign in</a>
+            <a href="/campaigns">Campaigns</a> · <a href="/experiments">Experiments</a> ·{" "}
+            <a href="/login">Sign in</a>
           </p>
         </div>
         <div className="research-token">
@@ -375,6 +376,20 @@ export default function ResearchPage() {
             onChange={(e) => setToken(e.target.value)}
             type="password"
           />
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                localStorage.removeItem("axiom_access_token");
+                localStorage.removeItem("axiom_user");
+              } catch {
+                /* ignore */
+              }
+              window.location.href = "/login";
+            }}
+          >
+            Log out
+          </button>
         </div>
       </header>
 

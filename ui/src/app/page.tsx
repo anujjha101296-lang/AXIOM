@@ -36,6 +36,14 @@ const availableNow: Capability[] = [
     status: "live",
     description:
       "Sandboxed experiment execution with resource limits, lifecycle management, and safe failure handling.",
+    href: "/experiments",
+  },
+  {
+    name: "Research Campaigns (FRCE)",
+    status: "live",
+    description:
+      "Campaign orchestration with web UI: create, scope, plan, run cycles, and inspect agent activity.",
+    href: "/campaigns",
   },
   {
     name: "API Gateway",
@@ -51,13 +59,6 @@ const earlyAccess: Capability[] = [
     status: "partial",
     description:
       "Formalization pipeline and proof compilation gate. Lean 4 required for real verification; other provers are stubs.",
-  },
-  {
-    name: "Research Campaigns (FRCE)",
-    status: "partial",
-    description:
-      "Campaign orchestration across research loops. Create, scope, plan, and run cycles from the web UI.",
-    href: "/campaigns",
   },
   {
     name: "Knowledge Acquisition (SKAI)",
@@ -81,11 +82,6 @@ const earlyAccess: Capability[] = [
 ];
 
 const planned: Capability[] = [
-  {
-    name: "Campaign Dashboard UI",
-    status: "planned",
-    description: "Visual interface for long-running research campaigns. API exists; UI not built.",
-  },
   {
     name: "Evidence Inspection UI",
     status: "planned",
@@ -164,6 +160,7 @@ export default function Home() {
           <a href="#honesty">Honesty</a>
           <Link href="/login">Sign in</Link>
           <Link href="/campaigns">Campaigns</Link>
+          <Link href="/experiments">Experiments</Link>
           <Link className="nav-cta" href="/research">
             Research Workspace ↗
           </Link>
