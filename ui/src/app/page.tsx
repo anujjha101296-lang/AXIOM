@@ -1,242 +1,268 @@
 import Link from "next/link";
 
-const features = [
-  {
-    num: "01",
-    title: "Epistemic Knowledge Graph",
-    desc: "Every theorem, lemma, definition, and conjecture lives in a typed, verifiable graph — with dependency edges, proof lineages, and epistemic status always visible.",
-  },
-  {
-    num: "02",
-    title: "Formal Proof Generation",
-    desc: "Translate mathematical claims into Lean 4, Coq, and Isabelle proof scripts. Generate tactic suggestions and compile verification reports automatically.",
-  },
-  {
-    num: "03",
-    title: "SMT Counterexample Search",
-    desc: "Run Z3-backed parameter sweeps over bounded domains to search for counterexamples to conjectures. Refutation results are stored and linked back to the graph.",
-  },
-  {
-    num: "04",
-    title: "MCTS Algebraic Proof Search",
-    desc: "Monte Carlo Tree Search explores proof tactic sequences for algebraic identities. Successful proof paths are exported as compilable Lean 4 scripts.",
-  },
-  {
-    num: "05",
-    title: "Conjecture Generation Engine",
-    desc: "Autonomously generate mathematically novel conjectures from patterns in the knowledge graph, scored by a novelty index and filtered for non-tautologies.",
-  },
-  {
-    num: "06",
-    title: "Scientific Capability Benchmarks",
-    desc: "A live evaluation engine measuring 8 capability dimensions (L0–L5) with composite scoring, prize readiness tracking, and regression detection for every sprint.",
-  },
+/** Verified platform facts — updated with capability audits, not marketing copy. */
+const verifiedFacts = [
+  { value: "280+", label: "Automated core tests" },
+  { value: "7", label: "Research loops with health gates" },
+  { value: "1", label: "Production-ready workspace UI" },
+  { value: "0", label: "Fake metrics on this page" },
 ];
 
-const tracks = [
+type CapabilityStatus = "live" | "partial" | "planned";
+
+interface Capability {
+  name: string;
+  status: CapabilityStatus;
+  description: string;
+  href?: string;
+}
+
+const availableNow: Capability[] = [
   {
-    letter: "Track A",
-    name: "Artificial Scientist",
-    icon: "🧠",
-    iconClass: "indigo",
-    desc: "Long-term research infrastructure that continuously improves AXIOM's ability to reason formally about mathematics and generate novel scientific insights.",
-    milestones: [
-      "Formal proof compilation (Lean 4, Coq)",
-      "MCTS proof search over open problems",
-      "Zeta zero verification framework",
-      "Autonomous conjecture discovery loop",
-    ],
-  },
-  {
-    letter: "Track B",
     name: "Research Workspace",
-    icon: "🔬",
-    iconClass: "violet",
-    desc: "Tools that frontier researchers can use today — an interactive spatial canvas for inspecting knowledge graphs, tracing evidence, and validating reasoning.",
-    milestones: [
-      "Interactive knowledge graph canvas",
-      "arXiv paper ingestion & parsing",
-      "Verification status dashboard",
-      "Collaborative research context sharing",
-    ],
+    status: "live",
+    description:
+      "Create projects, upload PDFs, take notes, full-text search, and Q&A sessions. The primary product surface today.",
+    href: "/research",
   },
   {
-    letter: "Track C",
-    name: "Organization & GTM",
-    icon: "🚀",
-    iconClass: "cyan",
-    desc: "Build the company: early users, documentation, technical blog posts, and the credibility needed to attract researchers and funding.",
-    milestones: [
-      "Public landing page & waitlist",
-      "Technical blog & research reports",
-      "Institutional pilot programs",
-      "YC-ready application materials",
-    ],
+    name: "Evidence & Reproducibility (E&R)",
+    status: "live",
+    description:
+      "Claim registry, discovery gate, provenance graph, and reproduction engine with explicit verification states.",
+  },
+  {
+    name: "Experiment Sandbox (SEC)",
+    status: "live",
+    description:
+      "Sandboxed experiment execution with resource limits, lifecycle management, and safe failure handling.",
+  },
+  {
+    name: "API Gateway",
+    status: "live",
+    description:
+      "Unified HTTP entry point with health checks, optional auth, and mounted routers for all research loops.",
   },
 ];
 
-const milestones = [
+const earlyAccess: Capability[] = [
   {
-    time: "Month 1–2",
-    active: true,
-    title: "Foundation & MVP",
-    items: [
-      "Working research workspace",
-      "Knowledge graph + arXiv ingestion",
-      "SMT counterexample sweeps",
-      "Website & waitlist live",
-      "10–20 early research users",
-    ],
+    name: "Formal Mathematics (FMTP)",
+    status: "partial",
+    description:
+      "Formalization pipeline and proof compilation gate. Lean 4 required for real verification; other provers are stubs.",
   },
   {
-    time: "Month 3–6",
-    active: false,
-    title: "Public Alpha",
-    items: [
-      "Formal proof pipeline (Lean 4)",
-      "Conjecture discovery engine",
-      "Scientific capability benchmarks",
-      "First institutional pilots",
-      "YC-ready technical demo",
-    ],
+    name: "Research Campaigns (FRCE)",
+    status: "partial",
+    description:
+      "Campaign orchestration across research loops. API-complete; no dashboard UI yet.",
   },
   {
-    time: "Month 6–12",
-    active: false,
-    title: "Research Platform",
-    items: [
-      "Autonomous discovery loop",
-      "Prize readiness tracking live",
-      "First technical blog publications",
-      "Growing research community",
-    ],
+    name: "Knowledge Acquisition (SKAI)",
+    status: "partial",
+    description:
+      "Knowledge graph, conflict/gap detection, and literature synthesis. Regex extraction; arXiv not fully wired.",
   },
   {
-    time: "Year 1–3",
-    active: false,
-    title: "Scientific Contributions",
-    items: [
-      "Original research feature contributions",
-      "Expanding scientific domains",
-      "Researcher trust & adoption",
-      "Credible approaches to open problems",
-    ],
+    name: "Graph Workspace",
+    status: "partial",
+    description:
+      "Interactive knowledge graph canvas with arXiv ingestion and SMT/MCTS demos. Developer prototype.",
+    href: "/workspace",
+  },
+  {
+    name: "Model Routing (SIMR)",
+    status: "partial",
+    description:
+      "Deterministic model and tool routing. Falls back to mock model without API keys (by design in v1).",
   },
 ];
 
-const metrics = [
-  { value: "8", label: "Capability Dimensions Tracked" },
-  { value: "32", label: "Automated Benchmarks" },
-  { value: "6", label: "Prize Problems Scored" },
-  { value: "L2", label: "Current Capability Level" },
+const planned: Capability[] = [
+  {
+    name: "Campaign Dashboard UI",
+    status: "planned",
+    description: "Visual interface for long-running research campaigns. API exists; UI not built.",
+  },
+  {
+    name: "Evidence Inspection UI",
+    status: "planned",
+    description: "Browse claims, provenance chains, and verification status in the browser.",
+  },
+  {
+    name: "Public Waitlist",
+    status: "planned",
+    description:
+      "Email capture for early access. Not implemented — use the research workspace directly for now.",
+  },
+  {
+    name: "Full E2E Browser Suite",
+    status: "planned",
+    description: "226 browser tests exist but are excluded from CI pending harness work.",
+  },
 ];
+
+const healthGates = [
+  { name: "CEL", target: "Core test suite", status: "pass" },
+  { name: "E&R", target: "erl-health", status: "pass" },
+  { name: "SIMR", target: "simr-health", status: "pass" },
+  { name: "FMTP", target: "fmtp-health", status: "pass" },
+  { name: "SEC", target: "sec-health", status: "pass" },
+  { name: "FRCE", target: "frce-health", status: "pass" },
+  { name: "SKAI", target: "skai-health", status: "pass" },
+];
+
+function StatusPill({ status }: { status: CapabilityStatus }) {
+  const labels = { live: "Available now", partial: "Early access", planned: "Planned" };
+  return <span className={`cap-pill cap-pill-${status}`}>{labels[status]}</span>;
+}
+
+function CapabilityCard({ cap }: { cap: Capability }) {
+  const inner = (
+    <>
+      <div className="cap-card-header">
+        <h3 className="cap-card-title">{cap.name}</h3>
+        <StatusPill status={cap.status} />
+      </div>
+      <p className="cap-card-desc">{cap.description}</p>
+      {cap.href && (
+        <span className="cap-card-link">
+          Open →
+        </span>
+      )}
+    </>
+  );
+
+  if (cap.href) {
+    return (
+      <Link className="cap-card cap-card-clickable" href={cap.href}>
+        {inner}
+      </Link>
+    );
+  }
+  return <article className="cap-card">{inner}</article>;
+}
 
 export default function Home() {
   return (
     <main>
-      <a className="skip-link" href="#main-content">Skip to content</a>
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
 
-      {/* ── Header ─────────────────────────────────────────────── */}
       <header className="site-header">
         <Link className="wordmark" href="/" aria-label="AXIOM home">
-          <span className="wordmark-mark" aria-hidden="true">A</span>
+          <span className="wordmark-mark" aria-hidden="true">
+            A
+          </span>
           <span>AXIOM</span>
         </Link>
         <nav aria-label="Primary navigation">
-          <a href="#platform">Platform</a>
-          <a href="#roadmap">Roadmap</a>
-          <a href="#mission">Mission</a>
-          <a className="nav-cta" href="/research">Research Workspace ↗</a>
-          <a className="nav-link" href="/workspace">Graph Workspace</a>
+          <a href="#available">Capabilities</a>
+          <a href="#honesty">Honesty</a>
+          <a href="#health">Health</a>
+          <Link className="nav-cta" href="/research">
+            Research Workspace ↗
+          </Link>
         </nav>
       </header>
 
-      {/* ── Hero ───────────────────────────────────────────────── */}
       <section className="hero" id="main-content" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow">AXIOM LABS · RESEARCH PLATFORM</p>
+          <p className="eyebrow">AXIOM · AI RESEARCH PLATFORM</p>
           <h1 id="hero-title">
-            The AI workspace for{" "}
-            <span className="gradient-text">frontier mathematical research.</span>
+            An honest workspace for{" "}
+            <span className="gradient-text">scientific research.</span>
           </h1>
           <p className="hero-summary">
-            AXIOM gives researchers an interactive environment to connect knowledge,
-            explore hypotheses, verify proofs, and track their distance from the
-            world's hardest open problems — with every reasoning step made visible.
+            AXIOM is in active development. What you see here reflects what is
+            actually implemented and tested — not aspirational marketing. Start
+            with the research workspace, or explore the API-backed research loops
+            behind it.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-primary" href="/research">
-              Start Research Project →
-            </a>
-            <a className="btn btn-secondary" href="/workspace">
-              Open Graph Workspace
-            </a>
-            <a className="btn btn-secondary" href="#platform">
-              Explore the Platform
+            <Link className="btn btn-primary" href="/research">
+              Open Research Workspace →
+            </Link>
+            <Link className="btn btn-secondary" href="/workspace">
+              Graph Workspace (prototype)
+            </Link>
+            <a
+              className="btn btn-secondary"
+              href="https://github.com/anujjha101296-lang/AXIOM"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              View source
             </a>
           </div>
           <div className="status-badge">
             <span className="status-dot" aria-hidden="true" />
-            In active development · Milestone 1 in progress
+            Early access · capabilities vary by loop
           </div>
         </div>
 
-        {/* Terminal visual */}
-        <div className="hero-visual" aria-label="AXIOM capability evaluation terminal output">
+        <div className="hero-visual" aria-label="Verified platform facts">
           <div className="terminal-card">
             <div className="terminal-header">
               <span className="dot dot-red" />
               <span className="dot dot-yellow" />
               <span className="dot dot-green" />
-              <span className="terminal-title">axiom evaluation run</span>
+              <span className="terminal-title">verified facts</span>
             </div>
             <div className="terminal-body">
-              <div><span className="t-dim">$</span> <span className="t-cmd">python -m axiom.evaluation.run_benchmarks</span></div>
-              <div className="t-dim">══════════════════════════════════════</div>
-              <div><span className="t-dim">[1/5]</span> <span className="t-bold">Math Reasoning</span> <span className="t-out">10/10 ✓</span></div>
-              <div><span className="t-dim">[2/5]</span> <span className="t-bold">Proof Verification</span> <span className="t-out"> 7/7 ✓</span></div>
-              <div><span className="t-dim">[3/5]</span> <span className="t-bold">Conjecture Gen</span> <span className="t-out">  5/5 ✓</span></div>
-              <div><span className="t-dim">[4/5]</span> <span className="t-bold">Knowledge Quality</span> <span className="t-warn"> 3/5 ~</span></div>
-              <div><span className="t-dim">[5/5]</span> <span className="t-bold">Research Planning</span> <span className="t-out"> 5/5 ✓</span></div>
+              <div>
+                <span className="t-dim">#</span>{" "}
+                <span className="t-bold">Truth over theater</span>
+              </div>
               <div className="t-dim">──────────────────────────────────────</div>
-              <div><span className="t-dim">Composite Score:</span> <span className="t-val">0.8010</span> <span className="t-out">▲ +8%</span></div>
-              <div><span className="t-dim">Weakest Gap:</span> <span className="t-warn">Counterexample Search</span></div>
-              <div><span className="t-dim">Prize Readiness:</span> <span className="t-val">Riemann 76→78</span></div>
-              <div><span className="t-out">✓ No regressions detected · run saved</span></div>
+              <div>
+                <span className="t-dim">tests:</span>{" "}
+                <span className="t-out">280+ core passing</span>{" "}
+                <span className="t-dim">(e2e excluded)</span>
+              </div>
+              <div>
+                <span className="t-dim">loops:</span>{" "}
+                <span className="t-out">7 health gates</span>{" "}
+                <span className="t-dim">(make *-health)</span>
+              </div>
+              <div>
+                <span className="t-dim">workspace:</span>{" "}
+                <span className="t-out">/research live</span>
+              </div>
+              <div>
+                <span className="t-dim">LLM Q&A:</span>{" "}
+                <span className="t-warn">mock without API keys</span>
+              </div>
+              <div>
+                <span className="t-dim">formal proofs:</span>{" "}
+                <span className="t-warn">Lean optional; simulated fallback</span>
+              </div>
+              <div className="t-dim">──────────────────────────────────────</div>
+              <div>
+                <span className="t-dim">audit:</span>{" "}
+                <span className="t-val">AXIOM_CAPABILITY_MATRIX.md</span>
+              </div>
             </div>
           </div>
 
           <div className="mini-cards">
-            <div className="mini-card">
-              <div className="mini-card-label">Composite Score</div>
-              <div className="mini-card-value">0.80</div>
-              <div className="mini-card-trend">↑ +8% this sprint</div>
-            </div>
-            <div className="mini-card">
-              <div className="mini-card-label">Prize Readiness</div>
-              <div className="mini-card-value">6/6</div>
-              <div className="mini-card-sub">problems scored</div>
-            </div>
-            <div className="mini-card">
-              <div className="mini-card-label">Benchmarks</div>
-              <div className="mini-card-value">30/32</div>
-              <div className="mini-card-trend">↑ passing</div>
-            </div>
-            <div className="mini-card">
-              <div className="mini-card-label">Regressions</div>
-              <div className="mini-card-value" style={{color: 'var(--emerald)'}}>0</div>
-              <div className="mini-card-sub">detected this run</div>
-            </div>
+            {verifiedFacts.map((f) => (
+              <div className="mini-card" key={f.label}>
+                <div className="mini-card-label">{f.label}</div>
+                <div className="mini-card-value">{f.value}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       <div className="divider" />
 
-      {/* ── Metrics Strip ──────────────────────────────────────── */}
-      <div className="container" style={{padding: '0 clamp(20px,5vw,48px)', maxWidth: 'var(--max-w)', margin: '0 auto'}}>
-        <div className="metrics-strip" role="list" aria-label="AXIOM platform metrics">
-          {metrics.map(m => (
+      <div className="container" style={{ padding: "0 clamp(20px,5vw,48px)", maxWidth: "var(--max-w)", margin: "0 auto" }}>
+        <div className="metrics-strip" role="list" aria-label="Verified platform metrics">
+          {verifiedFacts.map((m) => (
             <div className="metric-item" key={m.label} role="listitem">
               <div className="metric-value">{m.value}</div>
               <div className="metric-label">{m.label}</div>
@@ -245,92 +271,61 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── 3 Parallel Tracks ──────────────────────────────────── */}
-      <div className="section-full" id="platform">
-        <section className="section" aria-labelledby="tracks-title">
+      <div className="section-full" id="available">
+        <section className="section" aria-labelledby="available-title">
           <div className="section-header">
-            <p className="section-label">How We Build</p>
-            <h2 className="section-title" id="tracks-title">
-              Three parallel tracks,<br />
-              <span className="gradient-text">progressing together.</span>
+            <p className="section-label">Current capabilities</p>
+            <h2 className="section-title" id="available-title">
+              What works today.
             </h2>
             <p className="section-subtitle">
-              AXIOM doesn't wait until the research is done to build the product.
-              Research, product, and company advance in parallel — each
-              strengthening the others.
+              Each item is classified by implementation state from the repository
+              capability audit. We do not present planned features as shipped.
             </p>
           </div>
 
-          <div className="track-grid">
-            {tracks.map(t => (
-              <article className="track-card" key={t.letter}>
-                <div className={`track-icon ${t.iconClass}`} aria-hidden="true">
-                  {t.icon}
-                </div>
-                <p className="track-letter">{t.letter}</p>
-                <h3 className="track-name">{t.name}</h3>
-                <p className="track-desc">{t.desc}</p>
-                <div className="track-milestones" role="list">
-                  {t.milestones.map(m => (
-                    <div className="track-milestone" key={m} role="listitem">{m}</div>
-                  ))}
-                </div>
-              </article>
+          <h3 className="cap-section-label">Available now</h3>
+          <div className="cap-grid">
+            {availableNow.map((cap) => (
+              <CapabilityCard key={cap.name} cap={cap} />
+            ))}
+          </div>
+
+          <h3 className="cap-section-label">Early access</h3>
+          <div className="cap-grid">
+            {earlyAccess.map((cap) => (
+              <CapabilityCard key={cap.name} cap={cap} />
+            ))}
+          </div>
+
+          <h3 className="cap-section-label">Planned</h3>
+          <div className="cap-grid">
+            {planned.map((cap) => (
+              <CapabilityCard key={cap.name} cap={cap} />
             ))}
           </div>
         </section>
       </div>
 
-      {/* ── Features ───────────────────────────────────────────── */}
-      <section className="section" aria-labelledby="features-title">
+      <section className="section" id="health" aria-labelledby="health-title">
         <div className="section-header">
-          <p className="section-label">The Platform</p>
-          <h2 className="section-title" id="features-title">
-            Built for researchers who<br />
-            <span className="gradient-text">demand exactness.</span>
+          <p className="section-label">Verification</p>
+          <h2 className="section-title" id="health-title">
+            Health gates, not marketing metrics.
           </h2>
           <p className="section-subtitle">
-            Every AXIOM capability is designed to make reasoning explicit,
-            verification visible, and scientific progress measurable.
+            Each research loop has an executable health check. Run{" "}
+            <code className="inline-code">make &lt;loop&gt;-health</code> locally
+            to verify integration.
           </p>
         </div>
-        <div className="feature-grid">
-          {features.map(f => (
-            <article className="feature-card" key={f.num}>
-              <p className="feature-num">{f.num}</p>
-              <h3 className="feature-title">{f.title}</h3>
-              <p className="feature-desc">{f.desc}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      {/* ── Roadmap ────────────────────────────────────────────── */}
-      <section className="section" id="roadmap" aria-labelledby="roadmap-title">
-        <div className="section-header">
-          <p className="section-label">Roadmap</p>
-          <h2 className="section-title" id="roadmap-title">
-            Where AXIOM is going.
-          </h2>
-          <p className="section-subtitle">
-            Concrete milestones, not speculative timelines.
-            Every milestone is verified against the SCEP benchmark suite.
-          </p>
-        </div>
-        <div className="milestone-list">
-          {milestones.map(m => (
-            <div className="milestone-item" key={m.title}>
-              <div className="milestone-time">{m.time}</div>
-              <div className={`milestone-dot ${m.active ? 'active' : ''}`} aria-hidden="true" />
-              <div className="milestone-body">
-                <h3 className="milestone-title">{m.title}</h3>
-                <div className="milestone-items">
-                  {m.items.map(item => (
-                    <span className="milestone-tag" key={item}>{item}</span>
-                  ))}
-                </div>
+        <div className="health-grid">
+          {healthGates.map((gate) => (
+            <div className="health-card" key={gate.name}>
+              <div className="health-card-name">{gate.name}</div>
+              <div className="health-card-target">{gate.target}</div>
+              <div className={`health-card-status health-${gate.status}`}>
+                {gate.status === "pass" ? "Gate exists" : gate.status}
               </div>
             </div>
           ))}
@@ -339,30 +334,41 @@ export default function Home() {
 
       <div className="divider" />
 
-      {/* ── Mission ────────────────────────────────────────────── */}
-      <div className="section-full" id="mission">
-        <section className="section" aria-labelledby="mission-title">
+      <div className="section-full" id="honesty">
+        <section className="section" aria-labelledby="honesty-title">
           <div className="section-header centered">
-            <p className="section-label">Mission</p>
-            <h2 className="section-title" id="mission-title">
-              We're not building a chatbot.<br />
-              <span className="gradient-text">We're building a scientist.</span>
+            <p className="section-label">Principles</p>
+            <h2 className="section-title" id="honesty-title">
+              Truth over theater.
             </h2>
             <p className="section-subtitle">
-              AXIOM optimizes for scientific capability, research quality, and
-              verified discoveries — not features, users, or revenue. We believe
-              the only honest measure of an AI research platform is whether it
-              demonstrably brings humanity closer to solving difficult problems.
+              AXIOM optimizes for verified scientific capability — not demo
+              metrics. Generated, simulated, and formally verified results are
+              never conflated. If something is not built yet, we say so.
             </p>
           </div>
           <div className="track-grid">
             {[
-              { icon: "📐", title: "Evaluation-First", desc: "Every sprint begins with benchmarks. Every epic ends with a Capability Delta Report. We only ship when we can prove we've improved." },
-              { icon: "🔍", title: "Chief Skeptic Built-In", desc: "An independent audit layer challenges every score and rejects optimistic assumptions. Estimated capabilities are flagged. Verified ones are celebrated." },
-              { icon: "🏆", title: "Prize-Backed Targets", desc: "The Clay Millennium Problems are our long-horizon capability tests, not product promises. Prize readiness scores guide every engineering decision." },
-            ].map(p => (
+              {
+                icon: "✓",
+                title: "Evidence-first",
+                desc: "Every capability has acceptance criteria and executable verification. See VERIFICATION_STATUS.md and AXIOM_CAPABILITY_MATRIX.md.",
+              },
+              {
+                icon: "◎",
+                title: "Explicit limitations",
+                desc: "Mock LLMs, simulated compilers, and subprocess sandboxes are labeled — not hidden behind polished UI.",
+              },
+              {
+                icon: "→",
+                title: "Start with research",
+                desc: "The research workspace is the most complete product surface. Everything else supports or extends it.",
+              },
+            ].map((p) => (
               <article className="track-card" key={p.title}>
-                <div className="track-icon indigo" style={{fontSize: '24px'}} aria-hidden="true">{p.icon}</div>
+                <div className="track-icon indigo" style={{ fontSize: "24px" }} aria-hidden="true">
+                  {p.icon}
+                </div>
                 <h3 className="track-name">{p.title}</h3>
                 <p className="track-desc">{p.desc}</p>
               </article>
@@ -371,51 +377,51 @@ export default function Home() {
         </section>
       </div>
 
-      {/* ── CTA ────────────────────────────────────────────────── */}
       <section className="cta-section" aria-labelledby="cta-title">
         <div className="cta-card">
-          <p className="section-label" style={{marginBottom: '16px'}}>EARLY ACCESS</p>
-          <h2 id="cta-title">
-            Join researchers building with AXIOM.
-          </h2>
-          <p>
-            Get early access to the research workspace, benchmark results,
-            and our technical progress reports.
+          <p className="section-label" style={{ marginBottom: "16px" }}>
+            GET STARTED
           </p>
-          <form className="waitlist-form" onSubmit={e => e.preventDefault()} style={{marginBottom: '24px'}}>
-            <input
-              id="waitlist-email"
-              type="email"
-              placeholder="your@university.edu"
-              className="waitlist-input"
-              autoComplete="email"
-            />
-            <button type="submit" className="waitlist-btn">Join Waitlist</button>
-          </form>
+          <h2 id="cta-title">Try the research workspace.</h2>
+          <p>
+            Create a project, upload a paper, search your notes, and run Q&A
+            sessions. No waitlist required — the workspace is available now.
+          </p>
           <div className="cta-actions">
-            <a className="btn btn-primary" href="/workspace">
-              Explore workspace prototype →
-            </a>
-            <a className="btn btn-ghost" href="https://github.com" rel="noopener" target="_blank">
+            <Link className="btn btn-primary" href="/research">
+              Open Research Workspace →
+            </Link>
+            <a
+              className="btn btn-ghost"
+              href="https://github.com/anujjha101296-lang/AXIOM"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               View on GitHub
             </a>
           </div>
+          <p className="cta-footnote">
+            API documentation available at{" "}
+            <code className="inline-code">localhost:8000/docs</code> when running
+            locally with <code className="inline-code">make dev</code>.
+          </p>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────── */}
       <footer>
         <div className="site-footer">
           <Link className="wordmark" href="/" aria-label="AXIOM home">
-            <span className="wordmark-mark" aria-hidden="true">A</span>
+            <span className="wordmark-mark" aria-hidden="true">
+              A
+            </span>
             <span>AXIOM</span>
           </Link>
           <nav className="footer-links" aria-label="Footer navigation">
-            <a href="/workspace">Workspace</a>
-            <a href="#platform">Platform</a>
-            <a href="#roadmap">Roadmap</a>
+            <Link href="/research">Research Workspace</Link>
+            <Link href="/workspace">Graph Workspace</Link>
+            <a href="#available">Capabilities</a>
           </nav>
-          <p className="footer-copy">© {new Date().getFullYear()} AXIOM Labs</p>
+          <p className="footer-copy">© {new Date().getFullYear()} AXIOM Labs · Early access</p>
         </div>
       </footer>
     </main>

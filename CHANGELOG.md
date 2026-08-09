@@ -8,6 +8,14 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### P0-WEB — Honest Public Landing Page (2026-08-09)
+- Replaced mock metrics and fake terminal output with verified platform facts
+- Capability disclosure: Available now / Early access / Planned tiers
+- Removed dead waitlist form; primary CTA links to `/research` workspace
+- Health gate section documents executable `make *-health` checks
+- Landing page is a static server component (no client interactivity errors)
+- Updated metadata in `layout.tsx` for honest early-access positioning
+
 ### Sprint 0 — Production Foundation
 - Added `.gitignore`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`
 - Added Pydantic `BaseSettings` configuration system (`axiom/config/settings.py`)

@@ -2,7 +2,7 @@
 
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
-**Last updated:** 2026-08-06
+**Last updated:** 2026-08-09 (P0-WEB honest landing)
 **Active horizon:** Three-track foundation — research, product, and company
 
 ## Where we are today
@@ -19,6 +19,7 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 - **Research Workspace v1:** End-to-end vertical slice — create projects, upload PDFs, extract text, generate summaries, save structured notes, FTS search, resume sessions. API `/research/*`, UI `/research`, demo script `scripts/demo_research_workspace.sh`.
 - **S0-E3:** Verification truthfulness audit — `axiom/core/verification/truthfulness.py`; API responses expose `evidence_mode` and `formally_proven`; simulated/SMT/heuristic paths cannot claim `TIER_2_PROVEN`.
 - **EM-001 Research Workspace (production):** Projects CRUD, PDF upload/parse/store, notes with tags, FTS search, paper Q&A with saved conversations, session resume. UI at `/research`.
+- **P0-WEB:** Honest public landing page — capability tiers (available / early access / planned), no fake metrics, no dead waitlist, primary CTA to `/research`. `ui/src/app/page.tsx`.
 
 ## Blocked
 
