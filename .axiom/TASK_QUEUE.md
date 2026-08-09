@@ -22,6 +22,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | 12 | TSS-1 | Trust, Security & Safety Loop — continuous security evaluation. | H1-OBS | TSS docs, production guard, secret scan, optional route auth. | **Complete** — see `SECURITY_STATUS.md` |
 | 13 | E&R-1 | Evidence & Reproducibility Loop — provenance, claims, reproduction. | TSS-1, H1-OBS | Claim registry, discovery gate, `/evidence/*`, `make erl-health` passes. | **Complete** — see `EVIDENCE_STATUS.md` |
 | 14 | SIMR-1 | Scientific Intelligence & Model Routing — model/tool selection. | E&R-1, SCEP | Model/tool registries, router, `/routing/*`, `make simr-health` passes. | **Complete** — see `MODEL_REGISTRY.md` |
+| 15 | FMTP-1 | Formal Mathematics & Theorem-Proving Loop. | SIMR-1, MIP | Prover registry, formalization, proof search, `/formal/*`, `make fmtp-health` passes. | **Complete** — see `FORMAL_MATH_STATUS.md` |
 
 ## Queue protocol
 

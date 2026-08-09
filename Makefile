@@ -130,6 +130,9 @@ erl-health: ## Run E&R evidence & reproducibility health check
 simr-health: ## Run SIMR model routing health check
 	@python3 scripts/simr_health_check.py
 
+fmtp-health: ## Run FMTP formal mathematics health check
+	@if [ -x .venv/bin/python ]; then .venv/bin/python scripts/fmtp_health_check.py; else python3 scripts/fmtp_health_check.py; fi
+
 # ── Database ──────────────────────────────────────────────────────────────────
 db-migrate: ## Run database migrations
 	PYTHONPATH=. $(PYTHON) -c \

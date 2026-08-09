@@ -43,6 +43,7 @@ Entry point: `AXIOM_OPERATING_SYSTEM.md` → `.axiom/OPERATING_SYSTEM.md`
 - **TSS-1:** Trust, Security & Safety Loop — `.axiom/TSS.md`, security scorecards, production guard, optional route auth, secret scanner — `SECURITY_STATUS.md`.
 - **E&R-1:** Evidence & Reproducibility Loop — claim registry, discovery gate, provenance graph, reproduction engine, `/evidence/*` API — `EVIDENCE_STATUS.md`.
 - **SIMR-1:** Scientific Intelligence & Model Routing — model/tool registries, capability graph, router, research compiler, `/routing/*` API — `MODEL_REGISTRY.md`.
+- **FMTP-1:** Formal Mathematics & Theorem-Proving — prover registry, formalization pipelines, proof search, compilation gate, `/formal/*` API — `FORMAL_MATH_STATUS.md`.
 
 ## Blocked
 

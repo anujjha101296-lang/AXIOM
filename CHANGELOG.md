@@ -8,6 +8,17 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ## [Unreleased]
 
+### FMTP — Formal Mathematics & Theorem-Proving Loop (2026-08-09)
+- **FMTP v1:** `.axiom/FMTP.md`, formal math status reports, millennium readiness update
+- **Prover registry:** Lean4, Coq, Isabelle, SMT, SymPy with installation status
+- **Pipelines:** informal → formal, formal → informal, proof search, compilation gate
+- **Counterexample engine:** SMT modular + randomized testing
+- **Failure memory:** proof failures with repair suggestions
+- **Millennium gate:** blocks premature prize campaigns
+- **API:** `/formal/*` routes with optional authentication
+- **Health check:** `scripts/fmtp_health_check.py`, `make fmtp-health`
+- **Tests:** `tests/test_formal_math.py` (17 tests)
+
 ### SIMR — Scientific Intelligence & Model Routing (2026-08-08)
 - **SIMR v1:** `.axiom/SIMR.md`, model/tool registries, capability graph, routing policy docs
 - **Model registry:** 5 models with capability scores and fallback chains
