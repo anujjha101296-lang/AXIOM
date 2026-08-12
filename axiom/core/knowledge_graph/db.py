@@ -19,7 +19,7 @@ from axiom.core.knowledge_graph.schema import (
     OpenProblemNode,
     ConjectureNode,
 )
-from axiom.core.knowledge_graph.migrations import run_migrations
+# Migrations now handled by alembic
 
 # Set up type adapter for polymorphic nodes list parsing
 scientific_node_adapter = TypeAdapter(ScientificNode)
@@ -33,7 +33,7 @@ class EpistemicStore:
     def _init_db(self):
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.conn.execute("PRAGMA foreign_keys = ON;")
-        run_migrations(self.conn)
+        # Migrations now handled by alembic
 
     def add_node(self, node: ScientificNode) -> None:
         """Upsert a scientific node in the database."""

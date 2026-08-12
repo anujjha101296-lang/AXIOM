@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from axiom.config import settings
 from axiom.core.events.bus import AxiomEvent, Topics, event_bus
 from axiom.core.knowledge_graph.db import EpistemicStore
-from axiom.core.knowledge_graph.migrations import run_migrations
+# from axiom.core.knowledge_graph.migrations import run_migrations
 from axiom.core.memory.working_memory import WorkingMemory
 from axiom.core.parser.arxiv_parser import ArxivParser
 from axiom.core.reasoning.hypothesis_engine import HypothesisEngine
@@ -23,6 +23,9 @@ from axiom.evaluation.prize_readiness import PrizeReadinessScorer
 from axiom.observability.logger import configure_logging, get_logger
 from axiom.observability.metrics import METRICS
 from axiom.services.api_gateway.auth import verify_token
+from axiom.core.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 from axiom.services.api_gateway.routes.mip import router as mip_router
 from axiom.services.api_gateway.routes.eval_api import router as eval_router
 from axiom.services.api_gateway.routes.mde import router as mde_router
@@ -40,8 +43,8 @@ async def lifespan(app: FastAPI):
     logger.info("AXIOM API Gateway starting up",
                 extra={"version": settings.app_version, "env": settings.environment})
     # Run database migrations on startup
-    if store.conn:
-        run_migrations(store.conn)
+    # if store.conn:
+    #     run_migrations(store.conn)
     yield
     logger.info("AXIOM API Gateway shutting down")
     store.close()
@@ -140,12 +143,9 @@ def health_check():
 
 # Readiness check
 @app.get("/ready", tags=["system"])
-def readiness_check():
+async def readiness_check(db: AsyncSession = Depends(get_db)):
     try:
-        assert store.conn is not None
-        cursor = store.conn.cursor()
-        cursor.execute("SELECT 1;")
-        cursor.fetchone()
+        await db.execute(text("SELECT 1;"))
         return {"status": "ready", "database": "connected", "version": settings.app_version}
     except Exception as e:
         logger.error(f"Readiness check failed: {str(e)}")
