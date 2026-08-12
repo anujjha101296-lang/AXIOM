@@ -30,7 +30,11 @@ export default function ProjectPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "documents">("documents");
+  const [activeTab, setActiveTab] = useState<"overview" | "documents" | "search">("documents");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -115,6 +119,32 @@ export default function ProjectPage() {
     }
   };
 
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setSearchLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_BASE}/projects/${projectId}/search`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: searchQuery, limit: 5 })
+      });
+
+      if (!res.ok) throw new Error("Search failed");
+      const data = await res.json();
+      setSearchResults(data.results || data);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
   const handleDeleteDocument = async (docId: string) => {
     if (!confirm("Are you sure you want to delete this document?")) return;
 
@@ -195,12 +225,65 @@ export default function ProjectPage() {
             >
               Documents
             </button>
+            <button
+              onClick={() => setActiveTab("search")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "search"
+                  ? "border-indigo-500 text-indigo-400"
+                  : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              }`}
+            >
+              Search
+            </button>
           </nav>
         </div>
 
         {activeTab === "overview" && (
           <div className="py-12 text-center border border-dashed border-slate-700 rounded-lg bg-slate-900/50">
             <p className="text-slate-500">Project overview features coming soon.</p>
+          </div>
+        )}
+
+        {activeTab === "search" && (
+          <div className="space-y-8">
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Search Documents</h2>
+              <form onSubmit={handleSearch} className="flex items-end space-x-4">
+                <div className="flex-1">
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Query</label>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Ask a question about your documents..."
+                    className="block w-full border border-slate-800 rounded p-2 bg-slate-950 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!searchQuery.trim() || searchLoading}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 px-6 rounded transition-colors disabled:opacity-50 h-[42px]"
+                >
+                  {searchLoading ? "Searching..." : "Search"}
+                </button>
+              </form>
+            </div>
+
+            {searchResults.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white">Results</h3>
+                {searchResults.map((res, i) => (
+                  <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                    <p className="text-slate-300 text-sm mb-3">{res.text}</p>
+                    {res.metadata && (
+                      <div className="text-xs text-slate-500 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+                        {res.metadata.filename || res.metadata.source || JSON.stringify(res.metadata)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

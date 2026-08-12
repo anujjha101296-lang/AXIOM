@@ -9,6 +9,8 @@ from axiom.core.repositories import ProjectRepository, DocumentRepository
 from axiom.services.api_gateway.auth import get_current_user
 from axiom.research.pdf_extractor import PdfExtractor
 from axiom.core.models import DocumentChunk
+from axiom.research.embeddings import get_embedding_provider
+import json
 
 router = APIRouter(prefix="/projects/{project_id}/documents", tags=["documents"])
 
@@ -17,6 +19,7 @@ class DocumentResponse(BaseModel):
     project_id: str
     title: str
     status: str
+    indexing_status: str
     created_at: datetime
     
     class Config:
@@ -50,10 +53,20 @@ async def upload_document(
         
         # chunking (storing as one chunk for now as per instructions)
         chunk = DocumentChunk(document_id=document.id, content=extraction_result.text)
+        
+        # embed chunk
+        provider = get_embedding_provider()
+        embeddings = provider.embed_batch([chunk.content])
+        if embeddings:
+            chunk.embedding = json.dumps(embeddings[0])
+            
+        document.indexing_status = "INDEXED"
         db.add(chunk)
         await db.commit()
     except Exception as e:
         await doc_repo.update_status(document.id, "failed")
+        document.indexing_status = "INDEX_FAILED"
+        db.add(document)
         await db.commit()
         raise HTTPException(status_code=400, detail=f"Failed to process document: {str(e)}")
         

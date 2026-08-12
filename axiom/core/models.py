@@ -44,6 +44,7 @@ class Document(Base):
     project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     title = Column(String, nullable=False)
     status = Column(String, default="pending", nullable=False)
+    indexing_status = Column(String, default="pending", server_default="pending", nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
     project = relationship("Project", back_populates="documents")
@@ -55,6 +56,7 @@ class DocumentChunk(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     document_id = Column(String, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False, index=True)
     content = Column(Text, nullable=False)
+    embedding = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
     document = relationship("Document", back_populates="chunks")
