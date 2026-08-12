@@ -110,3 +110,22 @@ async def test_invalid_input(db_session):
     # Trying to create a user with duplicate email should fail (unique constraint)
     with pytest.raises(IntegrityError):
         await user_repo.create(email="dup@example.com", hashed_password="pwd2")
+
+from httpx import AsyncClient, ASGITransport
+from axiom.services.api_gateway.main import app
+
+@pytest.mark.asyncio
+async def test_health_check():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"
+
+@pytest.mark.asyncio
+async def test_readiness_check(test_engine):
+    app.dependency_overrides = {}
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/ready")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ready"
+    assert response.json()["database"] == "connected"

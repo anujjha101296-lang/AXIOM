@@ -2,6 +2,8 @@
 
 import React, { useCallback, useState, useEffect, useRef } from 'react';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 interface GraphNodeMetadata {
   compiler_status?: string;
   lean_file?: string;
@@ -79,7 +81,7 @@ export default function Home() {
   // Load Graph Data
   const fetchGraph = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:8000/graph', {
+      const res = await fetch(`${API_BASE}/graph`, {
         headers: { 'Authorization': `Bearer ${apiToken}` }
       });
       if (res.ok) {
@@ -253,7 +255,7 @@ export default function Home() {
     setIngestLoading(true);
     setIngestResult(null);
     try {
-      const res = await fetch('http://localhost:8000/ingest', {
+      const res = await fetch(`${API_BASE}/ingest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -279,7 +281,7 @@ export default function Home() {
     setSmtLoading(true);
     try {
       const variableList = smtVars.split(',').map((variable) => variable.trim());
-      const res = await fetch('http://localhost:8000/verify/conjecture', {
+      const res = await fetch(`${API_BASE}/verify/conjecture`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -306,7 +308,7 @@ export default function Home() {
     setProofLoading(true);
     try {
       const parsedVars = JSON.parse(proofVars);
-      const res = await fetch('http://localhost:8000/verify/proof', {
+      const res = await fetch(`${API_BASE}/verify/proof`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

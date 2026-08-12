@@ -25,6 +25,10 @@ from axiom.core.knowledge_graph.schema import (
 scientific_node_adapter = TypeAdapter(ScientificNode)
 
 class EpistemicStore:
+    """
+    Old mock database implementation / in-memory store for Phase 1.
+    Note: For the Database Foundation MVP, User, Project, and Document are managed via SQLAlchemy.
+    """
     def __init__(self, db_path: str = ":memory:"):
         self.db_path = db_path
         self.conn: Optional[sqlite3.Connection] = None

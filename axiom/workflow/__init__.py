@@ -2,6 +2,7 @@
 AXIOM Workflow Engine
 ======================
 Public API surface for the Autonomous Workflow Engine.
+TODO(Phase 2): This multi-agent workflow engine is scheduled for full implementation in Phase 2.
 """
 from __future__ import annotations
 

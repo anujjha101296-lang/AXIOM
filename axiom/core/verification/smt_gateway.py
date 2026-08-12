@@ -6,6 +6,7 @@ except ImportError:
 
 class SmtGateway:
     def __init__(self):
+        # TODO(Phase 2): Implement the full Z3 SMT solver initialization.
         pass
 
     def verify_modular_conjecture(self, equation: str, modulus: int, variables: List[str]) -> Tuple[bool, Optional[Dict[str, int]]]:

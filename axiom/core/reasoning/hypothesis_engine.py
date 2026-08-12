@@ -56,6 +56,7 @@ def _complex_extension(statement: str) -> str:
 class HypothesisEngine:
     """
     Generates candidate conjectures from EGS verified theorem nodes.
+    TODO(Phase 2): Implement the full Hypothesis Engine. Currently a placeholder/MVP implementation.
     """
 
     def __init__(self, store: EpistemicStore):
