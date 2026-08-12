@@ -22,18 +22,27 @@ from __future__ import annotations
 
 import os
 import time
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Optional
 
-from fastapi import Depends, Header, HTTPException, status
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
+from passlib.context import CryptContext
+from jose import jwt, JWTError
 
+from axiom.config import settings
+from axiom.core.database import get_db
+from axiom.core.repositories import UserRepository
+from axiom.core.models import User
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-SECRET_TOKEN = os.getenv("AXIOM_API_TOKEN", "axiom-dev-token")
-JWT_SECRET   = os.getenv("JWT_SECRET_KEY",  "CHANGE-ME-IN-PRODUCTION")
-JWT_ALGO     = "HS256"
-JWT_EXPIRY   = int(os.getenv("JWT_EXPIRY_MINUTES", "60")) * 60  # seconds
+SECRET_TOKEN = settings.api_token
+JWT_SECRET   = settings.jwt_secret_key
+JWT_ALGO     = settings.jwt_algorithm
+JWT_EXPIRY   = settings.jwt_expiry_minutes * 60  # seconds
 
 
 # ── Roles ─────────────────────────────────────────────────────────────────────
@@ -86,78 +95,53 @@ def verify_token(authorization: str = Header(None)) -> str:
     return token
 
 
+# ── Password Hashing ─────────────────────────────────────────────────────────
+
+import bcrypt
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+    except ValueError:
+        return False
+
+def get_password_hash(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
 # ── JWT Utilities (production multi-user path) ────────────────────────────────
 
-def _encode_jwt(payload: dict) -> str:
-    """Encode a JWT without external libraries using HMAC-SHA256."""
-    import base64
-    import hashlib
-    import hmac
-    import json
-
-    def b64url(data: bytes) -> str:
-        return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
-
-    header = b64url(json.dumps({"alg": JWT_ALGO, "typ": "JWT"}).encode())
-    body   = b64url(json.dumps(payload).encode())
-    signing_input = f"{header}.{body}".encode()
-    signature = b64url(
-        hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
-    )
-    return f"{header}.{body}.{signature}"
-
-
-def _decode_jwt(token: str) -> dict:
-    """Decode and verify a JWT. Raises ValueError on invalid/expired tokens."""
-    import base64
-    import hashlib
-    import hmac
-    import json
-
-    def b64url_decode(s: str) -> bytes:
-        pad = "=" * (4 - len(s) % 4)
-        return base64.urlsafe_b64decode(s + pad)
-
-    parts = token.split(".")
-    if len(parts) != 3:
-        raise ValueError("Invalid JWT structure")
-
-    header_b64, body_b64, sig_b64 = parts
-    signing_input = f"{header_b64}.{body_b64}".encode()
-    expected_sig = base64.urlsafe_b64encode(
-        hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
-    ).rstrip(b"=").decode()
-
-    if not hmac.compare_digest(sig_b64, expected_sig):
-        raise ValueError("JWT signature verification failed")
-
-    payload = json.loads(b64url_decode(body_b64))
-    if "exp" in payload and payload["exp"] < time.time():
-        raise ValueError("JWT token has expired")
-
-    return payload
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def create_jwt_token(user_id: str, role: Role = Role.RESEARCHER) -> str:
     """Generate a signed JWT for the given user/role."""
-    now = time.time()
-    return _encode_jwt({
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(seconds=JWT_EXPIRY)
+    to_encode = {
         "sub": user_id,
         "role": role.value,
-        "iat": now,
-        "exp": now + JWT_EXPIRY,
-    })
+        "iat": int(now.timestamp()),
+        "exp": int(expire.timestamp()),
+    }
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGO)
+    return encoded_jwt
 
 
 def decode_jwt_token(token: str) -> TokenPayload:
     """Decode and validate a JWT, returning the payload."""
     try:
-        data = _decode_jwt(token)
-        return TokenPayload(**data)
-    except (ValueError, KeyError, TypeError) as exc:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+        return TokenPayload(**payload)
+    except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {exc}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token format",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -167,11 +151,6 @@ def decode_jwt_token(token: str) -> TokenPayload:
 def require_role(minimum_role: Role):
     """
     FastAPI dependency factory for role-based access control.
-
-    Example:
-        @app.post("/admin")
-        def admin_endpoint(user = Depends(require_role(Role.ADMIN))):
-            ...
     """
     def _check(authorization: str = Header(None)) -> TokenPayload:
         if not authorization:
@@ -197,3 +176,82 @@ def require_role(minimum_role: Role):
             )
         return payload
     return _check
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    """
+    Dependency that decodes the JWT and fetches the user from DB.
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = decode_jwt_token(token)
+        email: str = payload.sub
+        print(f"Decoded email: {email}")
+        if email is None:
+            print("Email is None")
+            raise credentials_exception
+    except Exception as e:
+        print(f"Exception in decode: {e}")
+        raise credentials_exception
+    
+    repo = UserRepository(db)
+    user = await repo.get_by_email(email)
+    if user is None:
+        print(f"User not found for email: {email}")
+        raise credentials_exception
+    print(f"Found user: {user.email}")
+    return user
+
+
+# ── Auth Router ───────────────────────────────────────────────────────────────
+
+router = APIRouter(prefix="/auth", tags=["auth"])
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class UserResponse(BaseModel):
+    id: str
+    email: str
+    
+    class Config:
+        from_attributes = True
+
+@router.post("/register", response_model=UserResponse)
+async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
+    repo = UserRepository(db)
+    existing_user = await repo.get_by_email(user_in.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_pwd = get_password_hash(user_in.password)
+    user = await repo.create(user_in.email, hashed_pwd)
+    await db.commit()
+    return user
+
+@router.post("/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    repo = UserRepository(db)
+    user = await repo.get_by_email(form_data.username)
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = create_jwt_token(user_id=user.email)
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user

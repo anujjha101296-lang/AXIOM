@@ -1,4 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const features = [
   {
@@ -132,9 +138,146 @@ const metrics = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      if (authMode === "register") {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.detail || "Registration failed");
+        }
+        
+        // Auto login after register
+        const loginRes = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ username: email, password }),
+        });
+        
+        if (!loginRes.ok) throw new Error("Auto-login failed");
+        
+        const loginData = await loginRes.json();
+        localStorage.setItem("token", loginData.access_token);
+        router.push("/workspace");
+      } else {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ username: email, password }),
+        });
+        
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.detail || "Login failed");
+        }
+        
+        const data = await res.json();
+        localStorage.setItem("token", data.access_token);
+        router.push("/workspace");
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+  };
+
   return (
     <main>
       <a className="skip-link" href="#main-content">Skip to content</a>
+
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 p-8 rounded-lg shadow-2xl w-full max-w-md relative">
+            <button 
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+            >
+              ✕
+            </button>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {authMode === "login" ? "Welcome Back" : "Create Account"}
+            </h2>
+            <p className="text-slate-400 text-sm mb-6">
+              {authMode === "login" 
+                ? "Sign in to access your research workspace." 
+                : "Join AXIOM to start your mathematical research."}
+            </p>
+
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email</label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white"
+                  required
+                />
+              </div>
+              
+              {error && <div className="text-red-400 text-sm p-2 bg-red-400/10 rounded">{error}</div>}
+              
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2 rounded transition-colors disabled:opacity-50"
+              >
+                {loading ? "Processing..." : (authMode === "login" ? "Sign In" : "Register")}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-slate-400">
+              {authMode === "login" ? (
+                <>Don't have an account? <button onClick={() => setAuthMode("register")} className="text-indigo-400 hover:text-indigo-300">Register</button></>
+              ) : (
+                <>Already have an account? <button onClick={() => setAuthMode("login")} className="text-indigo-400 hover:text-indigo-300">Sign in</button></>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <header className="site-header">
@@ -142,12 +285,23 @@ export default function Home() {
           <span className="wordmark-mark" aria-hidden="true">A</span>
           <span>AXIOM</span>
         </Link>
-        <nav aria-label="Primary navigation">
+        <nav aria-label="Primary navigation" className="flex items-center gap-4">
           <a href="#platform">Platform</a>
           <a href="#roadmap">Roadmap</a>
           <a href="#mission">Mission</a>
-          <a className="nav-cta" href="/research">Research Workspace ↗</a>
-          <a className="nav-link" href="/workspace">Graph Workspace</a>
+          {isAuthenticated ? (
+            <>
+              <Link className="nav-link" href="/workspace">Dashboard</Link>
+              <button onClick={handleLogout} className="text-slate-400 hover:text-white text-sm font-medium ml-4">Logout</button>
+            </>
+          ) : (
+            <button 
+              onClick={() => { setAuthMode("login"); setShowAuthModal(true); }} 
+              className="text-white text-sm font-medium ml-4 border border-slate-700 px-3 py-1 rounded hover:bg-slate-800 transition-colors"
+            >
+              Sign In
+            </button>
+          )}
         </nav>
       </header>
 
@@ -165,12 +319,15 @@ export default function Home() {
             world's hardest open problems — with every reasoning step made visible.
           </p>
           <div className="hero-actions">
-            <a className="btn btn-primary" href="/research">
-              Start Research Project →
-            </a>
-            <a className="btn btn-secondary" href="/workspace">
-              Open Graph Workspace
-            </a>
+            {isAuthenticated ? (
+              <Link className="btn btn-primary" href="/workspace">
+                Open Workspace Dashboard →
+              </Link>
+            ) : (
+              <button className="btn btn-primary" onClick={() => { setAuthMode("register"); setShowAuthModal(true); }}>
+                Start Research Project →
+              </button>
+            )}
             <a className="btn btn-secondary" href="#platform">
               Explore the Platform
             </a>
@@ -374,28 +531,24 @@ export default function Home() {
       {/* ── CTA ────────────────────────────────────────────────── */}
       <section className="cta-section" aria-labelledby="cta-title">
         <div className="cta-card">
-          <p className="section-label" style={{marginBottom: '16px'}}>EARLY ACCESS</p>
+          <p className="section-label" style={{marginBottom: '16px'}}>GET STARTED</p>
           <h2 id="cta-title">
             Join researchers building with AXIOM.
           </h2>
           <p>
-            Get early access to the research workspace, benchmark results,
+            Get access to the research workspace, benchmark results,
             and our technical progress reports.
           </p>
-          <form className="waitlist-form" onSubmit={e => e.preventDefault()} style={{marginBottom: '24px'}}>
-            <input
-              id="waitlist-email"
-              type="email"
-              placeholder="your@university.edu"
-              className="waitlist-input"
-              autoComplete="email"
-            />
-            <button type="submit" className="waitlist-btn">Join Waitlist</button>
-          </form>
-          <div className="cta-actions">
-            <a className="btn btn-primary" href="/workspace">
-              Explore workspace prototype →
-            </a>
+          <div className="cta-actions mt-6">
+            {isAuthenticated ? (
+              <Link className="btn btn-primary" href="/workspace">
+                Go to Workspace →
+              </Link>
+            ) : (
+              <button className="btn btn-primary" onClick={() => { setAuthMode("register"); setShowAuthModal(true); }}>
+                Create Account →
+              </button>
+            )}
             <a className="btn btn-ghost" href="https://github.com" rel="noopener" target="_blank">
               View on GitHub
             </a>
