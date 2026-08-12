@@ -215,8 +215,7 @@ export default function WorkspaceDashboard() {
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-800/50">
                       <span className="text-xs text-slate-500 font-mono">ID: {p.id.substring(0, 8)}...</span>
                       <div className="space-x-2">
-                        {/* Placeholder for opening actual graph workspace if we had one for specific projects */}
-                        <button className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Open</button>
+                        <Link href={`/workspace/project/${p.id}`} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Open</Link>
                         <button 
                           onClick={() => handleDeleteProject(p.id)}
                           className="text-xs text-slate-500 hover:text-red-400 font-medium transition-colors"

@@ -32,6 +32,7 @@ from axiom.services.api_gateway.routes.mde import router as mde_router
 from axiom.services.api_gateway.routes.research import router as research_router
 from axiom.services.api_gateway.auth import router as auth_router
 from axiom.services.api_gateway.routes.projects import router as projects_router
+from axiom.services.api_gateway.routes.documents import router as documents_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -87,6 +88,9 @@ app.include_router(auth_router)
 
 # ── Projects API (CRUD) ───────────────────────────────────────────────────────
 app.include_router(projects_router)
+
+# ── Documents API (CRUD) ───────────────────────────────────────────────────────
+app.include_router(documents_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
