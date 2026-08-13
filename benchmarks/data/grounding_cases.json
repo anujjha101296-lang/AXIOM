@@ -1,0 +1,98 @@
+{
+  "cases": [
+    {
+      "case_id": "gc_001",
+      "name": "Fully supported answer",
+      "description": "Question that has clear, complete supporting evidence in the corpus",
+      "question": "What is supervised learning?",
+      "corpus_chunk_ids": ["doc_A_c0"],
+      "expected_behavior": {
+        "evidence_retrieved": true,
+        "claim_supported": true,
+        "citations_valid": true,
+        "insufficient_evidence_stated": false,
+        "contradiction_surfaced": false
+      },
+      "expected_answer_contains": ["labeled data", "loss function"],
+      "expected_citation_chunk_ids": ["doc_A_c0"],
+      "grounding_type": "FULLY_SUPPORTED"
+    },
+    {
+      "case_id": "gc_002",
+      "name": "Partially supported answer",
+      "description": "Question where only part of the answer is in the corpus",
+      "question": "Describe BERT's architecture and its training dataset size.",
+      "corpus_chunk_ids": ["doc_B_c1"],
+      "expected_behavior": {
+        "evidence_retrieved": true,
+        "claim_supported": false,
+        "citations_valid": true,
+        "insufficient_evidence_stated": true,
+        "contradiction_surfaced": false
+      },
+      "expected_answer_contains": ["bidirectional", "Google"],
+      "expected_citation_chunk_ids": ["doc_B_c1"],
+      "grounding_type": "PARTIALLY_SUPPORTED",
+      "limitation": "Training dataset size is not in the corpus"
+    },
+    {
+      "case_id": "gc_003",
+      "name": "No supporting evidence",
+      "description": "Question on a topic completely absent from the corpus",
+      "question": "What is the capital city of France?",
+      "corpus_chunk_ids": [],
+      "expected_behavior": {
+        "evidence_retrieved": false,
+        "claim_supported": false,
+        "citations_valid": false,
+        "insufficient_evidence_stated": true,
+        "contradiction_surfaced": false
+      },
+      "expected_answer_contains": ["not found", "insufficient", "no evidence", "cannot"],
+      "expected_citation_chunk_ids": [],
+      "grounding_type": "NOT_SUPPORTED"
+    },
+    {
+      "case_id": "gc_004",
+      "name": "Conflicting evidence",
+      "description": "Corpus contains contradictory information about a topic",
+      "question": "Is a high learning rate always better for faster training?",
+      "corpus_chunk_ids": ["doc_C_c1"],
+      "expected_behavior": {
+        "evidence_retrieved": true,
+        "claim_supported": false,
+        "citations_valid": true,
+        "insufficient_evidence_stated": false,
+        "contradiction_surfaced": true
+      },
+      "expected_answer_contains": ["divergence", "slow convergence", "too large", "too small"],
+      "expected_citation_chunk_ids": ["doc_C_c1"],
+      "grounding_type": "CONFLICTING",
+      "note": "The corpus shows both harms: too large = divergence, too small = slow convergence"
+    },
+    {
+      "case_id": "gc_005",
+      "name": "Misleading distractor",
+      "description": "Query uses terminology from corpus but the specific claim is not supported",
+      "question": "Do CNNs use self-attention mechanisms like transformers?",
+      "corpus_chunk_ids": ["doc_C_c0", "doc_B_c0"],
+      "expected_behavior": {
+        "evidence_retrieved": true,
+        "claim_supported": false,
+        "citations_valid": true,
+        "insufficient_evidence_stated": false,
+        "contradiction_surfaced": false
+      },
+      "expected_answer_contains": ["convolutional", "self-attention"],
+      "expected_citation_chunk_ids": ["doc_C_c0", "doc_B_c0"],
+      "grounding_type": "DISTRACTOR",
+      "note": "CNNs use convolutional filters (doc_C_c0), transformers use self-attention (doc_B_c0). CNNs do NOT use self-attention."
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "description": "Grounding benchmark cases for AXIOM Phase 8. Tests evidence retrieval, claim support, citation validity, and uncertainty expression.",
+    "total_cases": 5,
+    "grounding_types": ["FULLY_SUPPORTED", "PARTIALLY_SUPPORTED", "NOT_SUPPORTED", "CONFLICTING", "DISTRACTOR"]
+  }
+}

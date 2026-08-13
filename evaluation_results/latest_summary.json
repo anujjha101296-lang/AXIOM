@@ -1,0 +1,31 @@
+{
+  "run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+  "timestamp": "2026-08-13T05:12:38.981544+00:00",
+  "git_commit": "a675006",
+  "git_branch": "main",
+  "overall_pass_rate": 0.8823529411764706,
+  "suites": [
+    {
+      "suite_id": "retrieval_benchmark",
+      "suite_name": "Retrieval Quality Benchmark",
+      "total_cases": 5,
+      "passed_cases": 5,
+      "pass_rate": 1.0
+    },
+    {
+      "suite_id": "grounding_benchmark",
+      "suite_name": "Evidence Grounding & Citation Benchmark",
+      "total_cases": 5,
+      "passed_cases": 3,
+      "pass_rate": 0.6
+    },
+    {
+      "suite_id": "agent_benchmark",
+      "suite_name": "Research Agent Benchmark",
+      "total_cases": 7,
+      "passed_cases": 7,
+      "pass_rate": 1.0
+    }
+  ],
+  "results_path": "/Users/anujkumarjha/Downloads/AXIOM/evaluation_results/96a95d62-96d9-47d1-941f-1921567abd9d/results.json"
+}

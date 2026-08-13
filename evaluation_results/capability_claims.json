@@ -1,0 +1,140 @@
+[
+  {
+    "capability_id": "cap_001",
+    "name": "Document Retrieval",
+    "description": "Retrieve relevant document chunks given a user query using semantic similarity",
+    "status": "MEASURED",
+    "evidence_run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+    "evidence_suite_id": "retrieval_benchmark",
+    "measured_metric": "Mean Hit@1",
+    "measured_value": 1.0,
+    "git_commit": "a675006",
+    "limitations": [
+      "Currently benchmarked on a small 6-chunk deterministic corpus",
+      "Uses TF-IDF similarity for benchmarks; production uses embedding-based retrieval",
+      "No evaluation on adversarial queries or out-of-distribution topics",
+      "Retrieval quality depends on chunk size and overlap configuration"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012306+00:00"
+  },
+  {
+    "capability_id": "cap_002",
+    "name": "Evidence-Backed Q&A",
+    "description": "Answer questions grounded in retrieved document evidence with citations",
+    "status": "PARTIALLY_MEASURED",
+    "evidence_run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+    "evidence_suite_id": "grounding_benchmark",
+    "measured_metric": "Pass Rate",
+    "measured_value": 0.6,
+    "git_commit": "a675006",
+    "limitations": [
+      "Answer quality depends on LLM provider and configuration",
+      "Citation validity rate not yet measured in production traffic",
+      "Benchmark uses mock QA; real LLM grounding not benchmarked",
+      "Evaluated on 5 controlled grounding cases only"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012325+00:00"
+  },
+  {
+    "capability_id": "cap_003",
+    "name": "Insufficient Evidence Detection",
+    "description": "Express uncertainty and decline to answer when evidence is absent",
+    "status": "UNMEASURED",
+    "evidence_run_id": null,
+    "evidence_suite_id": null,
+    "measured_metric": null,
+    "measured_value": null,
+    "git_commit": "unknown",
+    "limitations": [
+      "Measured only in mock QA system \u2014 not real LLM",
+      "Benchmark does not cover all uncertainty scenarios",
+      "LLM hallucination on absent topics is not fully evaluated"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012343+00:00"
+  },
+  {
+    "capability_id": "cap_004",
+    "name": "Contradiction Detection",
+    "description": "Surface conflicting evidence when multiple documents disagree",
+    "status": "UNMEASURED",
+    "evidence_run_id": null,
+    "evidence_suite_id": null,
+    "measured_metric": null,
+    "measured_value": null,
+    "git_commit": "unknown",
+    "limitations": [
+      "Only 1 contradiction case in current benchmark",
+      "Detection is rule-based in mock QA, not LLM-based",
+      "Real contradiction detection quality depends on LLM reasoning"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012399+00:00"
+  },
+  {
+    "capability_id": "cap_005",
+    "name": "Controlled Research Agent \u2014 Budget Enforcement",
+    "description": "Agent stops execution when step/tool/runtime budgets are exhausted",
+    "status": "MEASURED",
+    "evidence_run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+    "evidence_suite_id": "agent_benchmark",
+    "measured_metric": "Pass Rate",
+    "measured_value": 1.0,
+    "git_commit": "a675006",
+    "limitations": [
+      "Budget enforcement tested via state machine simulation only",
+      "Real-world timing measurements not included in benchmark",
+      "Does not test preemptive cancellation of in-flight LLM calls"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012407+00:00"
+  },
+  {
+    "capability_id": "cap_006",
+    "name": "Controlled Research Agent \u2014 Safe Cancellation",
+    "description": "Agent halts immediately and persists CANCELLED state when cancellation is requested",
+    "status": "MEASURED",
+    "evidence_run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+    "evidence_suite_id": "agent_benchmark",
+    "measured_metric": "Pass Rate",
+    "measured_value": 1.0,
+    "git_commit": "a675006",
+    "limitations": [
+      "Cancellation tested via state machine simulation only",
+      "Does not cover concurrent cancellation races in async execution",
+      "Requires manual verification in live system"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012441+00:00"
+  },
+  {
+    "capability_id": "cap_007",
+    "name": "Controlled Research Agent \u2014 Tool Allowlist",
+    "description": "Agent uses only allowlisted tools: SEARCH_PROJECT_KNOWLEDGE, READ_DOCUMENT_EVIDENCE, ASK_GROUNDED_RESEARCH_ENGINE",
+    "status": "MEASURED",
+    "evidence_run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+    "evidence_suite_id": "agent_benchmark",
+    "measured_metric": "Pass Rate",
+    "measured_value": 1.0,
+    "git_commit": "a675006",
+    "limitations": [
+      "Tool allowlist enforcement tested at state machine level only",
+      "Jailbreak resistance not evaluated",
+      "Prompt injection defense not benchmarked in Phase 8"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012445+00:00"
+  },
+  {
+    "capability_id": "cap_008",
+    "name": "Regression Detection",
+    "description": "Detect capability regressions when comparing new versions against baseline",
+    "status": "UNMEASURED",
+    "evidence_run_id": null,
+    "evidence_suite_id": null,
+    "measured_metric": null,
+    "measured_value": null,
+    "git_commit": "unknown",
+    "limitations": [
+      "Regression detection requires at least one prior baseline run",
+      "Tolerance set at 5% \u2014 may be too lenient for critical capabilities",
+      "Does not capture qualitative regressions (e.g., answer style changes)"
+    ],
+    "timestamp": "2026-08-13T05:12:39.012452+00:00"
+  }
+]

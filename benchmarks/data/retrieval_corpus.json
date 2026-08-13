@@ -1,0 +1,91 @@
+{
+  "corpus": [
+    {
+      "id": "doc_A",
+      "title": "Machine Learning Fundamentals",
+      "chunks": [
+        {
+          "chunk_id": "doc_A_c0",
+          "text": "Supervised learning is a type of machine learning where the model is trained on labeled data. The algorithm learns to map input features to output labels by minimizing a loss function.",
+          "facts": ["supervised_learning_uses_labeled_data", "supervised_learning_minimizes_loss"]
+        },
+        {
+          "chunk_id": "doc_A_c1",
+          "text": "The gradient descent algorithm is used to optimize neural networks. It works by computing the gradient of the loss function with respect to model parameters and updating them in the opposite direction.",
+          "facts": ["gradient_descent_optimizes_networks", "gradient_descent_updates_parameters"]
+        }
+      ]
+    },
+    {
+      "id": "doc_B",
+      "title": "Natural Language Processing",
+      "chunks": [
+        {
+          "chunk_id": "doc_B_c0",
+          "text": "Transformer models use self-attention mechanisms to process sequences. The attention mechanism allows the model to weigh the importance of different tokens when encoding a sequence.",
+          "facts": ["transformers_use_self_attention", "attention_weighs_token_importance"]
+        },
+        {
+          "chunk_id": "doc_B_c1",
+          "text": "BERT is a bidirectional transformer model pre-trained on masked language modeling. It was released by Google in 2018 and achieved state-of-the-art results on many NLP benchmarks.",
+          "facts": ["bert_is_bidirectional", "bert_released_by_google_2018", "bert_achieves_state_of_art_nlp"]
+        }
+      ]
+    },
+    {
+      "id": "doc_C",
+      "title": "Deep Learning Architectures",
+      "chunks": [
+        {
+          "chunk_id": "doc_C_c0",
+          "text": "Convolutional neural networks (CNNs) excel at image recognition tasks. They use convolutional filters to detect local patterns such as edges and textures in images.",
+          "facts": ["cnn_excels_at_image_recognition", "cnn_uses_convolutional_filters"]
+        },
+        {
+          "chunk_id": "doc_C_c1",
+          "text": "The learning rate is a hyperparameter that controls the step size during gradient descent. A too-large learning rate causes divergence while a too-small learning rate leads to slow convergence.",
+          "facts": ["learning_rate_controls_step_size", "large_lr_causes_divergence", "small_lr_causes_slow_convergence"]
+        }
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query_id": "q1",
+      "question": "What is supervised learning and how does it work?",
+      "relevant_chunk_ids": ["doc_A_c0"],
+      "relevant_facts": ["supervised_learning_uses_labeled_data", "supervised_learning_minimizes_loss"]
+    },
+    {
+      "query_id": "q2",
+      "question": "How do transformer models process text sequences?",
+      "relevant_chunk_ids": ["doc_B_c0"],
+      "relevant_facts": ["transformers_use_self_attention", "attention_weighs_token_importance"]
+    },
+    {
+      "query_id": "q3",
+      "question": "What is BERT and who created it?",
+      "relevant_chunk_ids": ["doc_B_c1"],
+      "relevant_facts": ["bert_is_bidirectional", "bert_released_by_google_2018"]
+    },
+    {
+      "query_id": "q4",
+      "question": "How does gradient descent optimize neural networks?",
+      "relevant_chunk_ids": ["doc_A_c1"],
+      "relevant_facts": ["gradient_descent_optimizes_networks", "gradient_descent_updates_parameters"]
+    },
+    {
+      "query_id": "q5",
+      "question": "What is the effect of learning rate on model training?",
+      "relevant_chunk_ids": ["doc_C_c1"],
+      "relevant_facts": ["learning_rate_controls_step_size", "large_lr_causes_divergence", "small_lr_causes_slow_convergence"]
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "description": "Deterministic retrieval benchmark corpus for AXIOM Phase 8",
+    "total_documents": 3,
+    "total_chunks": 6,
+    "total_queries": 5
+  }
+}

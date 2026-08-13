@@ -1,0 +1,1353 @@
+{
+  "run_id": "96a95d62-96d9-47d1-941f-1921567abd9d",
+  "timestamp": "2026-08-13T05:12:38.981544+00:00",
+  "git_commit": "a675006",
+  "git_branch": "main",
+  "application_version": "phase8",
+  "python_version": "3.12.13",
+  "benchmark_version": "1.0",
+  "configuration": {
+    "suite": "all",
+    "tolerance": 0.05
+  },
+  "suite_results": [
+    {
+      "suite_id": "retrieval_benchmark",
+      "suite_name": "Retrieval Quality Benchmark",
+      "results": [
+        {
+          "case_id": "q1",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "Hit@1",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@3",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@5",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Recall@K",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "MRR",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "What is supervised learning and how does it work?",
+            "relevant_chunk_ids": [
+              "doc_A_c0"
+            ],
+            "ranked_chunk_ids": [
+              "doc_A_c0",
+              "doc_C_c1",
+              "doc_B_c1",
+              "doc_A_c1",
+              "doc_C_c0"
+            ],
+            "scores": [
+              [
+                "doc_A_c0",
+                0.3053
+              ],
+              [
+                "doc_C_c1",
+                0.19
+              ],
+              [
+                "doc_B_c1",
+                0.1516
+              ],
+              [
+                "doc_A_c1",
+                0.1477
+              ],
+              [
+                "doc_C_c0",
+                0.0499
+              ]
+            ]
+          },
+          "error_message": null,
+          "duration_seconds": 0.00010800361633300781,
+          "notes": ""
+        },
+        {
+          "case_id": "q2",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "Hit@1",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@3",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@5",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Recall@K",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "MRR",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "How do transformer models process text sequences?",
+            "relevant_chunk_ids": [
+              "doc_B_c0"
+            ],
+            "ranked_chunk_ids": [
+              "doc_B_c0",
+              "doc_B_c1",
+              "doc_A_c0",
+              "doc_A_c1",
+              "doc_C_c0"
+            ],
+            "scores": [
+              [
+                "doc_B_c0",
+                0.3645
+              ],
+              [
+                "doc_B_c1",
+                0.0654
+              ],
+              [
+                "doc_A_c0",
+                0.0
+              ],
+              [
+                "doc_A_c1",
+                0.0
+              ],
+              [
+                "doc_C_c0",
+                0.0
+              ]
+            ]
+          },
+          "error_message": null,
+          "duration_seconds": 3.790855407714844e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "q3",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "Hit@1",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@3",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@5",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Recall@K",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "MRR",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "What is BERT and who created it?",
+            "relevant_chunk_ids": [
+              "doc_B_c1"
+            ],
+            "ranked_chunk_ids": [
+              "doc_B_c1",
+              "doc_A_c1",
+              "doc_A_c0",
+              "doc_C_c0",
+              "doc_C_c1"
+            ],
+            "scores": [
+              [
+                "doc_B_c1",
+                0.2857
+              ],
+              [
+                "doc_A_c1",
+                0.1672
+              ],
+              [
+                "doc_A_c0",
+                0.0798
+              ],
+              [
+                "doc_C_c0",
+                0.0565
+              ],
+              [
+                "doc_C_c1",
+                0.0319
+              ]
+            ]
+          },
+          "error_message": null,
+          "duration_seconds": 5.3882598876953125e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "q4",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "Hit@1",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@3",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@5",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Recall@K",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "MRR",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "How does gradient descent optimize neural networks?",
+            "relevant_chunk_ids": [
+              "doc_A_c1"
+            ],
+            "ranked_chunk_ids": [
+              "doc_A_c1",
+              "doc_C_c0",
+              "doc_C_c1",
+              "doc_A_c0",
+              "doc_B_c0"
+            ],
+            "scores": [
+              [
+                "doc_A_c1",
+                0.4222
+              ],
+              [
+                "doc_C_c0",
+                0.1381
+              ],
+              [
+                "doc_C_c1",
+                0.1063
+              ],
+              [
+                "doc_A_c0",
+                0.0
+              ],
+              [
+                "doc_B_c0",
+                0.0
+              ]
+            ]
+          },
+          "error_message": null,
+          "duration_seconds": 5.173683166503906e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "q5",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "Hit@1",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@3",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Hit@5",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "Recall@K",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "MRR",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "What is the effect of learning rate on model training?",
+            "relevant_chunk_ids": [
+              "doc_C_c1"
+            ],
+            "ranked_chunk_ids": [
+              "doc_C_c1",
+              "doc_A_c0",
+              "doc_B_c1",
+              "doc_A_c1",
+              "doc_B_c0"
+            ],
+            "scores": [
+              [
+                "doc_C_c1",
+                0.4563
+              ],
+              [
+                "doc_A_c0",
+                0.3819
+              ],
+              [
+                "doc_B_c1",
+                0.2592
+              ],
+              [
+                "doc_A_c1",
+                0.1997
+              ],
+              [
+                "doc_B_c0",
+                0.1482
+              ]
+            ]
+          },
+          "error_message": null,
+          "duration_seconds": 5.078315734863281e-05,
+          "notes": ""
+        }
+      ],
+      "aggregate_metrics": [
+        {
+          "name": "Mean Hit@1",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.6,
+          "passed": true
+        },
+        {
+          "name": "Mean Hit@3",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.7,
+          "passed": true
+        },
+        {
+          "name": "Mean Hit@5",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.8,
+          "passed": true
+        },
+        {
+          "name": "Mean Recall@K",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.6,
+          "passed": true
+        },
+        {
+          "name": "MRR",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.5,
+          "passed": true
+        }
+      ],
+      "duration_seconds": 0.0006380081176757812,
+      "summary": {
+        "total_cases": 5,
+        "passed_cases": 5,
+        "failed_cases": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "suite_id": "grounding_benchmark",
+      "suite_name": "Evidence Grounding & Citation Benchmark",
+      "results": [
+        {
+          "case_id": "gc_001",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "citation_validity_rate",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "citation_coverage",
+              "value": 1.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "unsupported_citation_rate",
+              "value": 0.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "What is supervised learning?",
+            "grounding_type": "FULLY_SUPPORTED",
+            "evidence_retrieved": true,
+            "retrieved_chunk_ids": [
+              "doc_A_c0",
+              "doc_C_c1",
+              "doc_B_c1"
+            ],
+            "insufficient_evidence_stated": false,
+            "contradiction_detected": true,
+            "citation_metrics": {
+              "total_citations": 3,
+              "valid_citations": 3,
+              "invalid_citations": 0,
+              "citation_validity_rate": 1.0,
+              "citation_coverage": 1.0,
+              "unsupported_citation_rate": 0.0,
+              "validation_details": [
+                {
+                  "chunk_id": "doc_A_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_C_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_B_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                }
+              ]
+            },
+            "checks": {
+              "evidence_retrieval_match": true,
+              "citation_validity": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 8.20159912109375e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "gc_002",
+          "status": "FAILED",
+          "metrics": [
+            {
+              "name": "citation_validity_rate",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "citation_coverage",
+              "value": 1.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "unsupported_citation_rate",
+              "value": 0.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "checks_passed",
+              "value": 0.6666666666666666,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": false
+            }
+          ],
+          "actual_outputs": {
+            "question": "Describe BERT's architecture and its training dataset size.",
+            "grounding_type": "PARTIALLY_SUPPORTED",
+            "evidence_retrieved": true,
+            "retrieved_chunk_ids": [
+              "doc_B_c1",
+              "doc_C_c1",
+              "doc_C_c0"
+            ],
+            "insufficient_evidence_stated": false,
+            "contradiction_detected": true,
+            "citation_metrics": {
+              "total_citations": 3,
+              "valid_citations": 3,
+              "invalid_citations": 0,
+              "citation_validity_rate": 1.0,
+              "citation_coverage": 1.0,
+              "unsupported_citation_rate": 0.0,
+              "validation_details": [
+                {
+                  "chunk_id": "doc_B_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_C_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_C_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                }
+              ]
+            },
+            "checks": {
+              "evidence_retrieval_match": true,
+              "insufficient_evidence_expressed": false,
+              "citation_validity": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 6.413459777832031e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "gc_003",
+          "status": "FAILED",
+          "metrics": [
+            {
+              "name": "citation_validity_rate",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "citation_coverage",
+              "value": 1.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "unsupported_citation_rate",
+              "value": 0.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "checks_passed",
+              "value": 0.5,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": false
+            }
+          ],
+          "actual_outputs": {
+            "question": "What is the capital city of France?",
+            "grounding_type": "NOT_SUPPORTED",
+            "evidence_retrieved": true,
+            "retrieved_chunk_ids": [
+              "doc_A_c1",
+              "doc_A_c0",
+              "doc_B_c0"
+            ],
+            "insufficient_evidence_stated": true,
+            "contradiction_detected": false,
+            "citation_metrics": {
+              "total_citations": 0,
+              "valid_citations": 0,
+              "invalid_citations": 0,
+              "citation_validity_rate": 1.0,
+              "citation_coverage": 1.0,
+              "unsupported_citation_rate": 0.0,
+              "validation_details": []
+            },
+            "checks": {
+              "evidence_retrieval_match": false,
+              "insufficient_evidence_expressed": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 5.4836273193359375e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "gc_004",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "citation_validity_rate",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "citation_coverage",
+              "value": 1.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "unsupported_citation_rate",
+              "value": 0.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "Is a high learning rate always better for faster training?",
+            "grounding_type": "CONFLICTING",
+            "evidence_retrieved": true,
+            "retrieved_chunk_ids": [
+              "doc_C_c1",
+              "doc_A_c0",
+              "doc_B_c1"
+            ],
+            "insufficient_evidence_stated": false,
+            "contradiction_detected": true,
+            "citation_metrics": {
+              "total_citations": 3,
+              "valid_citations": 3,
+              "invalid_citations": 0,
+              "citation_validity_rate": 1.0,
+              "citation_coverage": 1.0,
+              "unsupported_citation_rate": 0.0,
+              "validation_details": [
+                {
+                  "chunk_id": "doc_C_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_A_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_B_c1",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                }
+              ]
+            },
+            "checks": {
+              "evidence_retrieval_match": true,
+              "contradiction_surfaced": true,
+              "citation_validity": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 5.817413330078125e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "gc_005",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "citation_validity_rate",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 0.5,
+              "passed": true
+            },
+            {
+              "name": "citation_coverage",
+              "value": 1.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "unsupported_citation_rate",
+              "value": 0.0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            }
+          ],
+          "actual_outputs": {
+            "question": "Do CNNs use self-attention mechanisms like transformers?",
+            "grounding_type": "DISTRACTOR",
+            "evidence_retrieved": true,
+            "retrieved_chunk_ids": [
+              "doc_B_c0",
+              "doc_C_c0",
+              "doc_A_c0"
+            ],
+            "insufficient_evidence_stated": false,
+            "contradiction_detected": false,
+            "citation_metrics": {
+              "total_citations": 3,
+              "valid_citations": 3,
+              "invalid_citations": 0,
+              "citation_validity_rate": 1.0,
+              "citation_coverage": 1.0,
+              "unsupported_citation_rate": 0.0,
+              "validation_details": [
+                {
+                  "chunk_id": "doc_B_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_C_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                },
+                {
+                  "chunk_id": "doc_A_c0",
+                  "exists_in_corpus": true,
+                  "was_retrieved": true,
+                  "is_valid": true
+                }
+              ]
+            },
+            "checks": {
+              "evidence_retrieval_match": true,
+              "citation_validity": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 4.887580871582031e-05,
+          "notes": ""
+        }
+      ],
+      "aggregate_metrics": [
+        {
+          "name": "Mean Citation Validity Rate",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.7,
+          "passed": true
+        },
+        {
+          "name": "Mean Citation Coverage",
+          "value": 1.0,
+          "unit": "",
+          "threshold": null,
+          "passed": null
+        },
+        {
+          "name": "Pass Rate",
+          "value": 0.6,
+          "unit": "",
+          "threshold": 0.6,
+          "passed": true
+        }
+      ],
+      "duration_seconds": 0.0005319118499755859,
+      "summary": {
+        "total_cases": 5,
+        "passed_cases": 3,
+        "failed_cases": 2,
+        "pass_rate": 0.6
+      }
+    },
+    {
+      "suite_id": "agent_benchmark",
+      "suite_name": "Research Agent Benchmark",
+      "results": [
+        {
+          "case_id": "at_001",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 1,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Simple single-document research",
+            "final_state": "COMPLETED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "ANALYZING",
+              "COMPLETED"
+            ],
+            "step_count": 2,
+            "tool_call_count": 1,
+            "tool_calls_made": [
+              {
+                "tool": "SEARCH_PROJECT_KNOWLEDGE",
+                "result": "evidence_found",
+                "success": true
+              }
+            ],
+            "insufficient_evidence_expressed": false,
+            "contradiction_detected": false,
+            "error_message": null,
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 3.1948089599609375e-05,
+          "notes": ""
+        },
+        {
+          "case_id": "at_002",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 4,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Multi-document synthesis",
+            "final_state": "COMPLETED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "ANALYZING",
+              "VERIFYING",
+              "COMPLETED"
+            ],
+            "step_count": 4,
+            "tool_call_count": 2,
+            "tool_calls_made": [
+              {
+                "tool": "SEARCH_PROJECT_KNOWLEDGE",
+                "result": "evidence_found",
+                "success": true
+              },
+              {
+                "tool": "READ_DOCUMENT_EVIDENCE",
+                "result": "evidence_found",
+                "success": true
+              }
+            ],
+            "insufficient_evidence_expressed": false,
+            "contradiction_detected": false,
+            "error_message": null,
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 8.821487426757812e-06,
+          "notes": ""
+        },
+        {
+          "case_id": "at_003",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 1,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Unsupported question",
+            "final_state": "COMPLETED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "ANALYZING",
+              "COMPLETED"
+            ],
+            "step_count": 2,
+            "tool_call_count": 1,
+            "tool_calls_made": [
+              {
+                "tool": "SEARCH_PROJECT_KNOWLEDGE",
+                "result": "no_evidence",
+                "success": true
+              }
+            ],
+            "insufficient_evidence_expressed": true,
+            "contradiction_detected": false,
+            "error_message": null,
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true,
+              "failure_honesty": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 6.198883056640625e-06,
+          "notes": ""
+        },
+        {
+          "case_id": "at_004",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 3,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 1,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Conflicting evidence",
+            "final_state": "COMPLETED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "ANALYZING",
+              "VERIFYING",
+              "COMPLETED"
+            ],
+            "step_count": 3,
+            "tool_call_count": 1,
+            "tool_calls_made": [
+              {
+                "tool": "SEARCH_PROJECT_KNOWLEDGE",
+                "result": "evidence_found",
+                "success": true
+              }
+            ],
+            "insufficient_evidence_expressed": true,
+            "contradiction_detected": true,
+            "error_message": null,
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true,
+              "contradiction_surfaced": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 3.814697265625e-06,
+          "notes": ""
+        },
+        {
+          "case_id": "at_005",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 1,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Tool failure handling",
+            "final_state": "COMPLETED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "ANALYZING",
+              "COMPLETED"
+            ],
+            "step_count": 2,
+            "tool_call_count": 1,
+            "tool_calls_made": [
+              {
+                "tool": "READ_DOCUMENT_EVIDENCE",
+                "result": "ERROR: chunk not found",
+                "success": false
+              }
+            ],
+            "insufficient_evidence_expressed": true,
+            "contradiction_detected": false,
+            "error_message": null,
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true,
+              "failure_honesty": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 4.0531158447265625e-06,
+          "notes": ""
+        },
+        {
+          "case_id": "at_006",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 2,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Budget exhaustion",
+            "final_state": "FAILED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "RETRIEVING",
+              "FAILED"
+            ],
+            "step_count": 2,
+            "tool_call_count": 2,
+            "tool_calls_made": [
+              {
+                "tool": "SEARCH_PROJECT_KNOWLEDGE",
+                "result": "evidence_found",
+                "success": true
+              },
+              {
+                "tool": "READ_DOCUMENT_EVIDENCE",
+                "result": "evidence_found",
+                "success": true
+              }
+            ],
+            "insufficient_evidence_expressed": false,
+            "contradiction_detected": false,
+            "error_message": "Budget exhausted: steps=2/2, tools=2/2",
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true,
+              "stops_at_budget": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 5.9604644775390625e-06,
+          "notes": ""
+        },
+        {
+          "case_id": "at_007",
+          "status": "PASSED",
+          "metrics": [
+            {
+              "name": "checks_passed",
+              "value": 1.0,
+              "unit": "",
+              "threshold": 1.0,
+              "passed": true
+            },
+            {
+              "name": "step_count",
+              "value": 0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            },
+            {
+              "name": "tool_call_count",
+              "value": 0,
+              "unit": "",
+              "threshold": null,
+              "passed": null
+            }
+          ],
+          "actual_outputs": {
+            "task_name": "Cancellation handling",
+            "final_state": "CANCELLED",
+            "states_visited": [
+              "CREATED",
+              "PLANNING",
+              "CANCELLED"
+            ],
+            "step_count": 0,
+            "tool_call_count": 0,
+            "tool_calls_made": [],
+            "insufficient_evidence_expressed": false,
+            "contradiction_detected": false,
+            "error_message": "Session cancelled by user request",
+            "checks": {
+              "task_completed": true,
+              "correct_stopping": true,
+              "valid_state_transitions": true,
+              "tool_calls_valid": true,
+              "budget_compliant": true,
+              "cancellation_safe": true,
+              "no_continuation_after_cancel": true
+            }
+          },
+          "error_message": null,
+          "duration_seconds": 2.86102294921875e-06,
+          "notes": ""
+        }
+      ],
+      "aggregate_metrics": [
+        {
+          "name": "Pass Rate",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 0.7,
+          "passed": true
+        },
+        {
+          "name": "Budget Compliance Rate",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 1.0,
+          "passed": true
+        },
+        {
+          "name": "State Machine Validity",
+          "value": 1.0,
+          "unit": "",
+          "threshold": 1.0,
+          "passed": true
+        }
+      ],
+      "duration_seconds": 0.00015997886657714844,
+      "summary": {
+        "total_cases": 7,
+        "passed_cases": 7,
+        "failed_cases": 0,
+        "pass_rate": 1.0
+      }
+    }
+  ],
+  "summary": {
+    "total_suites": 3,
+    "overall_pass_rate": 0.8823529411764706
+  }
+}

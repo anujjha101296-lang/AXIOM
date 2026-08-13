@@ -1,0 +1,145 @@
+{
+  "tasks": [
+    {
+      "task_id": "at_001",
+      "name": "Simple single-document research",
+      "description": "Retrieve and synthesize information from a single known document",
+      "goal": "What does the corpus say about supervised learning?",
+      "relevant_chunk_ids": ["doc_A_c0"],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE"],
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "ANALYZING", "COMPLETED"],
+      "budget": {"max_steps": 5, "max_tool_calls": 5, "max_runtime_seconds": 60},
+      "expected_behavior": {
+        "task_completed": true,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "HIGH",
+        "failure_honesty": "N/A"
+      }
+    },
+    {
+      "task_id": "at_002",
+      "name": "Multi-document synthesis",
+      "description": "Retrieve and synthesize information across multiple documents",
+      "goal": "Compare the optimization approaches used in neural networks and the attention mechanisms in transformers.",
+      "relevant_chunk_ids": ["doc_A_c1", "doc_B_c0"],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE", "READ_DOCUMENT_EVIDENCE"],
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "ANALYZING", "VERIFYING", "COMPLETED"],
+      "budget": {"max_steps": 8, "max_tool_calls": 10, "max_runtime_seconds": 90},
+      "expected_behavior": {
+        "task_completed": true,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "HIGH",
+        "failure_honesty": "N/A"
+      }
+    },
+    {
+      "task_id": "at_003",
+      "name": "Unsupported question",
+      "description": "Question on a topic completely absent from the corpus — agent must express uncertainty",
+      "goal": "What are the latest developments in quantum computing as described in the documents?",
+      "relevant_chunk_ids": [],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE"],
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "ANALYZING", "COMPLETED"],
+      "budget": {"max_steps": 5, "max_tool_calls": 5, "max_runtime_seconds": 60},
+      "expected_behavior": {
+        "task_completed": true,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "NONE",
+        "failure_honesty": "REQUIRED",
+        "must_express_insufficient_evidence": true
+      }
+    },
+    {
+      "task_id": "at_004",
+      "name": "Conflicting evidence",
+      "description": "Task where corpus contains conflicting information — agent must surface contradiction",
+      "goal": "What is the optimal learning rate for training neural networks?",
+      "relevant_chunk_ids": ["doc_C_c1"],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE"],
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "ANALYZING", "VERIFYING", "COMPLETED"],
+      "budget": {"max_steps": 8, "max_tool_calls": 8, "max_runtime_seconds": 90},
+      "expected_behavior": {
+        "task_completed": true,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "MEDIUM",
+        "failure_honesty": "REQUIRED",
+        "must_surface_contradiction": true
+      }
+    },
+    {
+      "task_id": "at_005",
+      "name": "Tool failure handling",
+      "description": "Agent encounters a tool failure and must handle gracefully",
+      "goal": "Retrieve document evidence from a non-existent chunk ID.",
+      "relevant_chunk_ids": [],
+      "expected_tool_calls": ["READ_DOCUMENT_EVIDENCE"],
+      "inject_fault": {"tool": "READ_DOCUMENT_EVIDENCE", "fault": "CHUNK_NOT_FOUND"},
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "ANALYZING", "COMPLETED"],
+      "budget": {"max_steps": 5, "max_tool_calls": 5, "max_runtime_seconds": 60},
+      "expected_behavior": {
+        "task_completed": true,
+        "correct_stopping": true,
+        "tool_calls_valid": false,
+        "budget_compliant": true,
+        "evidence_coverage": "NONE",
+        "failure_honesty": "REQUIRED",
+        "must_handle_tool_failure": true
+      }
+    },
+    {
+      "task_id": "at_006",
+      "name": "Budget exhaustion",
+      "description": "Task designed to exhaust the step budget — agent must stop at budget limit",
+      "goal": "Conduct a comprehensive analysis of all machine learning concepts in the corpus.",
+      "relevant_chunk_ids": ["doc_A_c0", "doc_A_c1", "doc_B_c0", "doc_B_c1", "doc_C_c0", "doc_C_c1"],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE", "READ_DOCUMENT_EVIDENCE"],
+      "budget": {"max_steps": 2, "max_tool_calls": 2, "max_runtime_seconds": 30},
+      "expected_state_transitions": ["CREATED", "PLANNING", "RETRIEVING", "FAILED"],
+      "expected_behavior": {
+        "task_completed": false,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "PARTIAL",
+        "failure_honesty": "REQUIRED",
+        "must_stop_at_budget": true,
+        "must_not_exceed_budget": true
+      }
+    },
+    {
+      "task_id": "at_007",
+      "name": "Cancellation handling",
+      "description": "Task is cancelled mid-execution — agent must halt safely and persist CANCELLED state",
+      "goal": "Analyze all transformer architectures described in the corpus.",
+      "relevant_chunk_ids": ["doc_B_c0", "doc_B_c1"],
+      "expected_tool_calls": ["SEARCH_PROJECT_KNOWLEDGE"],
+      "inject_fault": {"type": "CANCELLATION", "at_step": 1},
+      "budget": {"max_steps": 10, "max_tool_calls": 10, "max_runtime_seconds": 120},
+      "expected_state_transitions": ["CREATED", "PLANNING", "CANCELLED"],
+      "expected_behavior": {
+        "task_completed": false,
+        "correct_stopping": true,
+        "tool_calls_valid": true,
+        "budget_compliant": true,
+        "evidence_coverage": "NONE",
+        "failure_honesty": "REQUIRED",
+        "must_persist_cancelled_state": true,
+        "must_not_continue_after_cancel": true
+      }
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "description": "7 controlled agent benchmark tasks for AXIOM Phase 8. Tests task completion, tool usage, budget compliance, failure handling, cancellation, and uncertainty expression.",
+    "total_tasks": 7,
+    "task_types": ["simple_retrieval", "multi_document", "unsupported", "conflicting", "tool_failure", "budget_exhaustion", "cancellation"]
+  }
+}
