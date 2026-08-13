@@ -429,6 +429,10 @@ class ToolRegistry:
         )
         self._registry[tool_name] = tool_obj
 
+    def list_tools(self) -> List[str]:
+        """Return list of all registered tool names."""
+        return list(self._registry.keys())
+
     def get_tool(self, tool_name: str) -> BaseTool:
         """Retrieve registered BaseTool instance."""
         if tool_name not in self._registry:

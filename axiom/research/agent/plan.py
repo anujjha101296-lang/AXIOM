@@ -244,7 +244,9 @@ class ResearchPlan(BaseModel):
 
 
 def generate_initial_plan(
-    goal: str, document_summaries: Optional[List[str]] = None
+    goal: str,
+    document_summaries: Optional[List[str]] = None,
+    max_steps: Optional[int] = None,
 ) -> ResearchPlan:
     """Construct a structured machine-readable research plan given a research goal."""
     summaries = document_summaries or []
