@@ -37,7 +37,97 @@ class EpistemicStore:
     def _init_db(self):
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.conn.execute("PRAGMA foreign_keys = ON;")
-        # Migrations now handled by alembic
+        self._apply_schema()
+
+    def _apply_schema(self) -> None:
+        """Create all required tables idempotently. Maintains _schema_migrations log."""
+        assert self.conn is not None
+        c = self.conn
+        # IMPORTANT: executescript() resets PRAGMA settings.
+        # Use individual execute() calls to preserve foreign_keys=ON.
+        c.execute("PRAGMA foreign_keys = ON;")
+        ddl_statements = [
+            """CREATE TABLE IF NOT EXISTS _schema_migrations (
+                version INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                applied_at TEXT DEFAULT (datetime('now'))
+            )""",
+            """CREATE TABLE IF NOT EXISTS nodes (
+                id TEXT PRIMARY KEY,
+                type TEXT NOT NULL,
+                name TEXT NOT NULL,
+                data TEXT NOT NULL
+            )""",
+            """CREATE TABLE IF NOT EXISTS edges (
+                source_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                target_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                type TEXT NOT NULL,
+                confidence REAL DEFAULT 1.0,
+                provenance TEXT DEFAULT '[]',
+                PRIMARY KEY (source_id, target_id, type)
+            )""",
+            """CREATE TABLE IF NOT EXISTS proof_lineage (
+                id TEXT PRIMARY KEY,
+                claim_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                parent_claim_id TEXT,
+                proof_strategy TEXT,
+                status TEXT DEFAULT 'PENDING',
+                created_at TEXT DEFAULT (datetime('now'))
+            )""",
+            """CREATE TABLE IF NOT EXISTS memory_snapshots (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                snapshot TEXT NOT NULL,
+                domain TEXT,
+                created_at TEXT DEFAULT (datetime('now'))
+            )""",
+            """CREATE TABLE IF NOT EXISTS mathematical_objects (
+                id TEXT PRIMARY KEY,
+                node_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                object_type TEXT NOT NULL,
+                formal_symbol TEXT,
+                domain TEXT,
+                properties_json TEXT DEFAULT '{}'
+            )""",
+            """CREATE TABLE IF NOT EXISTS definitions (
+                id TEXT PRIMARY KEY,
+                node_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                term TEXT NOT NULL,
+                formal_definition TEXT,
+                informal_definition TEXT,
+                domain TEXT
+            )""",
+            """CREATE TABLE IF NOT EXISTS equivalent_statements (
+                id TEXT PRIMARY KEY,
+                statement_a_id TEXT NOT NULL,
+                statement_b_id TEXT NOT NULL,
+                equivalence_type TEXT DEFAULT 'IFF',
+                proof_reference TEXT,
+                confidence REAL DEFAULT 1.0
+            )""",
+            """CREATE TABLE IF NOT EXISTS failed_proof_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                claim_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+                tactic_sequence TEXT,
+                verifier TEXT,
+                error_message TEXT,
+                created_at TEXT DEFAULT (datetime('now'))
+            )""",
+        ]
+        for stmt in ddl_statements:
+            c.execute(stmt)
+        # Record all 4 schema migration versions idempotently
+        for version, name in [
+            (1, "v1_initial_nodes_edges"),
+            (2, "v2_add_proof_lineage"),
+            (3, "v3_add_memory_snapshots"),
+            (4, "v4_mde_ontology_schema"),
+        ]:
+            c.execute(
+                "INSERT OR IGNORE INTO _schema_migrations (version, name) VALUES (?, ?)",
+                (version, name)
+            )
+        c.commit()
 
     def add_node(self, node: ScientificNode) -> None:
         """Upsert a scientific node in the database."""
@@ -398,7 +488,7 @@ class EpistemicStore:
             })
         return results
 
-    def to_networkx(self) -> nx.DiGraph:
+    def to_networkx(self) -> Any:
         """Construct a NetworkX directed graph from the database contents."""
         assert self.conn is not None
         cursor = self.conn.cursor()
