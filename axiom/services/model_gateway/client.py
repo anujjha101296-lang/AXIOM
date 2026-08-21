@@ -8,6 +8,7 @@ from typing import Dict, Any, Optional
 class ModelClient:
     def __init__(self, cache_path: str = "/tmp/axiom_model_cache.db"):
         self.cache_path = cache_path
+        self.default_model = os.getenv("DEFAULT_MODEL", "mock-model")
         self._init_cache()
 
     def _init_cache(self):
@@ -46,6 +47,9 @@ class ModelClient:
         Normalized generation interface.
         Checks local SQLite cache first. Runs mock generation if no API keys are present.
         """
+        # Override hardcoded mock-model if a default is provided
+        if model == "mock-model" and self.default_model != "mock-model":
+            model = self.default_model
         # Calculate content-addressed hash
         prompt_hash = hashlib.sha256(f"{model}:{prompt}:{temperature}".encode()).hexdigest()
         

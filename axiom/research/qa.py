@@ -41,7 +41,7 @@ class PaperQA:
         )
 
         try:
-            answer = self.model_client.generate(prompt, model="mock-model", temperature=0.2)
+            answer = self.model_client.generate(prompt, temperature=0.2)
             if answer and len(answer.strip()) >= 20:
                 logger.info(
                     "Paper Q&A answered",

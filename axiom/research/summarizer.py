@@ -32,7 +32,7 @@ class DocumentSummarizer:
         )
 
         try:
-            summary = self.model_client.generate(prompt, model="mock-model", temperature=0.3)
+            summary = self.model_client.generate(prompt, temperature=0.3)
             if summary and len(summary.strip()) >= 40:
                 logger.info("Document summary generated", extra={"title": title, "chars": len(summary)})
                 return summary.strip()
