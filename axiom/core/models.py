@@ -57,10 +57,15 @@ class DocumentChunk(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     document_id = Column(String, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False, index=True)
     content = Column(Text, nullable=False)
-    embedding = Column(Text, nullable=True)
+    embedding = Column(Text, nullable=True)          # JSON float array
+    chunk_index = Column(Integer, nullable=False, default=0)
+    char_start = Column(Integer, nullable=True)
+    char_end = Column(Integer, nullable=True)
+    embedding_dim = Column(Integer, nullable=True)   # dimension of stored vector
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
     
     document = relationship("Document", back_populates="chunks")
+
 
 class ResearchSession(Base):
     __tablename__ = "research_sessions"

@@ -114,103 +114,122 @@ AskGroundedEngineInput = AskGroundedResearchEngineInput
 async def search_project_knowledge_handler(
     project_id: str = "default", query: str = "", limit: int = 5, db: Any = None
 ) -> List[Dict[str, Any]]:
-    """Handler for SEARCH_PROJECT_KNOWLEDGE."""
-    if db is not None:
-        from sqlalchemy import select
-        from axiom.core.models import DocumentChunk, Document
+    """Handler for SEARCH_PROJECT_KNOWLEDGE.
 
-        stmt = (
-            select(DocumentChunk, Document)
-            .join(Document, DocumentChunk.document_id == Document.id)
-            .where(Document.project_id == project_id)
-            .limit(limit)
+    Performs real semantic search against project document chunks using
+    cosine similarity over stored embeddings.  Returns real source evidence.
+    No fake chunks are returned — if no matching chunks exist, returns [].
+    """
+    if db is None:
+        raise RuntimeError(
+            "search_project_knowledge_handler requires a database session. "
+            "This tool cannot operate without a real DB connection."
         )
-        res = await db.execute(stmt)
-        rows = res.all()
-        results = []
-        for chunk, doc in rows:
-            results.append(
-                {
-                    "chunk_id": chunk.id,
-                    "document_id": doc.id,
-                    "project_id": project_id,
-                    "content": chunk.content,
-                    "score": 0.95,
-                }
-            )
-        if not results:
-            results.append(
-                {
-                    "chunk_id": f"chunk-{project_id}-default",
-                    "document_id": f"doc-{project_id}-default",
-                    "project_id": project_id,
-                    "content": f"Passage matching '{query}'",
-                    "score": 0.9,
-                }
-            )
-        return results
 
-    # Mock fallback
+    from axiom.research.embeddings import get_embedding_provider, EmbeddingConfigurationError
+    from axiom.research.vector_store import VectorStore
+
+    # Generate query embedding — fall back to text-only (keyword) mode if no provider
+    query_vector: Optional[List[float]] = None
+    try:
+        provider = get_embedding_provider()
+        vectors = provider.embed_batch([query])
+        if vectors:
+            query_vector = vectors[0]
+    except EmbeddingConfigurationError:
+        pass  # No embedding provider — fall back to keyword scan below
+
+    if query_vector is not None:
+        # Semantic search path
+        store = VectorStore()
+        results = await store.search(db, query_vector, project_id=project_id, top_k=limit)
+        return [r.to_dict() for r in results]
+
+    # Keyword fallback: retrieve all project chunks and return ordered by relevance
+    # (used when EMBEDDING_PROVIDER is not configured)
+    from sqlalchemy import select
+    from axiom.core.models import DocumentChunk, Document
+
+    stmt = (
+        select(DocumentChunk, Document)
+        .join(Document, DocumentChunk.document_id == Document.id)
+        .where(Document.project_id == project_id)
+        .order_by(DocumentChunk.chunk_index)
+        .limit(limit)
+    )
+    res = await db.execute(stmt)
+    rows = res.all()
+
+    # Simple keyword relevance: count query-term occurrences
+    query_lower = query.lower()
+    scored = []
+    for chunk, doc in rows:
+        hits = chunk.content.lower().count(query_lower) if query_lower else 0
+        scored.append((hits, chunk, doc))
+    scored.sort(key=lambda t: t[0], reverse=True)
+
     return [
         {
-            "chunk_id": f"chunk-{project_id}-1",
-            "document_id": f"doc-{project_id}-1",
+            "chunk_id": chunk.id,
+            "document_id": doc.id,
             "project_id": project_id,
-            "content": f"Relevant passage for query '{query}' in project {project_id}",
-            "score": 0.92,
+            "content": chunk.content,
+            "score": min(1.0, hits / max(1, len(query_lower.split()))),
+            "chunk_index": getattr(chunk, "chunk_index", 0),
         }
+        for hits, chunk, doc in scored
     ]
+
 
 
 async def read_document_evidence_handler(
     project_id: str = "default", document_id: str = "", db: Any = None
 ) -> Dict[str, Any]:
-    """Handler for READ_DOCUMENT_EVIDENCE."""
-    if db is not None:
-        from sqlalchemy import select
-        from axiom.core.models import Document, DocumentChunk
+    """Handler for READ_DOCUMENT_EVIDENCE.
 
-        stmt = select(Document).where(Document.id == document_id)
-        res = await db.execute(stmt)
-        doc = res.scalar_one_or_none()
-        if doc is None or doc.project_id != project_id:
-            raise PermissionError(
-                f"User is not authorized or access denied: document '{document_id}' does not belong to project '{project_id}'"
-            )
-
-        stmt_chunks = select(DocumentChunk).where(DocumentChunk.document_id == document_id)
-        res_chunks = await db.execute(stmt_chunks)
-        chunks = res_chunks.scalars().all()
-
-        return {
-            "document_id": doc.id,
-            "project_id": doc.project_id,
-            "title": doc.title or f"Document {doc.id}",
-            "content": doc.content or "Document content evidence",
-            "chunks": [
-                {"chunk_id": c.id, "content": c.content} for c in chunks
-            ],
-        }
-
-    # Mock authorization check
-    if (
-        "proj_B" in document_id
-        or "doc_B" in document_id
-        or "doc_proj_B" in document_id
-    ) and project_id != "proj_B":
-        raise PermissionError(
-            f"User is not authorized or access denied: document '{document_id}' does not belong to project '{project_id}'"
+    Returns real document chunks from the database, enforcing project isolation.
+    Raises PermissionError when the document does not belong to the project.
+    Raises RuntimeError when no DB session is available.
+    """
+    if db is None:
+        raise RuntimeError(
+            "read_document_evidence_handler requires a database session. "
+            "This tool cannot operate without a real DB connection."
         )
 
+    from sqlalchemy import select
+    from axiom.core.models import Document, DocumentChunk
+
+    stmt = select(Document).where(Document.id == document_id)
+    res = await db.execute(stmt)
+    doc = res.scalar_one_or_none()
+    if doc is None or doc.project_id != project_id:
+        raise PermissionError(
+            f"Access denied: document '{document_id}' does not belong to project '{project_id}'"
+        )
+
+    stmt_chunks = (
+        select(DocumentChunk)
+        .where(DocumentChunk.document_id == document_id)
+        .order_by(DocumentChunk.chunk_index)
+    )
+    res_chunks = await db.execute(stmt_chunks)
+    chunks = res_chunks.scalars().all()
+
     return {
-        "document_id": document_id,
-        "project_id": project_id,
-        "title": f"Document {document_id}",
-        "content": f"Evidence text content for {document_id} in {project_id}",
+        "document_id": doc.id,
+        "project_id": doc.project_id,
+        "title": doc.title or f"Document {doc.id}",
         "chunks": [
-            {"chunk_id": f"chunk-{document_id}-1", "content": "Mock document chunk text"}
+            {
+                "chunk_id": c.id,
+                "chunk_index": getattr(c, "chunk_index", 0),
+                "content": c.content,
+            }
+            for c in chunks
         ],
     }
+
 
 
 async def ask_grounded_research_engine_handler(
