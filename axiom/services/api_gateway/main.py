@@ -93,8 +93,10 @@ app.include_router(projects_router)
 # ── Documents API (CRUD) ───────────────────────────────────────────────────────
 app.include_router(documents_router)
 
-# ── Search API ────────────────────────────────────────────────────────────────
-app.include_router(search_router)
+from axiom.services.api_gateway.routes.discovery import router as discovery_router
+
+# ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
+app.include_router(discovery_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
