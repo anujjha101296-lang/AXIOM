@@ -9,10 +9,15 @@ dist/
 build/
 .eggs/
 .venv/
+.venv312/
 venv/
 env/
 pip-wheel-metadata/
 *.pth
+
+# Evaluation results (large benchmark data)
+evaluation_results/
+benchmarks/__pycache__/
 
 # Environment & Secrets
 .env
