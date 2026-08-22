@@ -95,12 +95,16 @@ app.include_router(documents_router)
 
 from axiom.services.api_gateway.routes.discovery import router as discovery_router
 from axiom.services.api_gateway.routes.pipeline import router as pipeline_router
+from axiom.services.api_gateway.routes.formal_prover import router as formal_prover_router
 
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
 
 # ── Research Pipeline Router (Phase 13: 13-Stage Workflow) ────────────────────
 app.include_router(pipeline_router)
+
+# ── Formal Prover Router (Phase 14: Lean 4 / Coq / Isabelle Verification) ─────
+app.include_router(formal_prover_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
