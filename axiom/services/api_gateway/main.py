@@ -102,6 +102,7 @@ from axiom.services.api_gateway.routes.knowledge_graph import router as knowledg
 from axiom.services.api_gateway.routes.hypothesis import router as hypothesis_router
 from axiom.services.api_gateway.routes.experiment import router as experiment_router
 from axiom.services.api_gateway.routes.formal_math import router as formal_math_router
+from axiom.services.api_gateway.routes.long_horizon import router as long_horizon_router
 
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
@@ -126,6 +127,9 @@ app.include_router(experiment_router)
 
 # ── Formal Math Router (Phase 16: Formal Mathematics & Proof Verification Engine) ─
 app.include_router(formal_math_router)
+
+# ── Long-Horizon Router (Phase 17: Long-Horizon Mathematical Research Engine) ─
+app.include_router(long_horizon_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path

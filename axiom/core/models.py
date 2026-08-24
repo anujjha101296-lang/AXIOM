@@ -433,3 +433,87 @@ class ProofArtifactDB(Base):
     hash_id = Column(String, nullable=False, index=True)
     artifact_uri = Column(Text, nullable=False, default="")
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchProblemDB(Base):
+    __tablename__ = "long_horizon_problems"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    formal_statement = Column(Text, nullable=False, default="")
+    status = Column(String, nullable=False, default="PLANNED", index=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class ResearchSubproblemDB(Base):
+    __tablename__ = "long_horizon_subproblems"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    problem_id = Column(String, ForeignKey("long_horizon_problems.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    statement = Column(Text, nullable=False)
+    dependencies_json = Column(Text, nullable=False, default="[]")
+    status = Column(String, nullable=False, default="PLANNED", index=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchTaskDB(Base):
+    __tablename__ = "long_horizon_tasks"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    subproblem_id = Column(String, ForeignKey("long_horizon_subproblems.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    strategy = Column(String, nullable=False, default="Decomposition")
+    state = Column(String, nullable=False, default="PLANNED", index=True)
+    budget_steps = Column(Integer, nullable=False, default=10)
+    current_step = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchAttemptDB(Base):
+    __tablename__ = "long_horizon_attempts"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    task_id = Column(String, ForeignKey("long_horizon_tasks.id", ondelete="CASCADE"), nullable=False, index=True)
+    approach_description = Column(Text, nullable=False)
+    method = Column(String, nullable=False, default="Direct Proof")
+    result_summary = Column(Text, nullable=False, default="")
+    status = Column(String, nullable=False, default="PROMISING")
+    failure_reason = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchDecisionDB(Base):
+    __tablename__ = "long_horizon_decisions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    problem_id = Column(String, ForeignKey("long_horizon_problems.id", ondelete="CASCADE"), nullable=False, index=True)
+    decision_type = Column(String, nullable=False)
+    rationale = Column(Text, nullable=False)
+    critic_recommendation = Column(String, nullable=False, default="CONTINUE")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ResearchMilestoneDB(Base):
+    __tablename__ = "long_horizon_milestones"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    problem_id = Column(String, ForeignKey("long_horizon_problems.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String, nullable=False)
+    evidence_summary = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ApproachMemoryDB(Base):
+    __tablename__ = "approach_memories"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    problem_id = Column(String, ForeignKey("long_horizon_problems.id", ondelete="CASCADE"), nullable=False, index=True)
+    approach_hash = Column(String, nullable=False, index=True)
+    summary = Column(Text, nullable=False)
+    status = Column(String, nullable=False, default="FAILED")
+    failure_reason = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
