@@ -517,3 +517,33 @@ class ApproachMemoryDB(Base):
     status = Column(String, nullable=False, default="FAILED")
     failure_reason = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ChallengeDB(Base):
+    __tablename__ = "benchmark_challenges"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    version = Column(String, nullable=False, default="AXIOM-MATH-001", index=True)
+    title = Column(String, nullable=False)
+    domain = Column(String, nullable=False)
+    difficulty_level = Column(String, nullable=False, default="LEVEL_0_BASIC", index=True)
+    statement = Column(Text, nullable=False)
+    allowed_resources_json = Column(Text, nullable=False, default="[]")
+    time_budget_sec = Column(Integer, nullable=False, default=300)
+    tool_budget_steps = Column(Integer, nullable=False, default=20)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+
+
+class EvaluationRunDB(Base):
+    __tablename__ = "benchmark_evaluation_runs"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    challenge_id = Column(String, ForeignKey("benchmark_challenges.id", ondelete="CASCADE"), nullable=False, index=True)
+    outcome = Column(String, nullable=False, default="RESEARCH_PROGRESS", index=True)
+    score_json = Column(Text, nullable=False, default="{}")
+    failure_class = Column(String, nullable=False, default="NONE", index=True)
+    runtime_sec = Column(Float, nullable=False, default=0.0)
+    steps_used = Column(Integer, nullable=False, default=0)
+    proof_verified = Column(Boolean, nullable=False, default=False)
+    counterexample_found = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)

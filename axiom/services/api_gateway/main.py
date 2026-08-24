@@ -103,6 +103,7 @@ from axiom.services.api_gateway.routes.hypothesis import router as hypothesis_ro
 from axiom.services.api_gateway.routes.experiment import router as experiment_router
 from axiom.services.api_gateway.routes.formal_math import router as formal_math_router
 from axiom.services.api_gateway.routes.long_horizon import router as long_horizon_router
+from axiom.services.api_gateway.routes.challenge_harness import router as challenge_harness_router
 
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
@@ -130,6 +131,9 @@ app.include_router(formal_math_router)
 
 # ── Long-Horizon Router (Phase 17: Long-Horizon Mathematical Research Engine) ─
 app.include_router(long_horizon_router)
+
+# ── Challenge Harness Router (Phase 18: Mathematical Research Challenge Harness) ─
+app.include_router(challenge_harness_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
