@@ -547,3 +547,40 @@ class EvaluationRunDB(Base):
     proof_verified = Column(Boolean, nullable=False, default=False)
     counterexample_found = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+
+
+class ResearchMissionDB(Base):
+    __tablename__ = "research_missions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    objective = Column(Text, nullable=False)
+    state = Column(String, nullable=False, default="INITIALIZED", index=True)
+    budget_json = Column(Text, nullable=False, default="{}")
+    current_iteration = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class MissionCheckpointDB(Base):
+    __tablename__ = "mission_checkpoints"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    mission_id = Column(String, ForeignKey("research_missions.id", ondelete="CASCADE"), nullable=False, index=True)
+    iteration = Column(Integer, nullable=False)
+    checkpoint_hash = Column(String, nullable=False, index=True)
+    summary = Column(Text, nullable=False)
+    state_snapshot_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+
+
+class MissionTaskDB(Base):
+    __tablename__ = "mission_tasks"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    mission_id = Column(String, ForeignKey("research_missions.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    assigned_role = Column(String, nullable=False, default="Mathematician")
+    state = Column(String, nullable=False, default="PLANNED", index=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
