@@ -105,6 +105,7 @@ from axiom.services.api_gateway.routes.formal_math import router as formal_math_
 from axiom.services.api_gateway.routes.long_horizon import router as long_horizon_router
 from axiom.services.api_gateway.routes.challenge_harness import router as challenge_harness_router
 from axiom.services.api_gateway.routes.mission_control import router as mission_control_router
+from axiom.services.api_gateway.routes.control_plane import router as control_plane_router
 
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
@@ -138,6 +139,9 @@ app.include_router(challenge_harness_router)
 
 # ── Mission Control Router (Phase 19: Autonomous Research Mission Control) ────
 app.include_router(mission_control_router)
+
+# ── Control Plane Router (Phase 20: Research Operating System / Production Control Plane) ─
+app.include_router(control_plane_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path

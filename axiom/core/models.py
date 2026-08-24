@@ -584,3 +584,39 @@ class MissionTaskDB(Base):
     assigned_role = Column(String, nullable=False, default="Mathematician")
     state = Column(String, nullable=False, default="PLANNED", index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class AgentProfileDB(Base):
+    __tablename__ = "agent_profiles"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    name = Column(String, nullable=False, index=True)
+    role = Column(String, nullable=False, unique=True, index=True)
+    allowed_tools_json = Column(Text, nullable=False, default="[]")
+    allowed_models_json = Column(Text, nullable=False, default="[]")
+    max_steps = Column(Integer, nullable=False, default=20)
+    max_tokens = Column(Integer, nullable=False, default=100000)
+    timeout_sec = Column(Integer, nullable=False, default=300)
+
+
+class DomainEventDB(Base):
+    __tablename__ = "domain_events"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    mission_id = Column(String, nullable=True, index=True)
+    task_id = Column(String, nullable=True, index=True)
+    event_type = Column(String, nullable=False, index=True)
+    actor = Column(String, nullable=False, default="system")
+    payload_json = Column(Text, nullable=False, default="{}")
+    timestamp = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+
+
+class WorkerNodeDB(Base):
+    __tablename__ = "worker_nodes"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hostname = Column(String, nullable=False, index=True)
+    status = Column(String, nullable=False, default="AVAILABLE", index=True)
+    current_task_id = Column(String, nullable=True)
+    last_heartbeat = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
