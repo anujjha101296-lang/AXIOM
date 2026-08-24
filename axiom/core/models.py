@@ -312,3 +312,70 @@ class VerificationPlanDB(Base):
     failure_criteria = Column(Text, nullable=False, default="")
     limitations_json = Column(Text, nullable=False, default="[]")
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ExperimentDB(Base):
+    __tablename__ = "experiments"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="SET NULL"), nullable=True, index=True)
+    prediction_id = Column(String, nullable=True)
+    plan_id = Column(String, ForeignKey("verification_plans.id", ondelete="SET NULL"), nullable=True)
+    name = Column(String, nullable=False)
+    objective = Column(Text, nullable=False)
+    code_body = Column(Text, nullable=False)
+    method = Column(String, nullable=False, default="numerical_simulation")
+    parameters_json = Column(Text, nullable=False, default="{}")
+    resource_limits_json = Column(Text, nullable=False, default="{}")
+    status = Column(String, nullable=False, default="PLANNED", index=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class ExperimentRunDB(Base):
+    __tablename__ = "experiment_runs"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    experiment_id = Column(String, ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False, index=True)
+    run_number = Column(Integer, nullable=False, default=1)
+    status = Column(String, nullable=False, default="PLANNED")
+    runtime_ms = Column(Float, nullable=False, default=0.0)
+    memory_bytes = Column(Integer, nullable=False, default=0)
+    stdout = Column(Text, nullable=False, default="")
+    stderr = Column(Text, nullable=False, default="")
+    result_data_json = Column(Text, nullable=False, default="{}")
+    input_hash = Column(String, nullable=False, default="")
+    spec_hash = Column(String, nullable=False, default="")
+    seed = Column(Integer, nullable=True)
+    error_message = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ExperimentObservationDB(Base):
+    __tablename__ = "experiment_observations"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    experiment_id = Column(String, ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False, index=True)
+    run_id = Column(String, ForeignKey("experiment_runs.id", ondelete="CASCADE"), nullable=False, index=True)
+    observation_level = Column(String, nullable=False, default="COMPUTATIONAL_OBSERVATION")
+    summary = Column(Text, nullable=False)
+    metrics_json = Column(Text, nullable=False, default="{}")
+    reproducibility_status = Column(String, nullable=False, default="REPRODUCIBLE")
+    interpretation_status = Column(String, nullable=False, default="SUPPORTED")
+    is_mathematical_proof = Column(Boolean, nullable=False, default=False)
+    limitations_json = Column(Text, nullable=False, default="[]")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ExperimentVerificationDB(Base):
+    __tablename__ = "experiment_verifications"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    experiment_id = Column(String, ForeignKey("experiments.id", ondelete="CASCADE"), nullable=False, index=True)
+    run_id = Column(String, ForeignKey("experiment_runs.id", ondelete="CASCADE"), nullable=False, index=True)
+    verification_status = Column(String, nullable=False, default="VERIFIED")
+    independent_method = Column(Text, nullable=False)
+    independent_result = Column(Text, nullable=False)
+    discrepancy = Column(Float, nullable=False, default=0.0)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
