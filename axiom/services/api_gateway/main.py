@@ -98,6 +98,8 @@ from axiom.services.api_gateway.routes.pipeline import router as pipeline_router
 from axiom.services.api_gateway.routes.formal_prover import router as formal_prover_router
 from axiom.services.api_gateway.routes.self_improvement import router as self_improvement_router
 
+from axiom.services.api_gateway.routes.knowledge_graph import router as knowledge_graph_router
+
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
 
@@ -109,6 +111,9 @@ app.include_router(formal_prover_router)
 
 # ── Self-Improvement Router (Phase 15: System Regression Loop) ───────────────
 app.include_router(self_improvement_router)
+
+# ── Knowledge Graph Router (Phase 13: Scientific Knowledge Graph & Claim Graph) ─
+app.include_router(knowledge_graph_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path

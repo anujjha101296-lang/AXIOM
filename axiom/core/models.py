@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Enum, Integer, Boolean
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Enum, Integer, Boolean, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -118,3 +118,108 @@ class ResearchArtifact(Base):
             return {"data": val}
         except Exception:
             return {"raw": self.content}
+
+
+class GraphEntityDB(Base):
+    __tablename__ = "graph_entities"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String, nullable=False, index=True)
+    entity_type = Column(String, nullable=False, default="concept")
+    domain = Column(String, nullable=False, default="general")
+    description = Column(Text, nullable=True)
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class GraphEntityAliasDB(Base):
+    __tablename__ = "graph_entity_aliases"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    entity_id = Column(String, ForeignKey("graph_entities.id", ondelete="CASCADE"), nullable=False, index=True)
+    alias = Column(String, nullable=False, index=True)
+    source_id = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class GraphClaimDB(Base):
+    __tablename__ = "graph_claims"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    claim_text = Column(Text, nullable=False)
+    claim_type = Column(String, nullable=False, default="FACTUAL")
+    epistemic_status = Column(String, nullable=False, default="EXTRACTED")
+    confidence_score = Column(Float, nullable=False, default=1.0)
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class GraphClaimEvidenceDB(Base):
+    __tablename__ = "graph_claim_evidences"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    claim_id = Column(String, ForeignKey("graph_claims.id", ondelete="CASCADE"), nullable=False, index=True)
+    chunk_id = Column(String, ForeignKey("document_chunks.id", ondelete="SET NULL"), nullable=True)
+    source_id = Column(String, nullable=True)
+    document_id = Column(String, ForeignKey("documents.id", ondelete="SET NULL"), nullable=True)
+    supports = Column(Boolean, nullable=False, default=True)
+    snippet = Column(Text, nullable=False, default="")
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class GraphRelationshipDB(Base):
+    __tablename__ = "graph_relationships"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    subject_entity_id = Column(String, ForeignKey("graph_entities.id", ondelete="CASCADE"), nullable=False, index=True)
+    object_entity_id = Column(String, ForeignKey("graph_entities.id", ondelete="CASCADE"), nullable=False, index=True)
+    predicate = Column(String, nullable=False, default="RELATED_TO")
+    status = Column(String, nullable=False, default="EXTRACTED")
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class GraphRelationshipEvidenceDB(Base):
+    __tablename__ = "graph_relationship_evidences"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    relationship_id = Column(String, ForeignKey("graph_relationships.id", ondelete="CASCADE"), nullable=False, index=True)
+    chunk_id = Column(String, ForeignKey("document_chunks.id", ondelete="SET NULL"), nullable=True)
+    source_id = Column(String, nullable=True)
+    snippet = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class GraphContradictionDB(Base):
+    __tablename__ = "graph_contradictions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    claim_a_id = Column(String, ForeignKey("graph_claims.id", ondelete="CASCADE"), nullable=False, index=True)
+    claim_b_id = Column(String, ForeignKey("graph_claims.id", ondelete="CASCADE"), nullable=False, index=True)
+    contradiction_type = Column(String, nullable=False, default="DIRECT")
+    reasoning = Column(Text, nullable=False, default="")
+    resolved = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class GraphResearchGapDB(Base):
+    __tablename__ = "graph_research_gaps"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    gap_type = Column(String, nullable=False, default="NO_EVIDENCE")
+    description = Column(Text, nullable=False)
+    severity = Column(String, nullable=False, default="MEDIUM")
+    target_entity_id = Column(String, nullable=True)
+    target_claim_id = Column(String, nullable=True)
+    target_question_id = Column(String, nullable=True)
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
