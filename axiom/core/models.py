@@ -379,3 +379,57 @@ class ExperimentVerificationDB(Base):
     independent_result = Column(Text, nullable=False)
     discrepancy = Column(Float, nullable=False, default=0.0)
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class FormalTheoremDB(Base):
+    __tablename__ = "formal_theorems"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    claim_id = Column(String, ForeignKey("graph_claims.id", ondelete="SET NULL"), nullable=True, index=True)
+    name = Column(String, nullable=False)
+    natural_language = Column(Text, nullable=False)
+    formal_statement = Column(Text, nullable=False)
+    language = Column(String, nullable=False, default="LEAN4")
+    status = Column(String, nullable=False, default="FORMALIZED", index=True)
+    assumptions_json = Column(Text, nullable=False, default="[]")
+    variables_json = Column(Text, nullable=False, default="[]")
+    quantifiers_json = Column(Text, nullable=False, default="[]")
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class FormalProofDB(Base):
+    __tablename__ = "formal_proofs"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    theorem_id = Column(String, ForeignKey("formal_theorems.id", ondelete="CASCADE"), nullable=False, index=True)
+    proof_script = Column(Text, nullable=False)
+    verifier_output = Column(Text, nullable=False, default="")
+    compiler_version = Column(String, nullable=False, default="Lean 4.7.0 / Z3 4.12.2")
+    status = Column(String, nullable=False, default="PROOF_IN_PROGRESS")
+    is_sorry_free = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class CounterexampleDB(Base):
+    __tablename__ = "counterexamples"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    theorem_id = Column(String, ForeignKey("formal_theorems.id", ondelete="CASCADE"), nullable=False, index=True)
+    domain = Column(String, nullable=False, default="Finite domain")
+    assignment_json = Column(Text, nullable=False, default="{}")
+    witness_summary = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ProofArtifactDB(Base):
+    __tablename__ = "proof_artifacts"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    theorem_id = Column(String, ForeignKey("formal_theorems.id", ondelete="CASCADE"), nullable=False, index=True)
+    proof_id = Column(String, ForeignKey("formal_proofs.id", ondelete="CASCADE"), nullable=False, index=True)
+    hash_id = Column(String, nullable=False, index=True)
+    artifact_uri = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)

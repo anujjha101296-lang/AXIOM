@@ -101,6 +101,7 @@ from axiom.services.api_gateway.routes.self_improvement import router as self_im
 from axiom.services.api_gateway.routes.knowledge_graph import router as knowledge_graph_router
 from axiom.services.api_gateway.routes.hypothesis import router as hypothesis_router
 from axiom.services.api_gateway.routes.experiment import router as experiment_router
+from axiom.services.api_gateway.routes.formal_math import router as formal_math_router
 
 # ── Discovery Router (Phase 12: Autonomous Mathematical Discovery) ────────────
 app.include_router(discovery_router)
@@ -122,6 +123,9 @@ app.include_router(hypothesis_router)
 
 # ── Experiment Router (Phase 15: Computational Experiment & Verification Engine) ─
 app.include_router(experiment_router)
+
+# ── Formal Math Router (Phase 16: Formal Mathematics & Proof Verification Engine) ─
+app.include_router(formal_math_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
