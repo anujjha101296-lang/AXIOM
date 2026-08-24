@@ -74,3 +74,4 @@ logs/
 tmp/
 /tmp/axiom*
 data/research_uploads/
+docs/capability_delta_*.md

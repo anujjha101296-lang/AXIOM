@@ -40,16 +40,16 @@ async def test_auth_and_projects(setup_db):
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # 1. Register User
-        res_register = await client.post("/auth/register", json={"email": "test@ax.com", "password": "pass"})
+        res_register = await client.post("/auth/register", json={"email": "test@ax.com", "password": "Password123!"})
         assert res_register.status_code == 200, res_register.text
         assert res_register.json()["email"] == "test@ax.com"
         
         # 2. Duplicate Registration fails
-        res_dup = await client.post("/auth/register", json={"email": "test@ax.com", "password": "pass"})
+        res_dup = await client.post("/auth/register", json={"email": "test@ax.com", "password": "Password123!"})
         assert res_dup.status_code == 400
         
         # 3. Login User
-        res_login = await client.post("/auth/login", data={"username": "test@ax.com", "password": "pass"})
+        res_login = await client.post("/auth/login", data={"username": "test@ax.com", "password": "Password123!"})
         assert res_login.status_code == 200
         token = res_login.json()["access_token"]
         headers = {"Authorization": f"Bearer {token}"}

@@ -16,8 +16,11 @@ from axiom.services.api_gateway.main import app
 
 @pytest.fixture
 def client():
-  token = os.environ.get("AXIOM_API_TOKEN", "test_token")
-  return TestClient(app, headers={"Authorization": f"Bearer {token}"})
+  from axiom.services.api_gateway.auth import SECRET_TOKEN
+  token = os.environ.get("AXIOM_API_TOKEN") or SECRET_TOKEN
+  c = TestClient(app)
+  c.headers["Authorization"] = f"Bearer {token}"
+  return c
 
 
 @pytest.fixture

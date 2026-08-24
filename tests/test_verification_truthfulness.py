@@ -16,8 +16,10 @@ from axiom.core.verification.truthfulness import (
 )
 from axiom.services.api_gateway.main import app
 
+from axiom.services.api_gateway.auth import SECRET_TOKEN
+
 client = TestClient(app)
-headers = {"Authorization": "Bearer test_token"}
+headers = {"Authorization": f"Bearer {SECRET_TOKEN}"}
 
 
 class TestTruthfulnessModule:

@@ -8,8 +8,10 @@ from axiom.core.verification.lean_exporter import LeanExporter
 from axiom.core.reasoning.mcts import MctsSolver
 from axiom.services.api_gateway.main import app
 
+from axiom.services.api_gateway.auth import SECRET_TOKEN
+
 client = TestClient(app)
-headers = {"Authorization": "Bearer test_token"}
+headers = {"Authorization": f"Bearer {SECRET_TOKEN}"}
 
 def test_smt_gateway():
     smt = SmtGateway()

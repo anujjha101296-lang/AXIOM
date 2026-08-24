@@ -169,7 +169,7 @@ class TestProjectIsolation:
     async def test_user_b_cannot_access_user_a_project(self):
         """User B's request to User A's project must raise 403."""
         from fastapi import HTTPException
-        from axiom.services.api_gateway.routes.research_tasks import _get_authorized_project
+        from axiom.services.api_gateway.routes.projects import _get_authorized_project
 
         user_a = self._make_mock_user("user_a")
         user_b = self._make_mock_user("user_b")
@@ -180,7 +180,7 @@ class TestProjectIsolation:
         mock_project_repo = AsyncMock()
         mock_project_repo.get = AsyncMock(return_value=project)
 
-        with patch("axiom.services.api_gateway.routes.research_tasks.ProjectRepository", return_value=mock_project_repo):
+        with patch("axiom.services.api_gateway.routes.projects.ProjectRepository", return_value=mock_project_repo):
             # User A should succeed
             result = await _get_authorized_project("proj_1", user_a, mock_db)
             assert result.owner_id == "user_a"
@@ -194,14 +194,14 @@ class TestProjectIsolation:
     async def test_user_b_cannot_access_nonexistent_project(self):
         """Accessing a non-existent project must return 404."""
         from fastapi import HTTPException
-        from axiom.services.api_gateway.routes.research_tasks import _get_authorized_project
+        from axiom.services.api_gateway.routes.projects import _get_authorized_project
 
         user = self._make_mock_user("user_x")
         mock_db = AsyncMock()
         mock_project_repo = AsyncMock()
         mock_project_repo.get = AsyncMock(return_value=None)
 
-        with patch("axiom.services.api_gateway.routes.research_tasks.ProjectRepository", return_value=mock_project_repo):
+        with patch("axiom.services.api_gateway.routes.projects.ProjectRepository", return_value=mock_project_repo):
             with pytest.raises(HTTPException) as exc_info:
                 await _get_authorized_project("nonexistent_project", user, mock_db)
             assert exc_info.value.status_code == 404

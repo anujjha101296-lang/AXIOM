@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -49,12 +49,7 @@ async def list_projects(
     repo = ProjectRepository(db)
     return await repo.list_for_user(owner_id=current_user.id)
 
-@router.get("/{project_id}", response_model=ProjectResponse)
-async def get_project(
-    project_id: str,
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(get_current_user)
-):
+async def _get_authorized_project(project_id: str, current_user: Any, db: AsyncSession) -> Any:
     repo = ProjectRepository(db)
     project = await repo.get(project_id)
     if not project:
@@ -62,6 +57,14 @@ async def get_project(
     if project.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to access this project")
     return project
+
+@router.get("/{project_id}", response_model=ProjectResponse)
+async def get_project(
+    project_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    return await _get_authorized_project(project_id, current_user, db)
 
 @router.patch("/{project_id}", response_model=ProjectResponse)
 async def update_project(
