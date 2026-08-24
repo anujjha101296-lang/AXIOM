@@ -223,3 +223,92 @@ class GraphResearchGapDB(Base):
     target_question_id = Column(String, nullable=True)
     metadata_json = Column(Text, nullable=False, default="{}")
     created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class HypothesisDB(Base):
+    __tablename__ = "hypotheses"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    session_id = Column(String, ForeignKey("research_sessions.id", ondelete="SET NULL"), nullable=True, index=True)
+    question_id = Column(String, nullable=True)
+    gap_id = Column(String, nullable=True)
+    claim = Column(Text, nullable=False)
+    motivation = Column(Text, nullable=False, default="")
+    assumptions_json = Column(Text, nullable=False, default="[]")
+    verification_strategy = Column(Text, nullable=False, default="")
+    status = Column(String, nullable=False, default="PROPOSED", index=True)
+    confidence_score = Column(Float, nullable=False, default=0.5)
+    rationale = Column(Text, nullable=False, default="")
+    metadata_json = Column(Text, nullable=False, default="{}")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class HypothesisEvidenceDB(Base):
+    __tablename__ = "hypothesis_evidences"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="CASCADE"), nullable=False, index=True)
+    claim_id = Column(String, nullable=True)
+    chunk_id = Column(String, ForeignKey("document_chunks.id", ondelete="SET NULL"), nullable=True)
+    source_id = Column(String, nullable=True)
+    supports = Column(Boolean, nullable=False, default=True)
+    snippet = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class HypothesisPredictionDB(Base):
+    __tablename__ = "hypothesis_predictions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="CASCADE"), nullable=False, index=True)
+    prediction_text = Column(Text, nullable=False)
+    expected_observation = Column(Text, nullable=False)
+    conditions = Column(Text, nullable=False, default="")
+    measurement = Column(Text, nullable=False, default="")
+    falsifying_observation = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class HypothesisCritiqueDB(Base):
+    __tablename__ = "hypothesis_critiques"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="CASCADE"), nullable=False, index=True)
+    status = Column(String, nullable=False, default="VALID")
+    critique_text = Column(Text, nullable=False)
+    unsupported_assumptions_json = Column(Text, nullable=False, default="[]")
+    scope_errors_json = Column(Text, nullable=False, default="[]")
+    is_falsifiable = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class HypothesisRevisionDB(Base):
+    __tablename__ = "hypothesis_revisions"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="CASCADE"), nullable=False, index=True)
+    revision_index = Column(Integer, nullable=False, default=1)
+    previous_claim = Column(Text, nullable=False)
+    new_claim = Column(Text, nullable=False)
+    reason = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class VerificationPlanDB(Base):
+    __tablename__ = "verification_plans"
+    
+    id = Column(String, primary_key=True, default=generate_uuid)
+    hypothesis_id = Column(String, ForeignKey("hypotheses.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id = Column(String, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
+    question = Column(Text, nullable=False)
+    hypothesis_summary = Column(Text, nullable=False)
+    required_evidence_json = Column(Text, nullable=False, default="[]")
+    predictions_json = Column(Text, nullable=False, default="[]")
+    method = Column(String, nullable=False, default="literature_research")
+    data_sources_json = Column(Text, nullable=False, default="[]")
+    success_criteria = Column(Text, nullable=False, default="")
+    failure_criteria = Column(Text, nullable=False, default="")
+    limitations_json = Column(Text, nullable=False, default="[]")
+    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
