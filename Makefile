@@ -144,3 +144,6 @@ clean-all: clean ## Deep clean (also remove venv)
 
 loc: ## Count lines of code
 	find axiom/ tests/ -name "*.py" | xargs wc -l | tail -1
+
+verify-deploy: ## Verify readiness for deployment
+	./scripts/verify_deployment.sh
