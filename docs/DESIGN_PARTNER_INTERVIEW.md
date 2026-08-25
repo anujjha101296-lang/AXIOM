@@ -1,15 +1,16 @@
-# AXIOM Design Partner Interview Guide
+# Design Partner Interview Script
 
-Use this unbiased script when conducting 30-minute discovery calls with early academic researchers, R&D leads, and technical advisors.
+## Context Setting
+"Thank you for trying AXIOM. We are an early-stage research OS focused on programmatic verification of AI reasoning. Our goal today is to understand if AXIOM genuinely helps your research workflow, what frustrates you, and where we fail."
 
-## Unbiased Questions
-1. **Current Workflow**: What specific research question or formal verification task were you trying to solve today?
-2. **Current Tooling**: How do you solve this today? (e.g. manual LaTeX writing, interactive Lean 4 REPL, custom Python scripts)
-3. **Primary Bottlenecks**: What part of your current research workflow takes the most time?
-4. **AXIOM Strengths**: What did AXIOM accomplish faster or more clearly than your current tools?
-5. **AXIOM Weaknesses**: What did AXIOM do poorly or fail to complete?
-6. **Trust Assessment**: Which output or artifact did you trust immediately, and why?
-7. **Skepticism Assessment**: Which output did you disbelieve or feel compelled to check manually?
-8. **Retention Drivers**: What single feature would make you open AXIOM every week for your active research?
-9. **Monetization / Willingness to Pay**: What part of this platform would your department or team pay a monthly license for?
-10. **Critical Gaps**: What key capability is currently missing that prevents you from relying on AXIOM for publications?
+## Questions
+1. **What were you trying to accomplish?** *(Understand the actual task they brought)*
+2. **How did you do this before AXIOM?** *(Establish the baseline workflow)*
+3. **What took the most time?** *(Identify the core bottleneck in the baseline)*
+4. **What did AXIOM save you?** *(Measure the delta in time, effort, or cognitive load)*
+5. **What did you distrust?** *(Identify areas where our UI, claims, or execution lacked transparency)*
+6. **What failed?** *(Identify strict execution failures or poor UX)*
+7. **What would make you use it every week?** *(Find the minimum bar for retention)*
+8. **What would make you pay?** *(Understand the value inflection point)*
+9. **Who else has this problem?** *(Identify adjacent personas for outreach)*
+10. **What should we remove?** *(Identify bloat and distraction)*
