@@ -77,4 +77,17 @@ export const axiomApi = {
       method: "POST",
       body: JSON.stringify({ statement_id: statementId, script }),
     }),
+
+  // Private Alpha (v0.1)
+  getAlphaSummary: () => request<any>("/api/v1/alpha/stats"),
+  getAlphaUsers: () => request<any>("/api/v1/alpha/users"),
+  inviteAlphaUser: (email: string) =>
+    request<any>(`/api/v1/alpha/users/invite?email=${encodeURIComponent(email)}`, { method: "POST" }),
+  updateAlphaUserStatus: (userId: string, status: string) =>
+    request<any>(`/api/v1/alpha/users/${userId}/status?status=${status}`, { method: "POST" }),
+  submitFeedback: (feedback: any) =>
+    request<any>("/api/v1/alpha/feedback", {
+      method: "POST",
+      body: JSON.stringify(feedback),
+    }),
 };
