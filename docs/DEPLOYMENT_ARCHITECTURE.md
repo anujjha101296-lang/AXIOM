@@ -3,7 +3,7 @@
 ## Frontend
 - **Framework**: Next.js
 - **Deployment Platform**: Vercel
-- **Configuration**: Vercel builds the `ui/` directory.
+- **CRITICAL VERCEL CONFIGURATION**: You MUST set the Vercel **Root Directory** to `ui` in the Vercel Dashboard (Settings > General > Root Directory). Do NOT use a `vercel.json` file in the repository root to configure this, as Vercel's framework detection will crash looking for `package.json` at the root.
 
 ## Backend
 - **Framework**: FastAPI
@@ -17,27 +17,3 @@
 ## Workers
 - **Type**: Long-running research tasks
 - **Deployment Platform**: External service (same as Backend or dedicated Celery/RQ instances).
-
-## Queue
-- **Type**: Redis / In-memory
-- **Deployment Platform**: External service.
-
-## Vector Store
-- **Type**: Local/Ephemeral (SQLite) -> Migrate to pgvector for production.
-- **Deployment Platform**: External service.
-
-## Object Storage
-- **Type**: AWS S3 / Cloudflare R2
-- **Deployment Platform**: External service.
-
-## LLM Providers
-- **Providers**: OpenAI, Google Gemini
-- **Deployment Platform**: External API.
-
-## Search Providers
-- **Providers**: Web search tools
-- **Deployment Platform**: External API.
-
-## Formal Verification
-- **Providers**: Z3 Theorem Prover, Lean 4
-- **Deployment Platform**: Packaged within the Backend Docker container (External service).
