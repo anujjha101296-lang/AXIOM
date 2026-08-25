@@ -26,3 +26,14 @@ The AXIOM backend requires a persistent, long-lived container environment to saf
 
 ## Scaling & Worker Architecture
 For production deployments exceeding MVP scale, the indefinite reasoning tasks (e.g., `ResearchPlanner`) should be decoupled from the synchronous HTTP request via a message queue (e.g., Celery/Redis). Currently, the HTTP request loop handles bounded research; this implies a slightly elevated timeout configuration is required on the ingress load balancer (e.g., `300s` instead of the default `60s`).
+
+## Deployment Procedure
+
+1. **Database Allocation**: Provision a managed PostgreSQL database (e.g., Supabase or Render PostgreSQL).
+2. **Secret Injection**: Add `DATABASE_URL`, `OPENAI_API_KEY`, and `JWT_SECRET_KEY` into the deployment platform's Secret Manager.
+3. **Container Build**: Point the deployment service to the `Dockerfile` at the repository root.
+4. **Health Verification**: Monitor the build logs. Verify that `GET /health` and `GET /health/ready` return 200 before routing live traffic.
+5. **Frontend Bind**: Copy the resulting HTTPS URL (e.g., `https://axiom-api.onrender.com`) and set it as `NEXT_PUBLIC_API_URL` in the Vercel Frontend dashboard.
+
+## Rollback Procedure
+If a deployment fails, use the provider dashboard to trigger a "Rollback" to the previously healthy image hash. Do not modify the database schema without a forward-only Alembic migration.
