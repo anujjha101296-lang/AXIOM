@@ -30,7 +30,7 @@ class AxiomSettings(BaseSettings):
     # ── Application ──────────────────────────────────────────────────────────
     app_name: str = Field(default="AXIOM", description="Application name")
     app_version: str = Field(default="0.2.0", description="Semantic version")
-    environment: Literal["development", "staging", "production"] = Field(
+    environment: Literal["development", "staging", "production", "test", "testing", "ci"] = Field(
         default="development", description="Deployment environment"
     )
     debug: bool = Field(default=False, description="Enable debug mode")

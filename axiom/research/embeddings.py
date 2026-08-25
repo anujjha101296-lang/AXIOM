@@ -58,6 +58,9 @@ class MockEmbeddingProvider(EmbeddingProvider):
     dimension = EMBEDDING_DIM_TEST
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
+        import os
+        if os.getenv("ENVIRONMENT", "").lower() == "production":
+            raise EmbeddingConfigurationError("MOCKS MUST NEVER EXECUTE IN PRODUCTION.")
         results = []
         for text in texts:
             rng = random.Random(hash(text))

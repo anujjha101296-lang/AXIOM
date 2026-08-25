@@ -1,3 +1,4 @@
+from axiom.research.llm import get_llm_provider
 """Strict Tool Registry and Handlers for Controlled Research Agent."""
 
 import asyncio
@@ -255,11 +256,17 @@ async def ask_grounded_research_engine_handler(
                     f"User is not authorized or access denied: chunk '{cid}' does not belong to project '{project_id}'"
                 )
 
-        answer_text = (
-            f"Mock Answer grounded for '{question}'"
-            if chunk_ids
-            else "Insufficient evidence"
-        )
+        if not chunk_ids:
+            answer_text = "Insufficient evidence"
+        else:
+            # Use real provider
+            llm = get_llm_provider()
+            import asyncio
+            # We can't await inside sync if this handler is ever sync, but it's async def
+            answer_text = await llm.generate(
+                system_prompt="You are a grounded research engine. Use the provided evidence to answer.",
+                user_prompt=f"Question: {question}\nEvidence chunks: {chunk_ids}"
+            )
         return {
             "project_id": project_id,
             "question": question,
@@ -276,11 +283,14 @@ async def ask_grounded_research_engine_handler(
                 f"User is not authorized or access denied: chunk '{cid}' does not belong to project '{project_id}'"
             )
 
-    answer_text = (
-        f"Grounded synthesis for '{question}' in project {project_id}"
-        if chunk_ids
-        else "Insufficient evidence"
-    )
+    if not chunk_ids:
+        answer_text = "Insufficient evidence"
+    else:
+        llm = get_llm_provider()
+        answer_text = await llm.generate(
+            system_prompt="You are a grounded research engine. Use the provided evidence to answer.",
+            user_prompt=f"Question: {question}\nEvidence chunks: {chunk_ids}"
+        )
     return {
         "project_id": project_id,
         "question": question,
