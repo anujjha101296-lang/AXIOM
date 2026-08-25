@@ -160,3 +160,67 @@ class VectorStore:
             )
             for score, chunk, doc in scored[:top_k]
         ]
+    def search_sync(
+        self,
+        db: Any,
+        query_vector: List[float],
+        project_id: str,
+        top_k: int = 5,
+        document_id: Optional[str] = None,
+    ) -> List[VectorSearchResult]:
+        """Search synchronously for the *top_k* most similar chunks within *project_id*."""
+        from sqlalchemy import select
+        from axiom.core.models import DocumentChunk, Document
+
+        stmt = (
+            select(DocumentChunk, Document)
+            .join(Document, DocumentChunk.document_id == Document.id)
+            .where(Document.project_id == project_id)
+        )
+        if document_id is not None:
+            stmt = stmt.where(DocumentChunk.document_id == document_id)
+
+        result = db.execute(stmt)
+        rows = result.all()
+
+        if not rows:
+            logger.info("VectorStore: no chunks found", extra={"project_id": project_id})
+            return []
+
+        scored = []
+        skipped = 0
+
+        for chunk, doc in rows:
+            if not chunk.embedding:
+                skipped += 1
+                continue
+            try:
+                stored_vec = json.loads(chunk.embedding)
+            except (json.JSONDecodeError, TypeError):
+                skipped += 1
+                continue
+
+            score = cosine_similarity(query_vector, stored_vec)
+            scored.append((score, chunk, doc))
+
+        if skipped:
+            logger.warning(
+                "VectorStore: skipped chunks without embeddings",
+                extra={"count": skipped, "project_id": project_id},
+            )
+
+        scored.sort(key=lambda t: t[0], reverse=True)
+
+        return [
+            VectorSearchResult(
+                chunk_id=chunk.id,
+                document_id=chunk.document_id,
+                project_id=doc.project_id,
+                content=chunk.content,
+                score=round(score, 6),
+                chunk_index=getattr(chunk, "chunk_index", 0),
+                char_start=getattr(chunk, "char_start", None),
+                char_end=getattr(chunk, "char_end", None),
+            )
+            for score, chunk, doc in scored[:top_k]
+        ]

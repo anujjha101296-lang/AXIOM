@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-from typing import Dict, List, Optional, Union, Annotated, Literal
+from typing import Dict, List, Optional, Union, Annotated, Literal, Any
 from pydantic import BaseModel, Field
 
 class NodeType(str, Enum):
@@ -43,7 +43,7 @@ class NodeBase(BaseModel):
     id: str = Field(..., description="Unique identifier, usually a content hash or UUID")
     type: NodeType = Field(..., description="The classification of the node")
     name: str = Field(..., description="Human-readable title or label")
-    metadata: Dict[str, Union[str, int, float, bool, List[str], None]] = Field(default_factory=dict, description="Arbitrary attributes")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Arbitrary attributes")
 
 class AuthorNode(NodeBase):
     type: Literal[NodeType.AUTHOR] = NodeType.AUTHOR
@@ -136,7 +136,7 @@ class Edge(BaseModel):
     target_id: str = Field(..., description="The ID of the target node")
     type: EdgeType = Field(..., description="The type of connection")
     confidence: float = Field(default=1.0, description="Confidence score of this relationship [0, 1]")
-    provenance: Dict[str, Union[str, int, float, bool, None]] = Field(
+    provenance: Dict[str, Any] = Field(
         default_factory=dict, 
         description="Lineage indicating how the relationship was discovered or extracted"
     )

@@ -3,12 +3,18 @@ import sqlite3
 import json
 import hashlib
 import requests
+import time
+import logging
 from typing import Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
 
 class ModelClient:
     def __init__(self, cache_path: str = "/tmp/axiom_model_cache.db"):
         self.cache_path = cache_path
         self.default_model = os.getenv("DEFAULT_MODEL", "mock-model")
+        self.max_retries = 3
+        self.timeout_sec = 30
         self._init_cache()
 
     def _init_cache(self):
@@ -26,54 +32,78 @@ class ModelClient:
         conn.close()
 
     def _get_cache(self, prompt_hash: str) -> Optional[str]:
-        conn = sqlite3.connect(self.cache_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT response FROM model_cache WHERE prompt_hash = ?;", (prompt_hash,))
-        row = cursor.fetchone()
-        conn.close()
-        return row[0] if row else None
+        try:
+            conn = sqlite3.connect(self.cache_path, timeout=5)
+            cursor = conn.cursor()
+            cursor.execute("SELECT response FROM model_cache WHERE prompt_hash = ?;", (prompt_hash,))
+            row = cursor.fetchone()
+            conn.close()
+            return row[0] if row else None
+        except sqlite3.Error:
+            return None
 
     def _set_cache(self, prompt_hash: str, prompt: str, model: str, response: str):
-        conn = sqlite3.connect(self.cache_path)
-        with conn:
-            conn.execute(
-                "INSERT OR REPLACE INTO model_cache (prompt_hash, prompt, model, response) VALUES (?, ?, ?, ?);",
-                (prompt_hash, prompt, model, response)
-            )
-        conn.close()
+        try:
+            conn = sqlite3.connect(self.cache_path, timeout=5)
+            with conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO model_cache (prompt_hash, prompt, model, response) VALUES (?, ?, ?, ?);",
+                    (prompt_hash, prompt, model, response)
+                )
+            conn.close()
+        except sqlite3.Error:
+            pass
 
     def generate(self, prompt: str, model: str = "mock-model", temperature: float = 0.7) -> str:
         """
-        Normalized generation interface.
-        Checks local SQLite cache first. Runs mock generation if no API keys are present.
+        Normalized generation interface with bounded retries, timeouts, and fallback.
         """
-        # Override hardcoded mock-model if a default is provided
         if model == "mock-model" and self.default_model != "mock-model":
             model = self.default_model
-        # Calculate content-addressed hash
+
         prompt_hash = hashlib.sha256(f"{model}:{prompt}:{temperature}".encode()).hexdigest()
         
-        # Check cache
         cached_response = self._get_cache(prompt_hash)
         if cached_response:
             return cached_response
 
-        # Execute generation
-        response_text = ""
         openai_key = os.getenv("OPENAI_API_KEY")
         gemini_key = os.getenv("GEMINI_API_KEY")
-
+        
+        # Build prioritized list of models/providers to try
+        strategies = []
         if openai_key and model.startswith("gpt"):
-            response_text = self._call_openai(prompt, model, temperature, openai_key)
+            strategies.append(lambda: self._call_openai(prompt, model, temperature, openai_key))
+            if gemini_key: # Fallback to gemini if openai fails
+                strategies.append(lambda: self._call_gemini(prompt, "gemini-1.5-pro", temperature, gemini_key))
         elif gemini_key and model.startswith("gemini"):
-            response_text = self._call_gemini(prompt, model, temperature, gemini_key)
-        else:
-            # Fallback to local mock completion for unit testing and offline execution
-            response_text = self._generate_mock(prompt, model)
+            strategies.append(lambda: self._call_gemini(prompt, model, temperature, gemini_key))
+            if openai_key: # Fallback to openai if gemini fails
+                strategies.append(lambda: self._call_openai(prompt, "gpt-4o", temperature, openai_key))
+        
+        # Always fallback to mock if API calls fail or keys are absent
+        strategies.append(lambda: self._generate_mock(prompt, model))
 
-        # Set cache
-        self._set_cache(prompt_hash, prompt, model, response_text)
-        return response_text
+        response_text = ""
+        for attempt, strategy in enumerate(strategies):
+            retries = 0
+            while retries <= self.max_retries:
+                try:
+                    response_text = strategy()
+                    self._set_cache(prompt_hash, prompt, model, response_text)
+                    return response_text
+                except (requests.Timeout, requests.RequestException) as e:
+                    logger.warning(f"Strategy {attempt} retry {retries} failed: {e}")
+                    retries += 1
+                    time.sleep(2 ** retries) # Exponential backoff
+                except Exception as e:
+                    logger.error(f"Strategy {attempt} failed unrecoverably: {e}")
+                    break # Try next strategy immediately
+
+        # If all else fails, return a safe explicit failure state
+        safe_fallback = "AXIOM ERROR: LLM Generation Failed (All providers exhausted)"
+        self._set_cache(prompt_hash, prompt, model, safe_fallback)
+        return safe_fallback
 
     def _call_openai(self, prompt: str, model: str, temperature: float, api_key: str) -> str:
         headers = {
@@ -85,7 +115,12 @@ class ModelClient:
             "messages": [{"role": "user", "content": prompt}],
             "temperature": temperature
         }
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=self.timeout_sec
+        )
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"]
 
@@ -98,7 +133,12 @@ class ModelClient:
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": temperature}
         }
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=self.timeout_sec
+        )
         response.raise_for_status()
         return response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
