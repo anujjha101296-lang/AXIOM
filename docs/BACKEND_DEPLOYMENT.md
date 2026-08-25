@@ -3,7 +3,7 @@
 The AXIOM backend requires a persistent, long-lived container environment to safely execute multi-agent research loops, formal solver subprocesses (Z3), and stateful database interactions. It MUST NOT be deployed on Vercel.
 
 ## Recommended Platforms
-1. **Render (Web Service)** - Preferred for ease of configuration.
+1. **Railway (Web Service)** - Preferred for ease of configuration.
 2. **Fly.io** - Preferred for distributed geographic edges and simple PostgreSQL clusters.
 3. **AWS ECS / Fargate** - Preferred for enterprise scalability.
 
@@ -13,7 +13,7 @@ The AXIOM backend requires a persistent, long-lived container environment to saf
 - **Container**: `Dockerfile` in the root repository.
 - **Port**: `8000` (Exposed natively by Uvicorn)
 - **Health Check Path**: `/health` (or `/ready` for database-coupled health checks)
-- **Database**: PostgreSQL (e.g., Supabase or Render Managed PostgreSQL). 
+- **Database**: PostgreSQL (e.g., Supabase or Railway Managed PostgreSQL). 
 
 ## Required Environment Variables
 | Variable | Description |
@@ -29,7 +29,7 @@ For production deployments exceeding MVP scale, the indefinite reasoning tasks (
 
 ## Deployment Procedure
 
-1. **Database Allocation**: Provision a managed PostgreSQL database (e.g., Supabase or Render PostgreSQL).
+1. **Database Allocation**: Provision a managed PostgreSQL database (e.g., Supabase or Railway PostgreSQL).
 2. **Secret Injection**: Add `DATABASE_URL`, `OPENAI_API_KEY`, and `JWT_SECRET_KEY` into the deployment platform's Secret Manager.
 3. **Container Build**: Point the deployment service to the `Dockerfile` at the repository root.
 4. **Health Verification**: Monitor the build logs. Verify that `GET /health` and `GET /health/ready` return 200 before routing live traffic.

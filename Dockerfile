@@ -36,4 +36,4 @@ USER axiom
 EXPOSE 8000
 
 # Graceful shutdown is managed by Uvicorn
-CMD ["uvicorn", "axiom.services.api_gateway.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--log-level", "info"]
+CMD ["sh", "-c", "uvicorn axiom.services.api_gateway.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 4 --log-level info"]

@@ -2,7 +2,7 @@
 
 This document defines the strict environmental contract required for the AXIOM FastAPI backend to operate in production. 
 
-> **SECURITY RULE**: Never commit values to version control. Set these explicitly in your provider (e.g., Render Dashboard, Fly.io secrets, AWS Parameter Store).
+> **SECURITY RULE**: Never commit values to version control. Set these explicitly in your provider (e.g., Railway Dashboard, Fly.io secrets, AWS Parameter Store).
 
 ## Required Variables
 
