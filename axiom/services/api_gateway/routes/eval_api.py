@@ -1,34 +1,27 @@
 """
 FastAPI Evaluation Router for EPIC-002
 Exposes capability scores, prize readiness, history, and benchmark triggers.
+S0-E4: all scores include evidence_state, benchmark_count, and limitations.
 """
 from __future__ import annotations
 
 import json
 import sqlite3
 import time
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from typing import Any
+
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 from axiom.config import settings
-from axiom.evaluation.frameworks.capability import (
-    CapabilitySnapshot,
-    CapabilityDimension,
-    make_dimension_score,
+from axiom.evaluation.frameworks.evidence import (
+    REQUIRED_SCORE_FIELDS,
+    build_baseline_dimensions_dict,
+    build_baseline_snapshot,
+    run_all_capability_benchmarks,
 )
 from axiom.evaluation.frameworks.prize_readiness import PrizeReadinessEngine
 from axiom.evaluation.reporting.delta_report import generate_delta_report
-from axiom.evaluation.benchmarks.suite import (
-    run_math_reasoning_benchmarks,
-    run_proof_verification_benchmarks,
-    run_conjecture_benchmarks,
-    run_knowledge_quality_benchmarks,
-    run_counterexample_benchmarks,
-    run_research_planning_benchmarks,
-    run_literature_synthesis_benchmarks,
-    run_research_productivity_benchmarks,
-)
 
 router = APIRouter(prefix="/eval", tags=["evaluation"])
 
@@ -37,48 +30,58 @@ class BenchmarkRunResponse(BaseModel):
     run_id: str
     timestamp: str
     composite_score: float
-    dimensions: Dict[str, Any]
-    readiness: List[Dict[str, Any]]
+    dimensions: dict[str, Any]
+    readiness: list[dict[str, Any]]
     weakest_capability: str
     highest_priority: str
     recommended_next_epic: str
     regression_detected: bool
 
 
-def _get_current_scores(db_path: str) -> Dict[str, Any]:
-    """Fetch or run the latest capability scores."""
+def _normalize_dimension(dim_name: str, info: dict[str, Any]) -> dict[str, Any]:
+    """Backfill S0-E4 fields on legacy stored snapshots."""
+    if all(f in info for f in REQUIRED_SCORE_FIELDS):
+        return info
+    baseline = build_baseline_dimensions_dict().get(dim_name, {})
+    merged = {**baseline, **info}
+    if "limitations" not in merged or not merged["limitations"]:
+        merged["limitations"] = baseline.get("limitations", ["Legacy snapshot — re-run benchmarks for full evidence."])
+    if "evidence_state" not in merged:
+        merged["evidence_state"] = "estimated" if merged.get("estimated") else "measured"
+    if "benchmark_count" not in merged:
+        merged["benchmark_count"] = 0
+    if "confidence" not in merged:
+        merged["confidence"] = 0.5
+    return merged
+
+
+def _normalize_snapshot(data: dict[str, Any]) -> dict[str, Any]:
+    dimensions = data.get("dimensions", {})
+    data["dimensions"] = {
+        name: _normalize_dimension(name, info) for name, info in dimensions.items()
+    }
+    return data
+
+
+def _get_current_scores(db_path: str) -> dict[str, Any]:
+    """Fetch latest capability scores or return evidence-gated baseline."""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
-    # Check if we have a run recorded
+
     try:
         row = cursor.execute(
             "SELECT json_data FROM eval_runs ORDER BY timestamp DESC LIMIT 1"
         ).fetchone()
     except sqlite3.OperationalError:
         row = None
-        
+
     conn.close()
-    
+
     if row:
-        return json.loads(row[0])
-        
-    # Standard baseline fallback if DB empty
-    return {
-        "run_id": "initial",
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "composite_score": 0.354,
-        "dimensions": {
-            "mathematical_reasoning": {"score": 0.40, "level": 1, "level_name": "L1: Basic"},
-            "proof_verification": {"score": 0.35, "level": 0, "level_name": "L0: None"},
-            "conjecture_generation": {"score": 0.30, "level": 2, "level_name": "L2: Nontrivial"},
-            "knowledge_quality": {"score": 0.45, "level": 2, "level_name": "L2: Structured"},
-            "counterexample_search": {"score": 0.35, "level": 2, "level_name": "L2: Heuristic"},
-            "research_planning": {"score": 0.30, "level": 1, "level_name": "L1: Linear"},
-            "literature_synthesis": {"score": 0.40, "level": 1, "level_name": "L1: Extraction"},
-            "research_productivity": {"score": 0.30, "level": 2, "level_name": "L2: Semi-Auto"},
-        }
-    }
+        return _normalize_snapshot(json.loads(row[0]))
+
+    baseline = build_baseline_snapshot()
+    return baseline.to_dict()
 
 
 @router.get("/scores")
@@ -92,12 +95,11 @@ def get_capability_scores():
 def get_prize_readiness():
     """Get the latest prize readiness scores for all 6 Millennium Problems."""
     data = _get_current_scores(settings.db_path)
-    
-    # Calculate readiness from scores
+
     scores_map = {}
     for d_name, info in data.get("dimensions", {}).items():
         scores_map[d_name] = info.get("score", 0.0)
-        
+
     engine = PrizeReadinessEngine()
     readiness_list = engine.compute_all(scores_map)
     return engine.to_ranked_list(readiness_list)
@@ -108,7 +110,7 @@ def get_run_history():
     """Get the last 10 evaluation runs."""
     conn = sqlite3.connect(settings.db_path)
     cursor = conn.cursor()
-    
+
     try:
         rows = cursor.execute(
             "SELECT run_id, timestamp, composite_score FROM eval_runs ORDER BY timestamp DESC LIMIT 10"
@@ -119,72 +121,12 @@ def get_run_history():
         ]
     except sqlite3.OperationalError:
         history = []
-        
+
     conn.close()
     return history
 
 
-@router.post("/run", response_model=BenchmarkRunResponse)
-def trigger_benchmark():
-    """Run all capability benchmarks synchronously and return current scores & delta report."""
-    db_path = settings.db_path
-    
-    # Run all 8 suites
-    mr_results, mr_score = run_math_reasoning_benchmarks()
-    pv_results, pv_score = run_proof_verification_benchmarks()
-    cg_results, cg_score = run_conjecture_benchmarks(db_path)
-    kq_results, kq_score = run_knowledge_quality_benchmarks(db_path)
-    ce_results, ce_score = run_counterexample_benchmarks(db_path)
-    rp_results, rp_score = run_research_planning_benchmarks()
-    ls_results, ls_score = run_literature_synthesis_benchmarks(db_path)
-    rd_results, rd_score = run_research_productivity_benchmarks(db_path)
-    
-    import uuid
-    run_id = str(uuid.uuid4())[:8]
-    timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    
-    snapshot = CapabilitySnapshot(run_id=run_id, timestamp=timestamp)
-    snapshot.dimension_scores = [
-        make_dimension_score(CapabilityDimension.MATHEMATICAL_REASONING, mr_score, len(mr_results)),
-        make_dimension_score(CapabilityDimension.PROOF_VERIFICATION, pv_score, len(pv_results)),
-        make_dimension_score(CapabilityDimension.CONJECTURE_GENERATION, cg_score, len(cg_results)),
-        make_dimension_score(CapabilityDimension.KNOWLEDGE_QUALITY, kq_score, len(kq_results)),
-        make_dimension_score(CapabilityDimension.COUNTEREXAMPLE_SEARCH, ce_score, len(ce_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PLANNING, rp_score, len(rp_results)),
-        make_dimension_score(CapabilityDimension.LITERATURE_SYNTHESIS, ls_score, len(ls_results)),
-        make_dimension_score(CapabilityDimension.RESEARCH_PRODUCTIVITY, rd_score, len(rd_results)),
-    ]
-    snapshot.compute_composite()
-    
-    # Compute Prize Readiness
-    scores_map = {s.dimension.value: s.raw_score for s in snapshot.dimension_scores}
-    engine = PrizeReadinessEngine()
-    readiness_scores = engine.compute_all(scores_map)
-    
-    # Get previous run for comparison
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    prev_run = None
-    prev_readiness = None
-    
-    try:
-        # Save run first so it exists, but fetch previous first
-        prev_row = cursor.execute(
-            "SELECT json_data FROM eval_runs ORDER BY timestamp DESC LIMIT 1"
-        ).fetchone()
-        
-        if prev_row:
-            prev_run = json.loads(prev_row[0])
-            prev_run_id = prev_run["run_id"]
-            readiness_rows = cursor.execute(
-                "SELECT json_data FROM eval_readiness WHERE run_id = ?", (prev_run_id,)
-            ).fetchall()
-            prev_readiness = [json.loads(r[0]) for r in readiness_rows]
-    except sqlite3.OperationalError:
-        pass
-        
-    # Ensure tables exist
+def _ensure_eval_tables(cursor: sqlite3.Cursor) -> None:
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS eval_runs (
         run_id TEXT PRIMARY KEY,
@@ -213,46 +155,76 @@ def trigger_benchmark():
         PRIMARY KEY (run_id, case_id)
     )
     """)
-    
-    # Save current run
+
+
+@router.post("/run", response_model=BenchmarkRunResponse)
+def trigger_benchmark():
+    """Run all capability benchmarks synchronously and return current scores & delta report."""
+    db_path = settings.db_path
+    bundle = run_all_capability_benchmarks(db_path)
+    snapshot = bundle.snapshot
+
+    engine = PrizeReadinessEngine()
+    readiness_scores = engine.compute_all(bundle.scores_map)
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    prev_run = None
+    prev_readiness = None
+
+    try:
+        prev_row = cursor.execute(
+            "SELECT json_data FROM eval_runs ORDER BY timestamp DESC LIMIT 1"
+        ).fetchone()
+
+        if prev_row:
+            prev_run = _normalize_snapshot(json.loads(prev_row[0]))
+            prev_run_id = prev_run["run_id"]
+            readiness_rows = cursor.execute(
+                "SELECT json_data FROM eval_readiness WHERE run_id = ?", (prev_run_id,)
+            ).fetchall()
+            prev_readiness = [json.loads(r[0]) for r in readiness_rows]
+    except sqlite3.OperationalError:
+        pass
+
+    _ensure_eval_tables(cursor)
+
     cursor.execute(
         "INSERT INTO eval_runs (run_id, timestamp, composite_score, json_data) VALUES (?, ?, ?, ?)",
-        (snapshot.run_id, snapshot.timestamp, snapshot.composite_score, json.dumps(snapshot.to_dict()))
+        (snapshot.run_id, snapshot.timestamp, snapshot.composite_score, json.dumps(snapshot.to_dict())),
     )
-    
+
     for score in readiness_scores:
         cursor.execute(
             "INSERT INTO eval_readiness (run_id, problem_id, score, json_data) VALUES (?, ?, ?, ?)",
-            (snapshot.run_id, score.problem_id, score.score, json.dumps(score.to_dict()))
+            (snapshot.run_id, score.problem_id, score.score, json.dumps(score.to_dict())),
         )
 
-    all_results = mr_results + pv_results + cg_results + kq_results + ce_results + rp_results + ls_results + rd_results
-    for res in all_results:
+    for res in bundle.all_results:
         cursor.execute(
             "INSERT INTO eval_results (run_id, case_id, score, passed, time_ms, notes) VALUES (?, ?, ?, ?, ?, ?)",
-            (snapshot.run_id, res.case_id, res.score, 1 if res.passed else 0, res.time_ms, getattr(res, "notes", ""))
+            (snapshot.run_id, res.case_id, res.score, 1 if res.passed else 0, res.time_ms, getattr(res, "notes", "")),
         )
-        
+
     conn.commit()
     conn.close()
-    
-    # Generate delta report
+
     report = generate_delta_report(
         epic_name="EPIC-002",
         prev_snapshot=prev_run,
         curr_snapshot=snapshot,
         prev_readiness=prev_readiness,
-        curr_readiness=readiness_scores
+        curr_readiness=readiness_scores,
     )
-    
-    # Save Markdown report
+
     try:
-        report_md_path = f"docs/capability_delta_{run_id}.md"
+        report_md_path = f"docs/capability_delta_{snapshot.run_id}.md"
         with open(report_md_path, "w") as f:
             f.write(report.to_markdown())
-    except Exception:
+    except OSError:
         pass
-        
+
     return {
         "run_id": snapshot.run_id,
         "timestamp": snapshot.timestamp,

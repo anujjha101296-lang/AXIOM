@@ -5,11 +5,21 @@ Core benchmark models, scoring schemas, and the level-classification engine.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class CapabilityDimension(str, Enum):
+class EvidenceState(StrEnum):
+    """How a capability score was produced (S0-E4 evidence gate)."""
+
+    MEASURED = "measured"
+    SIMULATED = "simulated"
+    ESTIMATED = "estimated"
+    BASELINE = "baseline"
+    UNAVAILABLE = "unavailable"
+
+
+class CapabilityDimension(StrEnum):
     MATHEMATICAL_REASONING = "mathematical_reasoning"
     PROOF_VERIFICATION = "proof_verification"
     CONJECTURE_GENERATION = "conjecture_generation"
@@ -87,6 +97,8 @@ class DimensionScore:
     confidence: float     # 0.0 – 1.0: statistical confidence in score
     benchmark_count: int  # number of benchmark cases contributing
     estimated: bool = False  # True if score is estimated (no benchmark evidence)
+    evidence_state: EvidenceState = EvidenceState.ESTIMATED
+    limitations: list[str] = field(default_factory=list)
 
     @property
     def weighted_score(self) -> float:
@@ -125,6 +137,8 @@ class CapabilitySnapshot:
                     "confidence": s.confidence,
                     "benchmark_count": s.benchmark_count,
                     "estimated": s.estimated,
+                    "evidence_state": s.evidence_state.value,
+                    "limitations": list(s.limitations),
                     "weighted": s.weighted_score,
                 }
                 for s in self.dimension_scores
@@ -147,9 +161,13 @@ def make_dimension_score(
     benchmark_count: int,
     confidence: float = 0.8,
     estimated: bool = False,
+    evidence_state: EvidenceState | None = None,
+    limitations: list[str] | None = None,
 ) -> DimensionScore:
     """Construct a DimensionScore with level classification."""
     level = classify_level(raw_score, dimension)
+    if evidence_state is None:
+        evidence_state = EvidenceState.ESTIMATED if estimated else EvidenceState.MEASURED
     return DimensionScore(
         dimension=dimension,
         raw_score=round(raw_score, 4),
@@ -158,4 +176,6 @@ def make_dimension_score(
         confidence=confidence,
         benchmark_count=benchmark_count,
         estimated=estimated,
+        evidence_state=evidence_state,
+        limitations=list(limitations or []),
     )

@@ -129,6 +129,9 @@ def test_get_capability_scores_endpoint(temp_eval_db):
         assert "score" in info
         assert "level" in info
         assert "level_name" in info
+        assert "evidence_state" in info
+        assert "benchmark_count" in info
+        assert "limitations" in info
         assert 0.0 <= info["score"] <= 1.0
 
 
