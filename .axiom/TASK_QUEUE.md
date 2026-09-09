@@ -8,13 +8,17 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 
 | Rank | ID | Task | Dependencies | Acceptance signal | Status |
 |---:|---|---|---|---|---|
-| 1 | S0-E2 | Provision and document Python 3.10+ runtime; align local setup, CI, and Docker where applicable; run full suite. | Runtime authority/environment | Test collection works under supported runtime; complete results recorded. | **Complete (core):** 134/134 core tests pass; 26 e2e failures documented |
-| 2 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive, accessible page distinguishes current capabilities from future vision. | In progress — `/research` workspace linked from landing |
-| 3 | R0-PLAN | Establish the initial researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
-| 4 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
-| 5 | S0-E3 | Audit verification routes/models for simulation versus formal-proof truthfulness. | S0-E2 test baseline | Regression tests prove fallback results cannot claim formal verification. | **Complete** |
-| 6 | S0-E4 | Review and integrate EPIC-002 capability framework. | S0-E2, S0-E3 | Evidence state, benchmark count, and limitations tested and documented. | **Ready — highest priority** |
-| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S0-E4 | A result can identify inputs, runtime, configuration, and evidence tier. | Deferred |
+| 1 | S1-SCI-001 | Complete Lorenz evidence ladder: sweep, timestep sensitivity, convergence, independent verifier, provenance, report. | Local scientific runtime | Reproducible evidence package with explicit numerical evidence tier. | **Active** |
+| 2 | S1-SCI-002 | Build bounded research-loop state machine: planner → experiment designer → executor → critic → verifier. | S1-SCI-001 | A question produces a sequence of bounded executable experiments. | Ready |
+| 3 | S1-SCI-003 | Add AXIOM Scientific Intelligence Benchmark v0.1. | S1-SCI-001/002 | Quantitative benchmark with failure cases and reproducibility metadata. | Planned |
+| 4 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive page distinguishes current capabilities from future vision. | In progress |
+| 5 | R0-PLAN | Maintain researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
+| 6 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
+| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S1-SCI-001 | Result identifies inputs, runtime, configuration, and evidence tier. | Ready
+
+## Two-month operating rule
+
+Prefer work that increases verified scientific capability over cosmetic UI. Every week must ship at least one research artifact, one product improvement, and one company-learning artifact.
 
 ## Queue protocol
 
