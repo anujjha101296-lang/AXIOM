@@ -1,90 +1,115 @@
-# AXIOM — Epistemic Scientific Research & Formal Proof Engine (v0.1.0 Founder Release)
+# AXIOM — Epistemic Scientific Research & Formal Proof Engine (v0.2.0)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/anujjha101296-lang/AXIOM)
-[![Release](https://img.shields.io/badge/version-0.1.0--founder-blue.svg)](https://github.com/anujjha101296-lang/AXIOM/releases/tag/v0.1.0)
+[![Release](https://img.shields.io/badge/version-0.2.0--scientific-runtime-blue.svg)](https://github.com/anujjha101296-lang/AXIOM/releases)
 
-**AXIOM** is an autonomous scientific research, hypothesis formulation, computational experiment, and formal proof verification engine. AXIOM combines semantic retrieval, claim graphs, hypothesis reasoning, sandboxed numerical simulation, and interactive theorem proving (Lean 4 / SMT Z3) into a single production-ready platform.
+**AXIOM** is an evidence-first scientific research platform. Its current wedge is computational physics and mathematical intelligence: bounded hypotheses, deterministic experiments, provenance, numerical critique, reproducibility, and formal verification paths.
 
----
+> **Design principle:** agents propose and investigate; deterministic scientific systems establish computational evidence.
 
-## 🌟 Key Capabilities
+## Current capabilities
 
-### 1. Scientific Knowledge Graph & Claim Graph (Phase 13)
-- Provenance chain: $\text{CLAIM} \rightarrow \text{EVIDENCE} \rightarrow \text{CHUNK} \rightarrow \text{SOURCE} \rightarrow \text{DOCUMENT/URL}$
-- Conservative entity resolution with multi-tier matching.
-- Explicit disagreement & contradiction detection (`Claim A CONTRADICTS Claim B`).
+### Scientific runtime
+- Deterministic Lorenz simulation and paired-trajectory sensitivity experiments.
+- Parameter sweeps and timestep-convergence checks.
+- Independent midpoint-integrator cross-check.
+- Explicit evidence tier `NUMERICAL_OBSERVATION`.
+- Provenance metadata, content hashing, and Markdown/JSON evidence reports.
+- Deterministic scientific critic with explicit acceptance/rejection gates.
+- Fixed `lorenz-evidence-v1` benchmark contract.
+- Bounded research loop: planner → hypothesis → experiment design → execution → critic → verification/repeat → completion/failure.
 
-### 2. Hypothesis & Scientific Reasoning Engine (Phase 14)
-- Controlled status lifecycle: `PROPOSED`, `UNDER_REVIEW`, `SUPPORTED`, `WEAKLY_SUPPORTED`, `CONTRADICTED`, `FALSIFIED`, `INCONCLUSIVE`, `RETIRED`.
-- Scientific critique engine evaluating logical consistency, circular reasoning, and unfalsifiability.
-- Observable predictions with explicit falsifiers.
+### Existing research platform
+- Scientific knowledge/claim graph.
+- Research workspace for projects, documents, notes, search, and paper Q&A.
+- Hypothesis reasoning and experiment APIs.
+- SMT/Z3 and Lean-oriented verification infrastructure.
+- Research pipeline, mission control, control plane, evaluation, and observability components.
 
-### 3. Computational Experiment & Verification Engine (Phase 15)
-- Sandboxed Python computational execution with AST safety validation and `sys.settrace()` runtime limits (5s timeout, 128MB RAM limit, 50KB output limit).
-- Dual-run reproducibility testing & independent analytical/numerical verifiers.
-- **Epistemic Principle**: Finite computational observation $\neq$ mathematical proof.
+## Epistemic safety
 
-### 4. Formal Mathematics & Proof Verification Engine (Phase 16)
-- **Lean 4 Integration**: Theorem skeleton generation, syntax checking, and `sorry`-free proof verification.
-- **SMT Z3 Gateway**: Propositional & predicate logic satisfiability (`SAT`, `UNSAT`, `UNKNOWN`).
-- **Counterexample Hunter**: Finite domain witness search.
+AXIOM deliberately distinguishes:
 
----
+```text
+GENERATED
+   ↓
+NUMERICAL_OBSERVATION
+   ↓
+NUMERICALLY_ROBUST
+   ↓
+INDEPENDENTLY_CHECKED
+   ↓
+SYMBOLICALLY_VERIFIED
+   ↓
+FORMALLY_VERIFIED
+```
 
-## 🚀 Quickstart
+A numerical observation is never presented as a mathematical proof merely because an AI model says so.
 
-### Prerequisites
-- Python 3.12+ / 3.13+
-- Node.js 20+
+## Local quickstart
 
-### Local Setup
 ```bash
-# 1. Clone repository
 git clone git@github.com:anujjha101296-lang/AXIOM.git
 cd AXIOM
-
-# 2. Set up Python virtual environment
 python3 -m venv .venv312
 source .venv312/bin/activate
-pip install -r requirements.txt # or poetry install
+pip install -r requirements.txt  # or: poetry install
+```
 
-# 3. Apply database migrations
+Run the deterministic scientific runtime:
+
+```bash
+python -m axiom.science_runtime.cli --rho 28
+python -m axiom.science_runtime.cli --sweep
+python -m axiom.science_runtime.cli --evidence --rho 28 --json-out axiom_lorenz_evidence.json --report-out axiom_lorenz_report.md
+```
+
+Run the bounded research loop from Python:
+
+```python
+from axiom.science_runtime import ResearchQuestion, run_research
+
+run = run_research(ResearchQuestion(
+    text="Investigate robust sensitivity in the Lorenz system.",
+    max_experiments=1,
+    allowed_rho=(28.0,),
+))
+print(run.stage)
+print(run.conclusion)
+```
+
+Optional local planning is available through Ollama. No paid API is required for the deterministic scientific runtime.
+
+## API / UI
+
+The broader platform uses FastAPI and Next.js. The intended product object is a **Research Run** with an evidence timeline, experiment artifacts, verification state, and provenance inspector—not a generic chat transcript.
+
+```bash
 alembic upgrade head
-
-# 4. Start FastAPI backend
 uvicorn axiom.services.api_gateway.main:app --reload --port 8000
 
-# 5. Start Next.js frontend (in separate terminal)
 cd ui
 npm install
-npm run build --webpack
-npm run dev --webpack
+npm run build
+npm run dev
 ```
 
----
+## Verification status
 
-## 🐳 One-Command Docker Deployment
+Do not infer green status from this README. The authoritative signal is the current CI run and independently executed local tests. The latest development environment has not independently executed the new scientific test suite, so this repository does not claim a fresh local pass here.
 
-```bash
-docker-compose up --build -d
-```
-- **Backend API**: `http://localhost:8000/docs`
-- **Frontend Workspace**: `http://localhost:3000`
+## Architecture
 
----
+See [`docs/AXIOM_TECHNICAL_EVOLUTION.md`](docs/AXIOM_TECHNICAL_EVOLUTION.md) for the target architecture covering agent orchestration, scientific tools, PostgreSQL/JSONB/pgvector, backend jobs, frontend research runs, observability, security, and evaluation.
 
-## 🧪 Benchmark & Test Verification
+## Two-month target
 
-```bash
-# Run 100% full regression test suite across all phases
-EMBEDDING_PROVIDER=test ENVIRONMENT=development .venv312/bin/python -m pytest tests/ -v
+The near-term objective is a reproducible end-to-end workflow:
 
-# Run Phase 16 Formal Mathematics Benchmarks (12/12 Passed)
-.venv312/bin/python benchmarks/phase16_formal_benchmark.py
-```
+**scientific question → falsifiable hypothesis → bounded experiment → deterministic execution → critique → independent verification → reproducible report**
 
----
+The longer-term goal is to evaluate whether this architecture can produce genuinely useful scientific progress beyond a plain LLM plus scripts.
 
-## 📄 License
+## License
+
 Licensed under the [MIT License](LICENSE).
