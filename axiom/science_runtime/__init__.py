@@ -1,10 +1,19 @@
 """Provider-neutral scientific discovery runtime.
 
 The runtime is deterministic by default. LLMs are optional accelerators, never
-required for the scientific computation or evidence record.
+required for scientific computation or evidence records.
 """
 
-from .models import ExperimentRecord, LorenzResult
+from .benchmark import run_lorenz_reference_benchmark
+from .critic import Critique, critique_evidence
 from .lorenz import run_lorenz_experiment
+from .models import ExperimentRecord, LorenzResult
 
-__all__ = ["ExperimentRecord", "LorenzResult", "run_lorenz_experiment"]
+__all__ = [
+    "Critique",
+    "ExperimentRecord",
+    "LorenzResult",
+    "critique_evidence",
+    "run_lorenz_experiment",
+    "run_lorenz_reference_benchmark",
+]
