@@ -7,40 +7,51 @@ Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Up
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. Core engineering baselines and the researcher workspace exist. The active priority is a measurable, local-first scientific execution loop.
+AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is mathematical intelligence and computational physics. The active priority is a measurable, local-first scientific execution loop that can later be driven by provider-neutral AI agents.
 
-## Completed
+## Completed / newly advanced
 
 - Operating contract and AXIOM Operating System under `.axiom/`.
 - Research Workspace v1 and verification truthfulness controls.
 - Core scientific/document/formal reasoning phases recorded in repository evidence.
-- **2026-09-09:** Added `axiom/science_runtime/` local-first deterministic Lorenz experiment runtime.
-- Added reproducible experiment records with explicit evidence tier `NUMERICAL_OBSERVATION`.
-- Added paired-trajectory sensitivity experiment and deterministic rho sweep.
-- Added timestep convergence and an independent midpoint-integrator cross-check.
-- Added structured `axiom.science.evidence.v1` bundles with provenance, limitations, and content hashing.
-- Added reproducible Markdown report generation and CLI flags for evidence export.
-- Added science-runtime tests and included them in the existing CI test command.
-- Added optional Ollama planner adapter; no paid API is required for the scientific runtime.
-- Added smoke tests and the two-month execution plan in `docs/TWO_MONTH_EXECUTION_PLAN.md`.
+- Deterministic Lorenz scientific runtime with explicit `NUMERICAL_OBSERVATION` evidence tier.
+- Paired-trajectory sensitivity experiment and deterministic rho sweep.
+- Timestep convergence and independent midpoint-integrator cross-check.
+- Structured `axiom.science.evidence.v1` bundles with provenance, limitations, and content hashing.
+- Reproducible Markdown report generation and CLI evidence export.
+- Deterministic scientific critic with explicit numerical-evidence acceptance gates.
+- Fixed Lorenz benchmark contract.
+- **2026-09-09:** Added a bounded research-loop state machine: planner → design → execute → critic → verify/repeat → complete/fail.
+- Added typed research question, hypothesis, experiment-plan, transition, and run records.
+- Added parameter allowlists and explicit experiment budgets so the autonomous loop fails closed rather than executing unbounded work.
+- Added an end-to-end deterministic research-loop test contract and CLI `--research` entrypoint.
+- Optional Ollama planner remains available; LLMs are accelerators, not sources of scientific truth.
+
+## Architecture direction
+
+- **Scientific runtime:** deterministic Python scientific tools remain the source of numerical truth.
+- **Agent runtime:** provider-neutral orchestration first; OpenAI Agents SDK can be an optional intelligence layer because it provides agents, tools, handoffs, guardrails, sessions, human-in-the-loop, and tracing. citeturn0search1turn0search6turn0search7
+- **Backend:** retain FastAPI for APIs and domain services; move durable research-run persistence toward PostgreSQL with JSONB/event records and optional pgvector rather than making a vector database the system of record. pgvector supports exact/approximate vector search alongside normal PostgreSQL ACID/JOIN capabilities. citeturn0search3
+- **Frontend:** retain the existing Next.js App Router research workspace and evolve it around evidence-first run views, experiment timelines, provenance, and benchmark dashboards rather than a generic chat UI. Next.js identifies App Router as the newer router for modern React features. citeturn0search2
+- **Observability:** adopt structured run IDs, transition events, tool-call provenance, latency/cost metrics, and agent traces. OpenAI Agents SDK tracing records generations, tool calls, handoffs, guardrails, and custom events when used. citeturn0search7
 
 ## Verification status
 
-- Code and tests have been committed to `main`.
-- **Local execution of the new test suite has not yet been independently run in this environment**, so passing status is not claimed here.
-- GitHub Actions should provide the authoritative clean-environment CI signal after the latest commits are processed; the existing CI workflow currently installs dependencies and runs its Python test command.
-- The scientific evidence remains numerical; convergence and independent integration checks do not constitute formal proof of chaos.
+- Repository changes have been committed to `main`.
+- **Local execution of the new test suite has not yet been independently run in this environment**, so passing status is not claimed.
+- GitHub Actions remains the authoritative clean-environment CI signal after the latest commits are processed; the existing workflow installs dependencies and runs its Python test command.
+- Scientific evidence remains numerical; convergence, solver cross-checks, and critic gates do not constitute formal proof of chaos.
 
-## Blocked
+## Blocked / constraints
 
-- No core engineering blocker.
-- Local LLM quality depends on the user's available hardware/model; this is intentionally an optional acceleration path.
+- No core engineering blocker identified.
+- Local LLM quality depends on available hardware/model; optional by design.
 - Vercel deployment access is not currently authorized through the connected deployment tool, so production deployment has not been attempted.
 - External deployment and paid compute remain human-approved decisions.
 
 ## Highest priority
 
-**S1-SCI-001:** Finish the Lorenz evidence ladder by validating the parameter sweep, provenance/report outputs, fresh-environment CI execution, and a fixed benchmark artifact.
+**S1-SCI-001 + S1-SCI-002:** finish the Lorenz evidence ladder and harden the bounded research loop with real tolerance semantics, robust independent verification, durable run/provenance storage, and provider-neutral agent adapters.
 
 ## 60-day target
 
