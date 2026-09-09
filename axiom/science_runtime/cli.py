@@ -5,6 +5,7 @@ import json
 
 from .lorenz import run_lorenz_experiment, sweep_rho
 from .report import build_lorenz_evidence_bundle, write_bundle
+from .research_loop import ResearchQuestion, run_research
 
 
 def main() -> None:
@@ -13,9 +14,21 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=10000)
     parser.add_argument("--sweep", action="store_true")
     parser.add_argument("--evidence", action="store_true", help="emit a reproducible evidence bundle")
+    parser.add_argument("--research", help="run a bounded scientific research loop")
+    parser.add_argument("--max-experiments", type=int, default=3)
     parser.add_argument("--json-out", help="write the evidence bundle to this JSON path")
     parser.add_argument("--report-out", help="write the Markdown report to this path")
     args = parser.parse_args()
+
+    if args.research:
+        run = run_research(
+            ResearchQuestion(
+                text=args.research,
+                max_experiments=args.max_experiments,
+            )
+        )
+        print(json.dumps(run.to_dict(), indent=2, sort_keys=True))
+        return
 
     if args.evidence:
         bundle = build_lorenz_evidence_bundle(args.rho)
