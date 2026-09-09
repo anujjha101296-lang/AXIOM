@@ -30,10 +30,10 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 ## Architecture direction
 
 - **Scientific runtime:** deterministic Python scientific tools remain the source of numerical truth.
-- **Agent runtime:** provider-neutral orchestration first; OpenAI Agents SDK can be an optional intelligence layer because it provides agents, tools, handoffs, guardrails, sessions, human-in-the-loop, and tracing. citeturn0search1turn0search6turn0search7
-- **Backend:** retain FastAPI for APIs and domain services; move durable research-run persistence toward PostgreSQL with JSONB/event records and optional pgvector rather than making a vector database the system of record. pgvector supports exact/approximate vector search alongside normal PostgreSQL ACID/JOIN capabilities. citeturn0search3
-- **Frontend:** retain the existing Next.js App Router research workspace and evolve it around evidence-first run views, experiment timelines, provenance, and benchmark dashboards rather than a generic chat UI. Next.js identifies App Router as the newer router for modern React features. citeturn0search2
-- **Observability:** adopt structured run IDs, transition events, tool-call provenance, latency/cost metrics, and agent traces. OpenAI Agents SDK tracing records generations, tool calls, handoffs, guardrails, and custom events when used. citeturn0search7
+- **Agent runtime:** provider-neutral orchestration first; OpenAI Agents SDK can be an optional intelligence layer with agents, tools, handoffs, guardrails, sessions, human-in-the-loop, and tracing.
+- **Backend:** retain FastAPI for APIs and domain services; move durable research-run persistence toward PostgreSQL with JSONB/event records and optional pgvector rather than making a vector database the system of record.
+- **Frontend:** retain the existing Next.js App Router research workspace and evolve it around evidence-first run views, experiment timelines, provenance, and benchmark dashboards rather than a generic chat UI.
+- **Observability:** adopt structured run IDs, transition events, tool-call provenance, latency/cost metrics, and agent traces.
 
 ## Verification status
 
