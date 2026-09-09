@@ -7,7 +7,7 @@ Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Up
 
 ## Where we are today
 
-AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. Core engineering baselines and the researcher workspace exist. The new priority is to turn that foundation into a measurable, local-first scientific execution loop.
+AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial wedge is mathematical intelligence: knowledge graph, ingestion, reasoning, verification, evaluation, and UI. Core engineering baselines and the researcher workspace exist. The active priority is a measurable, local-first scientific execution loop.
 
 ## Completed
 
@@ -17,18 +17,30 @@ AXIOM is a Python/FastAPI and Next.js research-platform repository whose initial
 - **2026-09-09:** Added `axiom/science_runtime/` local-first deterministic Lorenz experiment runtime.
 - Added reproducible experiment records with explicit evidence tier `NUMERICAL_OBSERVATION`.
 - Added paired-trajectory sensitivity experiment and deterministic rho sweep.
+- Added timestep convergence and an independent midpoint-integrator cross-check.
+- Added structured `axiom.science.evidence.v1` bundles with provenance, limitations, and content hashing.
+- Added reproducible Markdown report generation and CLI flags for evidence export.
+- Added science-runtime tests and included them in the existing CI test command.
 - Added optional Ollama planner adapter; no paid API is required for the scientific runtime.
 - Added smoke tests and the two-month execution plan in `docs/TWO_MONTH_EXECUTION_PLAN.md`.
+
+## Verification status
+
+- Code and tests have been committed to `main`.
+- **Local execution of the new test suite has not yet been independently run in this environment**, so passing status is not claimed here.
+- GitHub Actions should provide the authoritative clean-environment CI signal after the latest commits are processed; the existing CI workflow currently installs dependencies and runs its Python test command.
+- The scientific evidence remains numerical; convergence and independent integration checks do not constitute formal proof of chaos.
 
 ## Blocked
 
 - No core engineering blocker.
 - Local LLM quality depends on the user's available hardware/model; this is intentionally an optional acceleration path.
+- Vercel deployment access is not currently authorized through the connected deployment tool, so production deployment has not been attempted.
 - External deployment and paid compute remain human-approved decisions.
 
 ## Highest priority
 
-**S1-SCI-001:** Complete the Lorenz evidence ladder: parameter sweep, timestep sensitivity, convergence checks, independent numerical verifier, provenance persistence, and report generation.
+**S1-SCI-001:** Finish the Lorenz evidence ladder by validating the parameter sweep, provenance/report outputs, fresh-environment CI execution, and a fixed benchmark artifact.
 
 ## 60-day target
 
