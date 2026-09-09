@@ -21,10 +21,14 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 - Reproducible Markdown report generation and CLI evidence export.
 - Deterministic scientific critic with explicit numerical-evidence acceptance gates.
 - Fixed Lorenz benchmark contract.
-- **2026-09-09:** Added a bounded research-loop state machine: planner → design → execute → critic → verify/repeat → complete/fail.
-- Added typed research question, hypothesis, experiment-plan, transition, and run records.
-- Added parameter allowlists and explicit experiment budgets so the autonomous loop fails closed rather than executing unbounded work.
-- Added an end-to-end deterministic research-loop test contract and CLI `--research` entrypoint.
+- Bounded research-loop state machine: planner → hypothesis → design → execute → critic → verify/repeat → complete/fail.
+- Typed research question, hypothesis, experiment-plan, transition, and run records.
+- Parameter allowlists and explicit experiment budgets so the autonomous loop fails closed rather than executing unbounded work.
+- End-to-end deterministic research-loop test contract and CLI research entrypoint.
+- Dedicated authenticated FastAPI science-runtime router for bounded research and benchmark execution; gateway mounting remains the next integration step.
+- `docs/AXIOM_TECHNICAL_EVOLUTION.md` defining the target agent, data, backend, frontend, observability, security, and evaluation architecture.
+- CI strengthened to run the complete `tests/science_runtime` suite and database regression, with current Actions/setup-node/setup-python major versions and Node 20.
+- Root README rewritten to distinguish current evidence from future claims and remove unsupported production/build assertions.
 - Optional Ollama planner remains available; LLMs are accelerators, not sources of scientific truth.
 
 ## Architecture direction
@@ -37,9 +41,10 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 
 ## Verification status
 
-- Repository changes have been committed to `main`.
+- Repository changes are committed to `main`.
 - **Local execution of the new test suite has not yet been independently run in this environment**, so passing status is not claimed.
-- GitHub Actions remains the authoritative clean-environment CI signal after the latest commits are processed; the existing workflow installs dependencies and runs its Python test command.
+- CI configuration now explicitly targets the scientific runtime and database tests; actual green status must be confirmed from the resulting workflow run.
+- A visible Vercel check is pending on the latest workflow-related commit; deployment access remains separately constrained.
 - Scientific evidence remains numerical; convergence, solver cross-checks, and critic gates do not constitute formal proof of chaos.
 
 ## Blocked / constraints
@@ -52,6 +57,8 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 ## Highest priority
 
 **S1-SCI-001 + S1-SCI-002:** finish the Lorenz evidence ladder and harden the bounded research loop with real tolerance semantics, robust independent verification, durable run/provenance storage, and provider-neutral agent adapters.
+
+**Next product integration:** mount the science API into the gateway, persist research runs/events, then connect the existing Next.js workspace to live research-run state.
 
 ## 60-day target
 
