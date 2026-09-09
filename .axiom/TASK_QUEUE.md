@@ -9,7 +9,7 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 | Rank | ID | Task | Dependencies | Acceptance signal | Status |
 |---:|---|---|---|---|---|
 | 1 | S1-SCI-001 | Complete Lorenz evidence ladder: sweep, timestep sensitivity, convergence, independent verifier, provenance, report. | Local scientific runtime | Reproducible evidence package with explicit numerical evidence tier. | **Active** |
-| 2 | S1-SCI-002 | Build bounded research-loop state machine: planner → experiment designer → executor → critic → verifier. | S1-SCI-001 | A question produces a sequence of bounded executable experiments. | Ready |
+| 2 | S1-SCI-002 | Build bounded research-loop state machine: planner → experiment designer → executor → critic → verifier. | S1-SCI-001 | A question produces a sequence of bounded executable experiments. | **Next** |
 | 3 | S1-SCI-003 | Add AXIOM Scientific Intelligence Benchmark v0.1. | S1-SCI-001/002 | Quantitative benchmark with failure cases and reproducibility metadata. | Planned |
 | 4 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive page distinguishes current capabilities from future vision. | In progress |
 | 5 | R0-PLAN | Maintain researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
