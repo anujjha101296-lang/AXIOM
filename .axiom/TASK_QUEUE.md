@@ -8,13 +8,14 @@ Tasks are ordered by severity and by the weighted score in `DECISION_FRAMEWORK.m
 
 | Rank | ID | Task | Dependencies | Acceptance signal | Status |
 |---:|---|---|---|---|---|
-| 1 | S1-SCI-001 | Complete Lorenz evidence ladder: sweep, timestep sensitivity, convergence, independent verifier, provenance, report. | Local scientific runtime | Reproducible evidence package with explicit numerical evidence tier and declared tolerances. | **Active** |
+| 1 | S1-SCI-001 | Complete Lorenz evidence ladder: declared tolerances, sweep, timestep sensitivity, convergence, independent verifier, provenance, report. | Local scientific runtime | Reproducible evidence package with explicit numerical evidence tier and declared tolerance policy. | **Active** |
 | 2 | S1-SCI-002 | Harden bounded research-loop state machine: planner → experiment designer → executor → critic → verifier, with persistence-ready run records and provider-neutral agent adapters. | S1-SCI-001 | A question produces a bounded, auditable sequence of executable experiments with explicit stop conditions. | **Active** |
-| 3 | S1-SCI-003 | Add AXIOM Scientific Intelligence Benchmark v0.1. | S1-SCI-001/002 | Quantitative benchmark with failure cases and reproducibility metadata. | Planned |
-| 4 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive page distinguishes current capabilities from future vision. | In progress |
-| 5 | R0-PLAN | Maintain researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
-| 6 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
-| 7 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S1-SCI-001 | Result identifies inputs, runtime, configuration, and evidence tier. | Ready |
+| 3 | S1-SCI-004 | Integrate science runtime API into the FastAPI gateway and researcher workspace. | S1-SCI-002 | Authenticated API starts a bounded run and exposes run/evidence state to the UI. | **Next** |
+| 4 | S1-SCI-003 | Add AXIOM Scientific Intelligence Benchmark v0.1. | S1-SCI-001/002 | Quantitative benchmark with baseline, failure cases, and reproducibility metadata. | Planned |
+| 5 | P0-WEB | Create an honest public landing experience for the AI research workspace. | Existing Next.js UI | Responsive page distinguishes current capabilities from future vision. | In progress |
+| 6 | R0-PLAN | Maintain researcher workflow, benchmark program, and monthly evidence review. | Existing repository evidence | Research plan names workflow, measurement, non-claims, and review cadence. | In progress |
+| 7 | C0-PMO | Establish daily and weekly PMO cadence. | AOS | Operating document answers daily priorities, parallelism, blockers, and weekly shipping target. | In progress |
+| 8 | H1-OBS | Add reproducible run/provenance records to scientific capability evaluations. | S1-SCI-001 | Result identifies inputs, runtime, configuration, and evidence tier. | Ready |
 
 ## Two-month operating rule
 
