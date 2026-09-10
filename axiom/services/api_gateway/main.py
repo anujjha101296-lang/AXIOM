@@ -34,6 +34,7 @@ from axiom.services.api_gateway.auth import router as auth_router
 from axiom.services.api_gateway.routes.projects import router as projects_router
 from axiom.services.api_gateway.routes.documents import router as documents_router
 from axiom.services.api_gateway.routes.search import router as search_router
+from axiom.services.api_gateway.routes.science import router as science_router
 
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
@@ -146,6 +147,9 @@ app.include_router(control_plane_router)
 
 # ── Alpha Router (Private Alpha Access & Telemetry) ──────────────────────────
 app.include_router(alpha_router)
+
+# ── Scientific Runtime Router (bounded computational research) ───────────────
+app.include_router(science_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
