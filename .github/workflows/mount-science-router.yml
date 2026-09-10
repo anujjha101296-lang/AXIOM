@@ -1,0 +1,43 @@
+name: Mount science router
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  mount:
+    if: "!contains(github.event.head_commit.message, 'chore(ci): mount science router')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Mount router into API gateway
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path("axiom/services/api_gateway/main.py")
+          s = p.read_text(encoding="utf-8")
+          imp = "from axiom.services.api_gateway.routes.science import router as science_router\n"
+          marker = "from axiom.services.api_gateway.routes.search import router as search_router\n"
+          if imp not in s:
+              s = s.replace(marker, marker + imp)
+          include = "app.include_router(science_router)"
+          anchor = "app.include_router(alpha_router)"
+          if include not in s:
+              s = s.replace(anchor, anchor + "\n\n# ── Scientific Runtime Router (bounded computational research) ───────────────\n" + include)
+          p.write_text(s, encoding="utf-8")
+      - name: Commit mounted router
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Science router already mounted"
+            exit 0
+          fi
+          git add axiom/services/api_gateway/main.py
+          git commit -m "chore(ci): mount science router"
+          git push
