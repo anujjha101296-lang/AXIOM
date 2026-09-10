@@ -30,18 +30,18 @@ def critique_evidence(
     independent_relative_error: float,
     finite: bool,
     has_provenance: bool,
+    convergence_tolerance: float = 1.0,
+    independent_tolerance: float = 0.1,
 ) -> Critique:
-    """Apply deterministic scientific-quality gates to an evidence bundle.
-
-    This critic evaluates evidence quality; it does not infer a mathematical
-    theorem from numerical data.
-    """
+    """Apply explicit numerical-quality gates without promoting evidence to proof."""
+    if convergence_tolerance <= 0 or independent_tolerance <= 0:
+        raise ValueError("Numerical tolerances must be positive")
     checks = {
         "finite": finite,
         "reproducible": reproducible,
         "provenance": has_provenance,
-        "convergence": bool(convergence_errors) and all(e >= 0 and e < 1.0 for e in convergence_errors),
-        "independent_check": independent_relative_error < 0.1,
+        "convergence": bool(convergence_errors) and all(0 <= e < convergence_tolerance for e in convergence_errors),
+        "independent_check": 0 <= independent_relative_error < independent_tolerance,
         "evidence_tier_declared": evidence_tier == "NUMERICAL_OBSERVATION",
     }
     concerns: list[str] = []
@@ -56,17 +56,16 @@ def critique_evidence(
         concerns.append("Provenance metadata is incomplete.")
         next_actions.append("Persist source, parameters, method, and content hash.")
     if not checks["convergence"]:
-        concerns.append("Convergence evidence did not satisfy the current numerical gate.")
+        concerns.append(f"Convergence evidence exceeded the declared tolerance ({convergence_tolerance:g}).")
         next_actions.append("Repeat with a finer timestep ladder or shorter horizon.")
     if not checks["independent_check"]:
-        concerns.append("Independent solver disagreement exceeds the current tolerance.")
+        concerns.append(f"Independent solver disagreement exceeded the declared tolerance ({independent_tolerance:g}).")
         next_actions.append("Investigate solver error and repeat the cross-check.")
     if not checks["evidence_tier_declared"]:
         concerns.append("Evidence tier is missing or incorrectly upgraded.")
         next_actions.append("Downgrade the claim to the strongest explicitly supported evidence tier.")
 
-    passed = all(checks.values())
-    if passed:
+    if all(checks.values()):
         return Critique(
             verdict="ACCEPT_NUMERICAL_EVIDENCE",
             severity="LOW",
