@@ -1,10 +1,4 @@
-"""Persistence boundary for bounded scientific research runs.
-
-The runtime owns the scientific state machine; this module owns durable event
-serialization.  It intentionally uses the existing SQLAlchemy session factory
-so SQLite remains a zero-cost development backend and PostgreSQL can be used
-without changing the research protocol.
-"""
+"""Persistence boundary for bounded scientific research runs."""
 from __future__ import annotations
 
 import json
@@ -13,15 +7,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .models import ResearchRun
+from .research_loop import ResearchRun
 
 
 class ResearchRunStore:
-    """Durable JSONL store for replayable research runs.
-
-    JSONL is deliberately the first persistence adapter: append-only events are
-    easy to inspect, diff, archive, and migrate into PostgreSQL later.
-    """
+    """Append-only, local-first persistence adapter for research runs."""
 
     def __init__(self, root: str | Path = "data/research_runs") -> None:
         self.root = Path(root)
@@ -35,7 +25,7 @@ class ResearchRunStore:
             "run_id": run.run_id,
             "event_type": event_type,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "state": getattr(run.state, "value", run.state),
+            "stage": run.stage.value,
             "payload": payload or {},
         }
         with path.open("a", encoding="utf-8") as handle:
