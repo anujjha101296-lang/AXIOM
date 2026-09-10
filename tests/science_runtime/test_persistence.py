@@ -1,9 +1,9 @@
 from axiom.science_runtime.persistence import ResearchRunStore
-from axiom.science_runtime.research_loop import ResearchRun
+from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun
 
 
 def test_research_run_store_appends_event_and_snapshot(tmp_path):
-    run = ResearchRun.create("Investigate Lorenz sensitivity", max_experiments=2)
+    run = ResearchRun(run_id="research-test", question=ResearchQuestion("Investigate Lorenz sensitivity", max_experiments=2))
     store = ResearchRunStore(tmp_path)
 
     event_path = store.append(run, "RUN_CREATED", {"source": "test"})
