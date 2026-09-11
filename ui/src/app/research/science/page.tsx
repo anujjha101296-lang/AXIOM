@@ -17,7 +17,7 @@ type Run = {
     convergence: Array<{ reference_error: number | null }>;
     independent_check: { relative_error: number; finite: boolean };
   }>;
-  critiques: Array<{ verdict: string; concerns: string[]; next_action: string }>;
+  critiques: Array<{ verdict: string; concerns: string[]; next_actions: string[] }>;
   stage: string;
   transitions: Array<{ stage: string; action: string; detail: string }>;
   conclusion?: string | null;
@@ -25,10 +25,12 @@ type Run = {
 
 type Benchmark = {
   benchmark: string;
-  passed: boolean;
-  verdict: string;
-  evidence_tier: string;
+  rho: number;
   experiment_id: string;
+  convergence: Array<{ reference_error: number | null }>;
+  independent_check: { relative_error: number; finite: boolean };
+  provenance: { input_digest_sha256?: string };
+  critic: { verdict: string; severity: string; checks: Record<string, boolean>; concerns: string[]; next_actions: string[] };
 };
 
 export default function ScientificResearchPage() {
@@ -119,6 +121,10 @@ export default function ScientificResearchPage() {
           <button className="secondary" disabled={busy} type="button" onClick={runBenchmark}>
             Run evidence benchmark
           </button>
+          <label className="token-field">
+            API token
+            <input value={token} onChange={(e) => setToken(e.target.value)} type="password" autoComplete="off" />
+          </label>
           {error && <div className="error">{error}</div>}
         </form>
 
@@ -173,15 +179,16 @@ export default function ScientificResearchPage() {
 
       {benchmark && (
         <section className="panel benchmark-panel">
-          <div className="panel-heading"><div><span className="kicker">04</span><h2>Benchmark result</h2></div><span className="evidence-badge">{benchmark.verdict}</span></div>
-          <div className="benchmark-result"><strong>{benchmark.passed ? "PASS" : "FAIL"}</strong><span>{benchmark.benchmark} · {benchmark.evidence_tier} · {benchmark.experiment_id}</span></div>
+          <div className="panel-heading"><div><span className="kicker">04</span><h2>Benchmark result</h2></div><span className="evidence-badge">{benchmark.critic.verdict}</span></div>
+          <div className="benchmark-result"><strong>{benchmark.critic.verdict === "ACCEPT_NUMERICAL_EVIDENCE" ? "PASS" : "FAIL"}</strong><span>{benchmark.benchmark} · rho={benchmark.rho} · {benchmark.experiment_id}</span></div>
+          <div className="hashes"><code>provenance {benchmark.provenance.input_digest_sha256 ?? "—"}</code><code>independent relative error {benchmark.independent_check.relative_error.toExponential(2)}</code></div>
         </section>
       )}
 
       <style jsx>{`
         .science-shell{min-height:100vh;padding:48px;max-width:1440px;margin:0 auto;color:#111;background:#f7f7f5}
         .science-header{display:flex;justify-content:space-between;gap:32px;align-items:flex-start;margin-bottom:32px}.eyebrow,.kicker{font-size:11px;letter-spacing:.14em;font-weight:700;color:#777}.science-header h1{font-size:42px;letter-spacing:-.04em;margin:8px 0}.science-header p{color:#666;margin:0}.stage-pill,.evidence-badge,.runtime-tag{border:1px solid #d5d5d0;border-radius:999px;padding:8px 12px;font-size:11px;letter-spacing:.08em;font-weight:700;background:#fff}
-        .science-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:20px}.panel{background:#fff;border:1px solid #deded8;border-radius:18px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.035);margin-bottom:20px}.panel-heading{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.panel-heading h2{font-size:21px;margin:5px 0 0;letter-spacing:-.02em}.kicker{display:block;color:#aaa}.launch-panel label{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:700;color:#555;margin-bottom:18px}.launch-panel textarea,.launch-panel select{font:inherit;border:1px solid #d8d8d2;border-radius:10px;padding:12px;background:#fafaf8;color:#111;outline:none}.control-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bounds{border:1px dashed #ccc;padding:12px;border-radius:10px;display:flex;flex-direction:column;justify-content:center;gap:5px;font-size:11px;color:#777}.bounds strong{font-size:13px;color:#222}.launch-panel button{width:100%;border:0;border-radius:10px;padding:13px;margin-top:4px;background:#111;color:#fff;font-weight:700;cursor:pointer}.launch-panel button:disabled{opacity:.45;cursor:wait}.launch-panel .secondary{background:#f0f0eb;color:#222}.error{margin-top:14px;padding:10px;border-radius:9px;background:#fff0f0;color:#a22;font-size:12px}.empty{min-height:300px;display:grid;place-items:center;text-align:center;color:#888;font-size:13px}.run-id{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:#777;margin-bottom:18px}.hypothesis{border-left:3px solid #111;padding:2px 0 2px 14px;margin-bottom:24px}.hypothesis span,.conclusion>span{font-size:10px;letter-spacing:.12em;font-weight:800;color:#888}.hypothesis p{margin:7px 0;line-height:1.55}.timeline{display:flex;flex-direction:column}.timeline-item{display:grid;grid-template-columns:18px 1fr;gap:10px;position:relative;padding-bottom:18px}.timeline-item:not(:last-child):before{content:"";position:absolute;left:5px;top:11px;bottom:0;width:1px;background:#ddd}.dot{width:10px;height:10px;border:2px solid #111;border-radius:50%;background:#fff;z-index:1}.timeline-item strong{font-size:11px;margin-right:8px}.timeline-item span{font-size:11px;color:#777}.timeline-item p{font-size:12px;color:#666;margin:5px 0 0;line-height:1.45}.experiment-list{display:flex;flex-direction:column;gap:12px}.experiment{border:1px solid #e2e2dc;border-radius:12px;padding:16px}.experiment-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}.experiment-top span{font-size:10px;font-weight:800;letter-spacing:.08em}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metrics div{background:#f7f7f4;border-radius:9px;padding:10px}.metrics span{display:block;font-size:10px;color:#888;margin-bottom:5px}.metrics strong{font-size:13px}.hashes{display:grid;gap:4px;margin-top:12px}.hashes code{font-size:9px;color:#777;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.concerns{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.concerns span{font-size:10px;padding:5px 7px;background:#f2f2ed;border-radius:999px;color:#666}.conclusion{margin-top:18px;padding-top:18px;border-top:1px solid #e2e2dc}.conclusion p{margin:7px 0 0;line-height:1.55}.benchmark-result{display:flex;align-items:center;gap:16px}.benchmark-result strong{font-size:28px}.benchmark-result span{font-size:12px;color:#666}.science-header+ .science-grid{}
+        .science-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:20px}.panel{background:#fff;border:1px solid #deded8;border-radius:18px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.035);margin-bottom:20px}.panel-heading{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.panel-heading h2{font-size:21px;margin:5px 0 0;letter-spacing:-.02em}.kicker{display:block;color:#aaa}.launch-panel label{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:700;color:#555;margin-bottom:18px}.launch-panel textarea,.launch-panel select,.launch-panel input{font:inherit;border:1px solid #d8d8d2;border-radius:10px;padding:12px;background:#fafaf8;color:#111;outline:none}.token-field{margin-top:18px}.control-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bounds{border:1px dashed #ccc;padding:12px;border-radius:10px;display:flex;flex-direction:column;justify-content:center;gap:5px;font-size:11px;color:#777}.bounds strong{font-size:13px;color:#222}.launch-panel button{width:100%;border:0;border-radius:10px;padding:13px;margin-top:4px;background:#111;color:#fff;font-weight:700;cursor:pointer}.launch-panel button:disabled{opacity:.45;cursor:wait}.launch-panel .secondary{background:#f0f0eb;color:#222}.error{margin-top:14px;padding:10px;border-radius:9px;background:#fff0f0;color:#a22;font-size:12px}.empty{min-height:300px;display:grid;place-items:center;text-align:center;color:#888;font-size:13px}.run-id{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:#777;margin-bottom:18px}.hypothesis{border-left:3px solid #111;padding:2px 0 2px 14px;margin-bottom:24px}.hypothesis span,.conclusion>span{font-size:10px;letter-spacing:.12em;font-weight:800;color:#888}.hypothesis p{margin:7px 0;line-height:1.55}.timeline{display:flex;flex-direction:column}.timeline-item{display:grid;grid-template-columns:18px 1fr;gap:10px;position:relative;padding-bottom:18px}.timeline-item:not(:last-child):before{content:"";position:absolute;left:5px;top:11px;bottom:0;width:1px;background:#ddd}.dot{width:10px;height:10px;border:2px solid #111;border-radius:50%;background:#fff;z-index:1}.timeline-item strong{font-size:11px;margin-right:8px}.timeline-item span{font-size:11px;color:#777}.timeline-item p{font-size:12px;color:#666;margin:5px 0 0;line-height:1.45}.experiment-list{display:flex;flex-direction:column;gap:12px}.experiment{border:1px solid #e2e2dc;border-radius:12px;padding:16px}.experiment-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}.experiment-top span{font-size:10px;font-weight:800;letter-spacing:.08em}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metrics div{background:#f7f7f4;border-radius:9px;padding:10px}.metrics span{display:block;font-size:10px;color:#888;margin-bottom:5px}.metrics strong{font-size:13px}.hashes{display:grid;gap:4px;margin-top:12px}.hashes code{font-size:9px;color:#777;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.concerns{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.concerns span{font-size:10px;padding:5px 7px;background:#f2f2ed;border-radius:999px;color:#666}.conclusion{margin-top:18px;padding-top:18px;border-top:1px solid #e2e2dc}.conclusion p{margin:7px 0 0;line-height:1.55}.benchmark-result{display:flex;align-items:center;gap:16px}.benchmark-result strong{font-size:28px}.benchmark-result span{font-size:12px;color:#666}
         @media(max-width:900px){.science-shell{padding:24px}.science-grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.science-header{flex-direction:column}.science-header h1{font-size:32px}}
       `}</style>
     </main>
