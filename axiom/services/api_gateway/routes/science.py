@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
@@ -10,8 +11,9 @@ from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
 from axiom.services.api_gateway.auth import verify_token
-from axiom.science_runtime import ResearchQuestion, run_lorenz_reference_benchmark, run_research
+from axiom.science_runtime.benchmark import run_lorenz_reference_benchmark
 from axiom.science_runtime.persistence import ResearchRunStore
+from axiom.science_runtime.research_loop import ResearchQuestion, run_research
 
 router = APIRouter(prefix="/api/v1/science", tags=["science-runtime"])
 _store = ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
@@ -21,7 +23,11 @@ class ResearchRequest(BaseModel):
     question: str = Field(min_length=5, max_length=2000)
     model: str = Field(default="lorenz", min_length=1, max_length=64)
     max_experiments: int = Field(default=3, ge=1, le=10)
-    allowed_rho: list[float] = Field(default_factory=lambda: [20.0, 24.0, 28.0, 32.0, 40.0], min_length=1, max_length=10)
+    allowed_rho: list[float] = Field(
+        default_factory=lambda: [20.0, 24.0, 28.0, 32.0, 40.0],
+        min_length=1,
+        max_length=10,
+    )
 
 
 @router.post("/research", response_model=dict[str, Any])
@@ -56,7 +62,6 @@ async def get_research_run(run_id: str, token: str = Depends(verify_token)) -> d
     if not path.exists():
         raise HTTPException(status_code=404, detail="Research run not found")
     try:
-        import json
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Failed to read research run") from exc
@@ -68,7 +73,6 @@ async def get_research_events(run_id: str, token: str = Depends(verify_token)) -
     path = _store.root / f"{run_id}.jsonl"
     if not path.exists():
         raise HTTPException(status_code=404, detail="Research run not found")
-    import json
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
