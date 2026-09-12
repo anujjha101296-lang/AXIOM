@@ -8,8 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from dataclasses import asdict
-from typing import Any
+from typing import Any, Callable, Coroutine
 
 from .agent_protocol import ScientificPlan, ScientificPlanner
 
@@ -28,7 +27,7 @@ _ALLOWED_PARAMETER_RANGES: dict[str, tuple[float, float]] = {
 
 
 def validate_scientific_plan(plan: ScientificPlan) -> ScientificPlan:
-    """Validate the provider output before it can enter the runtime boundary."""
+    """Validate provider output before it can enter the runtime boundary."""
     if not plan.hypothesis.strip() or not plan.experiment_name.strip():
         raise ValueError("scientific plans require a hypothesis and experiment name")
     if not plan.parameters:
@@ -44,19 +43,6 @@ def validate_scientific_plan(plan: ScientificPlan) -> ScientificPlan:
             raise ValueError(f"parameter {name!r} is outside its safe range [{low}, {high}]")
 
     return plan
-
-
-class _PlannerOutput:
-    """Pydantic-compatible structured output declared lazily by the SDK."""
-
-    def __init__(self, hypothesis: str, rationale: str, experiment_name: str,
-                 parameters: dict[str, float], expected_observation: str) -> None:
-        self.hypothesis = hypothesis
-        self.rationale = rationale
-        self.experiment_name = experiment_name
-        self.parameters = parameters
-        self.expected_observation = expected_observation
-
 
 
 def _output_type() -> Any:
@@ -112,7 +98,7 @@ class OpenAIAgentsScientificPlanner(ScientificPlanner):
         return _to_plan(result.final_output)
 
     def plan(self, question: str) -> ScientificPlan:
-        return _run_sync(self.plan_async(question))
+        return _run_sync(self.plan_async, question)
 
 
 class OllamaAgentsScientificPlanner(ScientificPlanner):
@@ -130,7 +116,13 @@ class OllamaAgentsScientificPlanner(ScientificPlanner):
 
     async def plan_async(self, question: str) -> ScientificPlan:
         try:
-            from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
+            from agents import (
+                Agent,
+                AsyncOpenAI,
+                OpenAIChatCompletionsModel,
+                Runner,
+                set_tracing_disabled,
+            )
         except ImportError as exc:
             raise PlannerConfigurationError(
                 "openai-agents is not installed; install the AXIOM agent dependencies"
@@ -149,15 +141,17 @@ class OllamaAgentsScientificPlanner(ScientificPlanner):
         return _to_plan(result.final_output)
 
     def plan(self, question: str) -> ScientificPlan:
-        return _run_sync(self.plan_async(question))
+        return _run_sync(self.plan_async, question)
 
 
-def _run_sync(coro: Any) -> ScientificPlan:
-    """Run a provider coroutine from synchronous runtime boundaries."""
+def _run_sync(
+    factory: Callable[[str], Coroutine[Any, Any, ScientificPlan]], question: str
+) -> ScientificPlan:
+    """Run a provider coroutine from a synchronous runtime boundary."""
     try:
         asyncio.get_running_loop()
     except RuntimeError:
-        return asyncio.run(coro)
+        return asyncio.run(factory(question))
     raise RuntimeError("use plan_async() when calling a planner from an active event loop")
 
 
