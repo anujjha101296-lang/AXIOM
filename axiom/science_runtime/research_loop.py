@@ -195,7 +195,7 @@ def run_research(
         transition(ResearchStage.CRITIQUED, "critique_completed", critique.verdict)
 
         if critique.verdict == "ACCEPT_NUMERICAL_EVIDENCE":
-            transition(ResearchStage.VERIFIED, "verification_completed", "Numerical evidence satisfied all declared critic gates.")
+            transition(ResearchStage.VERIFIED, "verify", "Numerical evidence satisfied all declared critic gates.")
             run.conclusion = (
                 f"Numerical evidence at rho={plan.rho:g} passed the bounded reproducibility, "
                 "convergence, provenance, and independent-check gates. This is not a formal proof of chaos."
