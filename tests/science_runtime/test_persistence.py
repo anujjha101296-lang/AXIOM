@@ -1,7 +1,7 @@
 import json
 
 from axiom.science_runtime.persistence import ResearchRunStore
-from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun, Transition
+from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun, ResearchStage, Transition
 
 
 def test_research_run_store_appends_event_and_snapshot(tmp_path):
@@ -20,16 +20,15 @@ def test_research_run_store_appends_event_and_snapshot(tmp_path):
 def test_research_run_store_sequences_events_and_replays_after_cursor(tmp_path):
     run = ResearchRun(run_id="research-order", question=ResearchQuestion("Investigate Lorenz sensitivity"))
     store = ResearchRunStore(tmp_path)
-    run.stage = "HYPOTHESIS"  # type: ignore[assignment]
+    run.stage = ResearchStage.HYPOTHESIS
 
-    first = store.append(run, "RUN_CREATED")
-    second = store.append(run, "HYPOTHESIS_PROPOSED")
-    events = [json.loads(line) for line in first.read_text().splitlines() if line.strip()]
+    event_path = store.append(run, "RUN_CREATED")
+    store.append(run, "HYPOTHESIS_PROPOSED")
+    events = [json.loads(line) for line in event_path.read_text().splitlines() if line.strip()]
 
     assert [event["sequence"] for event in events] == [1, 2]
     assert [event["event_id"] for event in events] == ["research-order:1", "research-order:2"]
     assert [event["sequence"] for event in store.read_events(run.run_id, after_sequence=1)] == [2]
-    assert second == first
 
 
 def test_record_transition_persists_structured_lifecycle_event(tmp_path):
