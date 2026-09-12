@@ -16,7 +16,13 @@ from starlette.concurrency import run_in_threadpool
 from axiom.services.api_gateway.auth import verify_token
 from axiom.science_runtime.benchmark import run_lorenz_reference_benchmark
 from axiom.science_runtime.persistence import ResearchRunStore
-from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun, ResearchStage, run_research
+from axiom.science_runtime.research_loop import (
+    ResearchQuestion,
+    ResearchRun,
+    ResearchStage,
+    Transition,
+    run_research,
+)
 
 router = APIRouter(prefix="/api/v1/science", tags=["science-runtime"])
 _store = ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
@@ -45,10 +51,14 @@ def _question(payload: ResearchRequest) -> ResearchQuestion:
     )
 
 
-def _execute_and_persist(question: ResearchQuestion, run_id: str) -> ResearchRun:
-    run = run_research(question, event_sink=_store.record_transition, run_id=run_id)
+def _persist_transition(run: ResearchRun, transition: Transition) -> None:
+    """Make every lifecycle transition durable before the next transition occurs."""
+    _store.record_transition(run, transition)
     _store.snapshot(run)
-    return run
+
+
+def _execute_and_persist(question: ResearchQuestion, run_id: str) -> ResearchRun:
+    return run_research(question, event_sink=_persist_transition, run_id=run_id)
 
 
 @router.post("/research", response_model=dict[str, Any])
@@ -81,7 +91,7 @@ async def queue_bounded_research(
 
 @router.get("/research/{run_id}", response_model=dict[str, Any])
 async def get_research_run(run_id: str, token: str = Depends(verify_token)) -> dict[str, Any]:
-    """Return the latest snapshot of a research run."""
+    """Return the latest durable snapshot of a research run."""
     path = _store.root / f"{run_id}.snapshot.json"
     if not path.exists():
         raise HTTPException(status_code=404, detail="Research run not found")
