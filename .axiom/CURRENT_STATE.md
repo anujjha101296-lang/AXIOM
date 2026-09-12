@@ -2,7 +2,7 @@
 
 Read `CONSTITUTION.md`, `TASK_QUEUE.md`, `ROADMAP.md`, and `MEMORY.md` first. Update this document at the end of every meaningful engineering or research cycle.
 
-**Last updated:** 2026-09-11
+**Last updated:** 2026-09-12
 **Active horizon:** Two-month founder build — research, product, and company in parallel
 
 ## Where we are today
@@ -27,12 +27,15 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 - End-to-end deterministic research-loop test contract and CLI research entrypoint.
 - Dedicated authenticated FastAPI science-runtime router for bounded research, run snapshots/events, and benchmark execution; router is mounted in the API gateway.
 - Science API contract tests covering the mounted router and bounded POST surface.
-- New Next.js `/research/science` workspace for launching bounded investigations and viewing hypothesis, state transitions, evidence, critic verdicts, hashes, and benchmark results.
+- Next.js `/research/science` workspace for launching bounded investigations and viewing hypothesis, state transitions, evidence, critic verdicts, hashes, and benchmark results.
 - One-time router-mount workflow removed after successful integration.
 - CI dependency installation aligned more closely with the repository `pyproject.toml` runtime requirements.
 - `docs/AXIOM_TECHNICAL_EVOLUTION.md` defining the target agent, data, backend, frontend, observability, security, and evaluation architecture.
 - Root README rewritten to distinguish current evidence from future claims and remove unsupported production/build assertions.
 - Optional Ollama planner remains available; LLMs are accelerators, not sources of scientific truth.
+- **S1-SCI-006 implemented:** every research-loop transition can be persisted immediately as an ordered append-only event with monotonic sequence IDs.
+- **Live research API implemented:** asynchronous run queue endpoint plus authenticated Server-Sent Events stream with replay cursor and terminal event.
+- **Workspace live mode implemented:** the science workspace launches the async run and refreshes its run snapshot as lifecycle events arrive, so progress no longer depends on waiting for completion.
 
 ## Architecture direction
 
@@ -45,10 +48,8 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 ## Verification status
 
 - Repository changes are committed to `main`.
-- GitHub Actions verified the scientific runtime suite at **17 passed** on the latest pre-CI-change run, including the science API contract tests.
-- The latest CI run after dependency alignment is still the authoritative integration check; green status has not yet been claimed.
-- The prior integration failure was a missing `requests` dependency during API-gateway test collection; the CI install list has now been aligned with the runtime dependencies declared in `pyproject.toml`.
-- A visible Vercel check may remain pending; deployment access remains separately constrained.
+- GitHub Actions previously verified the scientific runtime suite at **17 passed** and the database/UI integration on the preceding green run.
+- A new CI run was triggered by the live-event changes and is currently the authoritative verification check; its initial state was queued, so this milestone is **implemented but not yet CI-verified**.
 - Scientific evidence remains numerical; convergence, solver cross-checks, and critic gates do not constitute formal proof of chaos.
 
 ## Blocked / constraints
@@ -60,9 +61,9 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 
 ## Highest priority
 
-**S1-SCI-001 + S1-SCI-002 + S1-SCI-004:** finish the Lorenz evidence ladder, harden the bounded research loop, and connect the scientific API/workspace with durable event semantics and provider-neutral agent adapters.
+**Next:** S1-SCI-005 — wire provider-neutral planner adapters for OpenAI Agents SDK and Ollama into the existing structured scientific-plan contract, with deterministic execution and evidence verification remaining authoritative.
 
-**Immediate next engineering:** finish CI green, then add live event streaming and per-transition persistence before wiring the OpenAI/Ollama planner adapters into the research loop.
+In parallel, complete the Lorenz evidence ladder (S1-SCI-001), harden the research-loop guarantees (S1-SCI-002), and then build the quantitative Scientific Intelligence Benchmark v0.1 (S1-SCI-003).
 
 ## 60-day target
 
