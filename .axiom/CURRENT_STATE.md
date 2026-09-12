@@ -32,15 +32,16 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 - CI dependency installation aligned more closely with the repository `pyproject.toml` runtime requirements.
 - `docs/AXIOM_TECHNICAL_EVOLUTION.md` defining the target agent, data, backend, frontend, observability, security, and evaluation architecture.
 - Root README rewritten to distinguish current evidence from future claims and remove unsupported production/build assertions.
-- Optional Ollama planner remains available; LLMs are accelerators, not sources of scientific truth.
-- **S1-SCI-006 implemented:** every research-loop transition can be persisted immediately as an ordered append-only event with monotonic sequence IDs.
-- **Live research API implemented:** asynchronous run queue endpoint plus authenticated Server-Sent Events stream with replay cursor and terminal event.
-- **Workspace live mode implemented:** the science workspace launches the async run and refreshes its run snapshot as lifecycle events arrive, so progress no longer depends on waiting for completion.
+- **S1-SCI-006 verified:** every research-loop transition can be persisted immediately as an ordered append-only event with monotonic sequence IDs; lifecycle, replay, async, and SSE tests passed in the green CI run following the verification-contract fix.
+- **Live research API verified:** asynchronous run queue endpoint plus authenticated Server-Sent Events stream with replay cursor and terminal event are covered by passing CI tests.
+- **Workspace live mode implemented:** the science workspace launches the async run and refreshes its run snapshot as lifecycle events arrive.
+- **S1-SCI-005 implemented:** provider-neutral OpenAI Agents SDK and local Ollama planner adapters now emit the same `ScientificPlan` contract; provider output is validated against an allowlisted Lorenz parameter surface before it can enter the runtime boundary.
+- OpenAI agent output is structured through the Agents SDK `output_type`; Ollama uses the SDK's OpenAI-compatible Chat Completions model path. Both remain proposal-only and cannot directly execute scientific code.
 
 ## Architecture direction
 
 - **Scientific runtime:** deterministic Python scientific tools remain the source of numerical truth.
-- **Agent runtime:** provider-neutral orchestration first; OpenAI Agents SDK can be an optional intelligence layer with agents, tools, handoffs, guardrails, sessions, human-in-the-loop, and tracing.
+- **Agent runtime:** provider-neutral orchestration first; OpenAI Agents SDK is an optional intelligence layer with structured outputs, tools, handoffs, guardrails, sessions, human-in-the-loop, and tracing. Local Ollama can use the same adapter contract without requiring cloud inference.
 - **Backend:** retain FastAPI for APIs and domain services; move durable research-run persistence toward PostgreSQL with JSONB/event records and optional pgvector rather than making a vector database the system of record.
 - **Frontend:** retain the existing Next.js App Router research workspace and evolve it around evidence-first run views, experiment timelines, provenance, and benchmark dashboards rather than a generic chat UI.
 - **Observability:** adopt structured run IDs, transition events, tool-call provenance, latency/cost metrics, and agent traces.
@@ -48,8 +49,8 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 ## Verification status
 
 - Repository changes are committed to `main`.
-- GitHub Actions previously verified the scientific runtime suite at **17 passed** and the database/UI integration on the preceding green run.
-- A new CI run was triggered by the live-event changes and is currently the authoritative verification check; its initial state was queued, so this milestone is **implemented but not yet CI-verified**.
+- The previous scientific-runtime/API/event milestone is CI-verified green: scientific regression, database regression, and Next.js production build all passed after the `verify` transition contract fix.
+- The newest provider-adapter commits have triggered another CI run; that run is the authoritative verification check for S1-SCI-005 and remains **pending** at this update.
 - Scientific evidence remains numerical; convergence, solver cross-checks, and critic gates do not constitute formal proof of chaos.
 
 ## Blocked / constraints
@@ -61,7 +62,7 @@ AXIOM is a Python/FastAPI and Next.js research platform whose initial wedge is m
 
 ## Highest priority
 
-**Next:** S1-SCI-005 — wire provider-neutral planner adapters for OpenAI Agents SDK and Ollama into the existing structured scientific-plan contract, with deterministic execution and evidence verification remaining authoritative.
+**Active:** S1-SCI-005 — verify the provider-neutral planner adapters in CI, then wire the selected planner into the bounded research loop without allowing model output to bypass deterministic execution or evidence gates.
 
 In parallel, complete the Lorenz evidence ladder (S1-SCI-001), harden the research-loop guarantees (S1-SCI-002), and then build the quantitative Scientific Intelligence Benchmark v0.1 (S1-SCI-003).
 
