@@ -6,7 +6,7 @@ from typing import Any, Callable
 from uuid import uuid4
 
 from .critic import Critique
-from .report import EvidenceBundle, build_lorenz_evidence_bundle, render_markdown_report
+from .report import EvidenceBundle, build_lorenz_evidence_bundle
 
 
 class ResearchStage(StrEnum):
@@ -49,6 +49,10 @@ class Transition:
     stage: str
     action: str
     detail: str
+
+
+Planner = Callable[[ResearchQuestion], tuple[Hypothesis, ExperimentPlan]]
+EventSink = Callable[["ResearchRun", Transition], None]
 
 
 @dataclass
@@ -104,18 +108,9 @@ class ResearchRun:
                     f"- provenance SHA-256: `{bundle.provenance['input_digest_sha256']}`",
                 ]
             )
-        lines.extend([
-            "",
-            "## Conclusion",
-            self.conclusion or "No conclusion reached.",
-            "",
-            "## State transitions",
-        ])
+        lines.extend(["", "## Conclusion", self.conclusion or "No conclusion reached.", "", "## State transitions"])
         lines.extend(f"- `{t.stage}` — {t.action}: {t.detail}" for t in self.transitions)
         return "\n".join(lines) + "\n"
-
-
-Planner = Callable[[ResearchQuestion], tuple[Hypothesis, ExperimentPlan]]
 
 
 def deterministic_planner(question: ResearchQuestion) -> tuple[Hypothesis, ExperimentPlan]:
@@ -143,25 +138,32 @@ def run_research(
     question: ResearchQuestion,
     *,
     planner: Planner = deterministic_planner,
+    event_sink: EventSink | None = None,
+    run_id: str | None = None,
 ) -> ResearchRun:
-    run = ResearchRun(run_id=f"research-{uuid4().hex[:12]}", question=question)
-    run.transitions.append(Transition(ResearchStage.PLANNED.value, "plan", "Bounded research run created."))
+    run = ResearchRun(run_id=run_id or f"research-{uuid4().hex[:12]}", question=question)
+
+    def transition(stage: ResearchStage, action: str, detail: str) -> None:
+        run.stage = stage
+        item = Transition(stage.value, action, detail)
+        run.transitions.append(item)
+        if event_sink is not None:
+            event_sink(run, item)
+
+    transition(ResearchStage.PLANNED, "run_created", "Bounded research run created.")
     hypothesis, first_plan = planner(question)
     run.hypothesis = hypothesis
-    run.stage = ResearchStage.HYPOTHESIS
-    run.transitions.append(Transition(run.stage.value, "hypothesize", hypothesis.statement))
+    transition(ResearchStage.HYPOTHESIS, "hypothesis_proposed", hypothesis.statement)
 
     plan: ExperimentPlan | None = first_plan
     while plan is not None and len(run.evidence) < question.max_experiments:
         if plan.rho not in question.allowed_rho:
-            run.stage = ResearchStage.FAILED
-            run.transitions.append(Transition(run.stage.value, "reject_plan", "Planner proposed rho outside the allowlist."))
+            transition(ResearchStage.FAILED, "plan_rejected", "Planner proposed rho outside the allowlist.")
             run.conclusion = "Run failed closed because the experiment plan violated its declared parameter bounds."
             return run
 
         run.plans.append(plan)
-        run.stage = ResearchStage.DESIGNED
-        run.transitions.append(Transition(run.stage.value, "design", f"Execute Lorenz evidence experiment at rho={plan.rho:g}."))
+        transition(ResearchStage.DESIGNED, "experiment_designed", f"Execute Lorenz evidence experiment at rho={plan.rho:g}.")
 
         bundle = build_lorenz_evidence_bundle(
             plan.rho,
@@ -171,10 +173,7 @@ def run_research(
             cross_check_dt=plan.cross_check_dt,
         )
         run.evidence.append(bundle)
-        run.stage = ResearchStage.EXECUTED
-        run.transitions.append(Transition(run.stage.value, "execute", f"Generated deterministic evidence bundle {bundle.experiment_id}."))
-
-        from .critic import critique_evidence
+        transition(ResearchStage.EXECUTED, "experiment_executed", f"Generated deterministic evidence bundle {bundle.experiment_id}.")
 
         convergence_errors = [
             point["reference_error"]
@@ -182,6 +181,8 @@ def run_research(
             if point["reference_error"] is not None
         ]
         independent = bundle.independent_check
+        from .critic import critique_evidence
+
         critique = critique_evidence(
             evidence_tier=bundle.evidence_tier,
             reproducible=True,
@@ -191,25 +192,20 @@ def run_research(
             has_provenance=bool(bundle.provenance),
         )
         run.critiques.append(critique)
-        run.stage = ResearchStage.CRITIQUED
-        run.transitions.append(Transition(run.stage.value, "critic", critique.verdict))
+        transition(ResearchStage.CRITIQUED, "critique_completed", critique.verdict)
 
         if critique.verdict == "ACCEPT_NUMERICAL_EVIDENCE":
-            run.stage = ResearchStage.VERIFIED
-            run.transitions.append(Transition(run.stage.value, "verify", "Numerical evidence satisfied all declared critic gates."))
+            transition(ResearchStage.VERIFIED, "verification_completed", "Numerical evidence satisfied all declared critic gates.")
             run.conclusion = (
                 f"Numerical evidence at rho={plan.rho:g} passed the bounded reproducibility, "
                 "convergence, provenance, and independent-check gates. This is not a formal proof of chaos."
             )
-            run.stage = ResearchStage.COMPLETED
-            run.transitions.append(Transition(run.stage.value, "complete", "Accepted bounded numerical result."))
+            transition(ResearchStage.COMPLETED, "run_completed", "Accepted bounded numerical result.")
             return run
 
-        run.stage = ResearchStage.REPEATING
-        run.transitions.append(Transition(run.stage.value, "repeat", "Critic rejected the evidence; select the next allowed rho."))
+        transition(ResearchStage.REPEATING, "repeat_requested", "Critic rejected the evidence; select the next allowed rho.")
         plan = _next_plan(question, {p.rho for p in run.plans})
 
-    run.stage = ResearchStage.FAILED
     run.conclusion = "No experiment satisfied the declared evidence gates within the bounded experiment budget."
-    run.transitions.append(Transition(run.stage.value, "stop", "Experiment budget exhausted without verified numerical evidence."))
+    transition(ResearchStage.FAILED, "run_failed", "Experiment budget exhausted without verified numerical evidence.")
     return run
