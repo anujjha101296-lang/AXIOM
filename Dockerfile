@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY pyproject.toml ./
 
-# Keep the container dependency set aligned with pyproject.toml.
+# Keep the production image aligned with the Python runtime used by AXIOM.
+# Scientific dependencies are explicit because the science router is imported
+# during API startup and therefore must be present before the first request.
 RUN pip install --upgrade pip && \
     pip install --prefix=/install \
     fastapi \
@@ -18,6 +20,8 @@ RUN pip install --upgrade pip && \
     pydantic \
     pydantic-settings \
     networkx \
+    numpy \
+    scipy \
     sympy \
     pylatexenc \
     requests \
