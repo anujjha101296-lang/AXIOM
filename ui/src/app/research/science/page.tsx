@@ -33,6 +33,15 @@ type Benchmark = {
   critic: { verdict: string; severity: string; checks: Record<string, boolean>; concerns: string[]; next_actions: string[] };
 };
 
+async function readRun(runId: string, token: string): Promise<Run> {
+  const response = await fetch(`${API_BASE}/api/v1/science/research/${runId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error((await response.text()) || `Run lookup failed (${response.status})`);
+  return response.json();
+}
+
 export default function ScientificResearchPage() {
   const [token, setToken] = useState("axiom-dev-token");
   const [question, setQuestion] = useState(
@@ -44,13 +53,38 @@ export default function ScientificResearchPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  async function streamResearch(runId: string, authToken: string) {
+    const response = await fetch(`${API_BASE}/api/v1/science/research/${runId}/events/stream`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok || !response.body) throw new Error((await response.text()) || "Research event stream failed");
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const frames = buffer.split("\n\n");
+      buffer = frames.pop() ?? "";
+      for (const frame of frames) {
+        if (!frame.includes("event: research")) continue;
+        const next = await readRun(runId, authToken);
+        setRun(next);
+      }
+    }
+    setRun(await readRun(runId, authToken));
+  }
+
   async function startResearch(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setError("");
     setRun(null);
     try {
-      const response = await fetch(`${API_BASE}/api/v1/science/research`, {
+      const response = await fetch(`${API_BASE}/api/v1/science/research/async`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -61,7 +95,8 @@ export default function ScientificResearchPage() {
         }),
       });
       if (!response.ok) throw new Error((await response.text()) || `Request failed (${response.status})`);
-      setRun(await response.json());
+      const queued = await response.json();
+      await streamResearch(queued.run_id, token);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Research request failed");
     } finally {
@@ -91,7 +126,7 @@ export default function ScientificResearchPage() {
         <div>
           <div className="eyebrow">AXIOM / SCIENTIFIC RUNTIME</div>
           <h1>Scientific Research Workspace</h1>
-          <p>Bounded computational research with explicit evidence, critique, and provenance.</p>
+          <p>Bounded computational research with explicit evidence, critique, provenance, and live lifecycle events.</p>
         </div>
         <div className="stage-pill">{run?.stage ?? "READY"}</div>
       </header>
@@ -116,7 +151,7 @@ export default function ScientificResearchPage() {
             <div className="bounds"><span>Allowed ρ</span><strong>20 · 24 · 28 · 32 · 40</strong></div>
           </div>
           <button disabled={busy || question.trim().length < 5} type="submit">
-            {busy ? "Running scientific runtime…" : "Start bounded investigation"}
+            {busy ? "Streaming scientific run…" : "Start bounded investigation"}
           </button>
           <button className="secondary" disabled={busy} type="button" onClick={runBenchmark}>
             Run evidence benchmark
