@@ -6,6 +6,7 @@ from .research_loop import ExperimentPlan, Hypothesis, Planner, ResearchQuestion
 
 
 def as_research_planner(agent: ScientificPlanner) -> Planner:
+    """Adapt a typed scientific planner to the existing research-loop contract."""
     def planner(question: ResearchQuestion) -> tuple[Hypothesis, ExperimentPlan]:
         if question.model.lower() != "lorenz":
             raise ValueError(f"Unsupported model: {question.model}")
