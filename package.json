@@ -1,0 +1,14 @@
+{
+  "name": "axiom-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd ui && npm install && npm run build",
+    "lint": "cd ui && npm run lint"
+  },
+  "dependencies": {
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}
