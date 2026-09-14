@@ -6,6 +6,39 @@ authors = ["AXIOM Labs Team"]
 readme = "README.md"
 packages = [{include = "axiom"}]
 
+[project]
+name = "axiom"
+version = "0.2.0"
+description = "AXIOM — Autonomous eXploration of Ideas, Observations & Models"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.5,<3",
+  "pydantic-settings>=2,<3",
+  "networkx>=3,<4",
+  "numpy>=1.26,<3",
+  "scipy>=1.11,<2",
+  "sympy>=1.12,<2",
+  "pylatexenc>=2.10,<3",
+  "requests>=2.31,<3",
+  "fastapi>=0.109,<1",
+  "uvicorn[standard]>=0.22,<1",
+  "z3-solver>=4.12,<5",
+  "anyio>=4,<5",
+  "pypdf>=5,<7",
+  "python-multipart>=0.0.9,<1",
+  "passlib[bcrypt]>=1.7,<2",
+  "python-jose[cryptography]>=3.3,<4",
+  "email-validator>=2,<3",
+  "bcrypt>=4,<6",
+  "sqlalchemy>=2,<3",
+  "alembic>=1.12,<2",
+  "greenlet>=3,<4",
+  "aiosqlite>=0.19,<1",
+  "google-generativeai>=0.3,<1",
+  "openai>=1.10,<3",
+  "openai-agents",
+]
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^2.5.0"
@@ -49,13 +82,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.vercel]
 entrypoint = "axiom.services.api_gateway.main:app"
 
-# ── pytest ────────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v --tb=short"
 markers = [
     "slow: marks tests as slow (deselect with '-m not slow')",
-    "integration: marks tests as integration tests",
+    "integration: marks integration tests",
     "benchmark: marks scientific capability benchmark tests",
     "tier1: MDE E2E tier-1 feature coverage tests",
     "tier2: MDE E2E tier-2 boundary and corner-case tests",
@@ -71,6 +103,7 @@ omit = [
     "axiom/__init__.py",
     "axiom/config/__init__.py",
     "axiom/observability/__init__.py",
+    "axiom/core/events/__init__.py",
     "axiom/core/events/__init__.py",
 ]
 
