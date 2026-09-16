@@ -55,6 +55,6 @@ def test_event_row_is_linked_to_run(store):
     run = _run()
     store.persist_transition(run, Transition("PLANNED", "run_created", "created"))
     with store.engine.connect() as connection:
-        event = connection.execute(select(ResearchEventRow)).scalar_one()
-        saved = connection.execute(select(ResearchRunRow)).scalar_one()
-    assert event.run_id == saved.run_id == run.run_id
+        event = connection.execute(select(ResearchEventRow)).mappings().one()
+        saved = connection.execute(select(ResearchRunRow)).mappings().one()
+    assert event["run_id"] == saved["run_id"] == run.run_id
