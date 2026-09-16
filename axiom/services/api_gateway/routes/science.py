@@ -16,6 +16,7 @@ from starlette.concurrency import run_in_threadpool
 from axiom.services.api_gateway.auth import verify_token
 from axiom.science_runtime.benchmark import run_lorenz_reference_benchmark
 from axiom.science_runtime.persistence import ResearchRunStore
+from axiom.science_runtime.postgres_persistence import PostgresResearchRunStore
 from axiom.science_runtime.research_loop import (
     ResearchQuestion,
     ResearchRun,
@@ -25,7 +26,21 @@ from axiom.science_runtime.research_loop import (
 )
 
 router = APIRouter(prefix="/api/v1/science", tags=["science-runtime"])
-_store = ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
+
+
+def _build_store() -> ResearchRunStore | PostgresResearchRunStore:
+    """Select durable SQL storage when AXIOM_DATABASE_URL is configured.
+
+    Local file persistence remains the explicit development/test fallback. The
+    API never writes to both stores for one run, preventing split-brain state.
+    """
+    database_url = os.getenv("AXIOM_DATABASE_URL") or os.getenv("DATABASE_URL")
+    if database_url:
+        return PostgresResearchRunStore(database_url, create_schema=False)
+    return ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
+
+
+_store = _build_store()
 _TERMINAL_STAGES = {ResearchStage.COMPLETED.value, ResearchStage.FAILED.value}
 
 
@@ -52,13 +67,31 @@ def _question(payload: ResearchRequest) -> ResearchQuestion:
 
 
 def _persist_transition(run: ResearchRun, transition: Transition) -> None:
-    """Make every lifecycle transition durable before the next transition occurs."""
-    _store.record_transition(run, transition)
-    _store.snapshot(run)
+    """Persist every lifecycle transition before the next transition occurs."""
+    if isinstance(_store, PostgresResearchRunStore):
+        _store.persist_transition(run, transition)
+    else:
+        _store.record_transition(run, transition)
+        _store.snapshot(run)
 
 
 def _execute_and_persist(question: ResearchQuestion, run_id: str) -> ResearchRun:
     return run_research(question, event_sink=_persist_transition, run_id=run_id)
+
+
+def _read_snapshot(run_id: str) -> dict[str, Any] | None:
+    if isinstance(_store, PostgresResearchRunStore):
+        return _store.read_snapshot(run_id)
+    path = _store.root / f"{run_id}.snapshot.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _read_events(run_id: str, after_sequence: int = 0) -> list[dict[str, Any]]:
+    if isinstance(_store, PostgresResearchRunStore):
+        return _store.read_events(run_id, after_sequence=after_sequence)
+    return _store.read_events(run_id, after_sequence=after_sequence)
 
 
 @router.post("/research", response_model=dict[str, Any])
@@ -92,49 +125,42 @@ async def queue_bounded_research(
 @router.get("/research/{run_id}", response_model=dict[str, Any])
 async def get_research_run(run_id: str, token: str = Depends(verify_token)) -> dict[str, Any]:
     """Return the latest durable snapshot of a research run."""
-    path = _store.root / f"{run_id}.snapshot.json"
-    if not path.exists():
-        raise HTTPException(status_code=404, detail="Research run not found")
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        snapshot = _read_snapshot(run_id)
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Failed to read research run") from exc
+    if snapshot is None:
+        raise HTTPException(status_code=404, detail="Research run not found")
+    return snapshot
 
 
 @router.get("/research/{run_id}/events", response_model=list[dict[str, Any]])
 async def get_research_events(run_id: str, token: str = Depends(verify_token)) -> list[dict[str, Any]]:
     """Return the append-only event history for a research run."""
-    path = _store.root / f"{run_id}.jsonl"
-    if not path.exists():
+    if _read_snapshot(run_id) is None:
         raise HTTPException(status_code=404, detail="Research run not found")
-    return _store.read_events(run_id)
+    return _read_events(run_id)
 
 
 @router.get("/research/{run_id}/events/stream")
 async def stream_research_events(run_id: str, token: str = Depends(verify_token)) -> StreamingResponse:
     """Replay new lifecycle events as Server-Sent Events until the run terminates."""
-    event_path = _store.root / f"{run_id}.jsonl"
-    snapshot_path = _store.root / f"{run_id}.snapshot.json"
-    if not event_path.exists() and not snapshot_path.exists():
+    if _read_snapshot(run_id) is None:
         raise HTTPException(status_code=404, detail="Research run not found")
 
     async def event_generator() -> AsyncIterator[str]:
         sequence = 0
         idle_polls = 0
         while idle_polls < 300:
-            events = _store.read_events(run_id, after_sequence=sequence)
+            events = _read_events(run_id, after_sequence=sequence)
             for event in events:
                 sequence = max(sequence, int(event["sequence"]))
                 yield f"id: {event['event_id']}\nevent: research\ndata: {json.dumps(event, sort_keys=True)}\n\n"
                 idle_polls = 0
-            if snapshot_path.exists():
-                try:
-                    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-                    if snapshot.get("stage") in _TERMINAL_STAGES:
-                        yield f"event: complete\ndata: {json.dumps({'run_id': run_id, 'stage': snapshot['stage']})}\n\n"
-                        return
-                except (OSError, json.JSONDecodeError):
-                    pass
+            snapshot = _read_snapshot(run_id)
+            if snapshot and snapshot.get("stage") in _TERMINAL_STAGES:
+                yield f"event: complete\ndata: {json.dumps({'run_id': run_id, 'stage': snapshot['stage']})}\n\n"
+                return
             idle_polls += 1
             yield ": keep-alive\n\n"
             await asyncio.sleep(0.25)
