@@ -6,12 +6,11 @@ the production target; SQLite remains useful for contract tests.
 """
 from __future__ import annotations
 
-import json
 from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, Integer, String, Text, create_engine, select
+from sqlalchemy import JSON, DateTime, Integer, String, create_engine, select, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from .research_loop import ResearchRun, Transition
@@ -52,9 +51,34 @@ class PostgresResearchRunStore:
         if create_schema:
             _Base.metadata.create_all(self.engine)
 
+    @staticmethod
+    def _lock_run(session: Session, run_id: str) -> None:
+        """Serialize event sequence allocation for one run on PostgreSQL.
+
+        SQLite has no equivalent advisory lock, so its single-writer behavior is
+        sufficient for the contract tests. PostgreSQL gets a transaction-scoped
+        advisory lock, including the first event where no run row exists yet.
+        """
+        if session.bind is not None and session.bind.dialect.name == "postgresql":
+            session.execute(text("SELECT pg_advisory_xact_lock(hashtext(:run_id))"), {"run_id": run_id})
+
+    def _ensure_run(self, session: Session, run: ResearchRun, now: datetime) -> ResearchRunRow:
+        row = session.get(ResearchRunRow, run.run_id, with_for_update=True)
+        if row is None:
+            row = ResearchRunRow(
+                run_id=run.run_id,
+                snapshot=asdict(run),
+                updated_at=now,
+            )
+            session.add(row)
+            session.flush()
+        return row
+
     def append(self, run: ResearchRun, event_type: str, payload: dict[str, Any] | None = None) -> ResearchEventRow:
         now = datetime.now(timezone.utc)
-        with Session(self.engine) as session, session.begin():
+        with Session(self.engine, expire_on_commit=False) as session, session.begin():
+            self._lock_run(session, run.run_id)
+            self._ensure_run(session, run, now)
             last = session.execute(
                 select(ResearchEventRow.sequence)
                 .where(ResearchEventRow.run_id == run.run_id)
@@ -84,20 +108,21 @@ class PostgresResearchRunStore:
 
     def snapshot(self, run: ResearchRun) -> None:
         now = datetime.now(timezone.utc)
-        payload = asdict(run)
         with Session(self.engine) as session, session.begin():
             row = session.get(ResearchRunRow, run.run_id, with_for_update=True)
             if row is None:
-                session.add(ResearchRunRow(run_id=run.run_id, snapshot=payload, updated_at=now))
+                session.add(ResearchRunRow(run_id=run.run_id, snapshot=asdict(run), updated_at=now))
             else:
-                row.snapshot = payload
+                row.snapshot = asdict(run)
                 row.updated_at = now
 
     def persist_transition(self, run: ResearchRun, transition: Transition) -> ResearchEventRow:
-        """Persist event and snapshot in one transaction."""
+        """Persist one lifecycle event and its corresponding snapshot atomically."""
         now = datetime.now(timezone.utc)
         payload = {"detail": transition.detail, "transition_stage": transition.stage}
-        with Session(self.engine) as session, session.begin():
+        with Session(self.engine, expire_on_commit=False) as session, session.begin():
+            self._lock_run(session, run.run_id)
+            row = self._ensure_run(session, run, now)
             last = session.execute(
                 select(ResearchEventRow.sequence)
                 .where(ResearchEventRow.run_id == run.run_id)
@@ -116,13 +141,9 @@ class PostgresResearchRunStore:
                 payload=payload,
             )
             session.add(event)
-            snapshot = asdict(run)
-            row = session.get(ResearchRunRow, run.run_id, with_for_update=True)
-            if row is None:
-                session.add(ResearchRunRow(run_id=run.run_id, snapshot=snapshot, updated_at=now))
-            else:
-                row.snapshot = snapshot
-                row.updated_at = now
+            row.snapshot = asdict(run)
+            row.updated_at = now
+            session.flush()
             return event
 
     def read_events(self, run_id: str, after_sequence: int = 0) -> list[dict[str, Any]]:
