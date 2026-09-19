@@ -1,0 +1,8 @@
+{
+  "benchmark": "scientific-intelligence-v0.1",
+  "task_count": 40,
+  "levels": {"L1": 5, "L2": 5, "L3": 5, "L4": 5, "L5": 5, "L6": 5, "L7": 5, "L8": 5},
+  "generator": "axiom.science_runtime.intelligence_benchmark.build_v0_1_tasks",
+  "scoring": "axiom.science_runtime.intelligence_evaluation.evaluate_text",
+  "epistemic_boundary": "Benchmark scores are bounded behavioral measurements, not claims of general scientific intelligence."
+}
