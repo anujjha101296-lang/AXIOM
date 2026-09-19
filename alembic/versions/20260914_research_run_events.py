@@ -1,13 +1,13 @@
 """Create durable scientific research run/event storage.
 
 Revision ID: 20260914_research_run_events
-Revises:
+Revises: e5f66185a747
 """
 from alembic import op
 import sqlalchemy as sa
 
 revision = "20260914_research_run_events"
-down_revision = None
+down_revision = "e5f66185a747"
 branch_labels = None
 depends_on = None
 
