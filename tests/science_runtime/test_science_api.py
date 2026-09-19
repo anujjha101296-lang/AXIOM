@@ -40,3 +40,15 @@ def test_async_research_endpoint_returns_accepted_job_contract() -> None:
 def test_event_stream_is_server_sent_events() -> None:
     route = next(route for route in router.routes if route.path.endswith("/events/stream"))
     assert route.response_class is not None
+
+
+def test_production_requires_durable_database(monkeypatch) -> None:
+    import pytest
+    from axiom.services.api_gateway.routes import science
+
+    monkeypatch.delenv("AXIOM_DATABASE_URL", raising=False)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("AXIOM_ENVIRONMENT", "production")
+
+    with pytest.raises(RuntimeError, match="Durable scientific persistence"):
+        science._build_store()
