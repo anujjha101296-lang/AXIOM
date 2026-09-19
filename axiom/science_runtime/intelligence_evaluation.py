@@ -8,6 +8,7 @@ no synthetic score is substituted.
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import asdict, dataclass
 from enum import StrEnum
@@ -113,7 +114,8 @@ def evaluate_text(task: BenchmarkTask, response: str) -> BenchmarkScore:
     }[task.level]
     hits = sum(term in text for term in concept_terms)
     correctness = min(1.0, hits / len(concept_terms))
-    false_proof = "formal proof" in text or "mathematical proof" in text
+    proof_claim = re.search(r"(?<!not )(?:is|constitutes|establishes|proves) (?:a |the )?(?:formal|mathematical) proof", text)
+    false_proof = proof_claim is not None
     evidence_correctness = 0.0 if false_proof else correctness
     reproducible = all(term in text for term in ("rho", "dt")) if task.level in {
         BenchmarkLevel.EXPERIMENT_DESIGN,
