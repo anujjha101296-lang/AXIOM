@@ -35,8 +35,14 @@ def _build_store() -> ResearchRunStore | PostgresResearchRunStore:
     API never writes to both stores for one run, preventing split-brain state.
     """
     database_url = os.getenv("AXIOM_DATABASE_URL") or os.getenv("DATABASE_URL")
+    environment = os.getenv("AXIOM_ENVIRONMENT") or os.getenv("ENVIRONMENT") or "development"
     if database_url:
         return PostgresResearchRunStore(database_url, create_schema=False)
+    if environment.lower() in {"production", "prod"}:
+        raise RuntimeError(
+            "Durable scientific persistence is required in production. "
+            "Set AXIOM_DATABASE_URL or DATABASE_URL."
+        )
     return ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
 
 
