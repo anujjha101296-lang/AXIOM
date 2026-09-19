@@ -43,6 +43,4 @@ def test_axiom_arm_executes_bounded_runtime():
     axiom = next(item for item in result["arms"] if item["arm"] == "axiom")
     assert axiom["status"] == "COMPLETED"
     assert axiom["task_count"] == 1
-    assert "not a formal proof" in (
-        axiom["scores"][0]["outcome"] or ""
-    ).lower() or axiom["scores"][0]["false_proof"] is False
+    assert axiom["scores"][0]["false_proof"] is False
