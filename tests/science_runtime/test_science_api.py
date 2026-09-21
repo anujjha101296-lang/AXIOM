@@ -76,4 +76,5 @@ def test_queued_run_is_persisted_before_background_execution(monkeypatch, tmp_pa
     assert snapshot is not None
     assert snapshot["run_id"] == run_id
     assert snapshot["stage"] == "PLANNED"
-    assert events[0]["event_type"] == "RUN_QUEUED"\n    assert events[0]["payload"]["transition_stage"] == "PLANNED"
+    assert events[0]["event_type"] == "RUN_QUEUED"
+    assert events[0]["payload"]["transition_stage"] == "PLANNED"
