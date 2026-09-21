@@ -52,3 +52,29 @@ def test_production_requires_durable_database(monkeypatch) -> None:
 
     with pytest.raises(RuntimeError, match="Durable scientific persistence"):
         science._build_store()
+
+def test_queued_run_is_persisted_before_background_execution(monkeypatch, tmp_path) -> None:
+    from axiom.services.api_gateway.routes import science
+    from axiom.science_runtime.persistence import ResearchRunStore
+
+    store = ResearchRunStore(tmp_path)
+    monkeypatch.setattr(science, "_store", store)
+
+    question = science.ResearchRequest(
+        question="Test whether nearby Lorenz trajectories separate.",
+    )
+    run_id = "research-queued-test"
+
+    science._initialize_queued_run(
+        science._question(question),
+        run_id,
+    )
+
+    snapshot = science._read_snapshot(run_id)
+    events = science._read_events(run_id)
+
+    assert snapshot is not None
+    assert snapshot["run_id"] == run_id
+    assert snapshot["stage"] == "PLANNED"
+    assert events[0]["event_type"] == "RUN_QUEUED"
+    assert events[0]["payload"]["transition_stage"] == "PLANNED"
