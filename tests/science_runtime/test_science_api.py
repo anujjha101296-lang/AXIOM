@@ -60,7 +60,7 @@ def test_queued_run_is_persisted_before_background_execution(monkeypatch, tmp_pa
     store = ResearchRunStore(tmp_path)
     monkeypatch.setattr(science, "_store", store)
 
-    question = science.ResearchQuestion(
+    question = science.ResearchRequest(
         question="Test whether nearby Lorenz trajectories separate.",
     )
     run_id = "research-queued-test"
