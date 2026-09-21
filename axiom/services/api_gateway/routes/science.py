@@ -81,6 +81,23 @@ def _persist_transition(run: ResearchRun, transition: Transition) -> None:
         _store.snapshot(run)
 
 
+def _initialize_queued_run(question: ResearchQuestion, run_id: str) -> None:
+    """Create durable initial state before scheduling background execution.
+
+    This closes the async API race where a client could receive a run_id and
+    immediately subscribe before the worker had emitted its first transition.
+    """
+    run = ResearchRun(run_id=run_id, question=question)
+    _persist_transition(
+        run,
+        Transition(
+            ResearchStage.PLANNED.value,
+            "run_queued",
+            "Bounded research run accepted and queued for execution.",
+        ),
+    )
+
+
 def _execute_and_persist(question: ResearchQuestion, run_id: str) -> ResearchRun:
     return run_research(question, event_sink=_persist_transition, run_id=run_id)
 
