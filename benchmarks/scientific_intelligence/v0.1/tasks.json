@@ -5,35 +5,35 @@
     {
       "task_id": "sci-v0.1-l1-01",
       "level": "L1",
-      "prompt": "For the Lorenz system at rho=20, explain what a finite paired-trajectory separation value establishes.",
+      "prompt": "For the Lorenz system at rho=20.0, explain what a finite paired-trajectory separation value establishes.",
       "expected_concept": "distinguish numerical observation from proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l1-02",
       "level": "L1",
-      "prompt": "For the Lorenz system at rho=24, explain what a finite paired-trajectory separation value establishes.",
+      "prompt": "For the Lorenz system at rho=24.0, explain what a finite paired-trajectory separation value establishes.",
       "expected_concept": "distinguish numerical observation from proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l1-03",
       "level": "L1",
-      "prompt": "For the Lorenz system at rho=28, explain what a finite paired-trajectory separation value establishes.",
+      "prompt": "For the Lorenz system at rho=28.0, explain what a finite paired-trajectory separation value establishes.",
       "expected_concept": "distinguish numerical observation from proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l1-04",
       "level": "L1",
-      "prompt": "For the Lorenz system at rho=32, explain what a finite paired-trajectory separation value establishes.",
+      "prompt": "For the Lorenz system at rho=32.0, explain what a finite paired-trajectory separation value establishes.",
       "expected_concept": "distinguish numerical observation from proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l1-05",
       "level": "L1",
-      "prompt": "For the Lorenz system at rho=40, explain what a finite paired-trajectory separation value establishes.",
+      "prompt": "For the Lorenz system at rho=40.0, explain what a finite paired-trajectory separation value establishes.",
       "expected_concept": "distinguish numerical observation from proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
@@ -75,35 +75,35 @@
     {
       "task_id": "sci-v0.1-l3-01",
       "level": "L3",
-      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=20.",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=20.0.",
       "expected_concept": "state a measurable observation and bounded conditions",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l3-02",
       "level": "L3",
-      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=24.",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=24.0.",
       "expected_concept": "state a measurable observation and bounded conditions",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l3-03",
       "level": "L3",
-      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=28.",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=28.0.",
       "expected_concept": "state a measurable observation and bounded conditions",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l3-04",
       "level": "L3",
-      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=32.",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=32.0.",
       "expected_concept": "state a measurable observation and bounded conditions",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l3-05",
       "level": "L3",
-      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=40.",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=40.0.",
       "expected_concept": "state a measurable observation and bounded conditions",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
@@ -180,35 +180,35 @@
     {
       "task_id": "sci-v0.1-l6-01",
       "level": "L6",
-      "prompt": "A paired trajectory separates at rho=20, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "prompt": "A paired trajectory separates at rho=20.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
       "expected_concept": "numerically robust evidence, not formal proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l6-02",
       "level": "L6",
-      "prompt": "A paired trajectory separates at rho=24, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "prompt": "A paired trajectory separates at rho=24.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
       "expected_concept": "numerically robust evidence, not formal proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l6-03",
       "level": "L6",
-      "prompt": "A paired trajectory separates at rho=28, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "prompt": "A paired trajectory separates at rho=28.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
       "expected_concept": "numerically robust evidence, not formal proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l6-04",
       "level": "L6",
-      "prompt": "A paired trajectory separates at rho=32, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "prompt": "A paired trajectory separates at rho=32.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
       "expected_concept": "numerically robust evidence, not formal proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l6-05",
       "level": "L6",
-      "prompt": "A paired trajectory separates at rho=40, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "prompt": "A paired trajectory separates at rho=40.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
       "expected_concept": "numerically robust evidence, not formal proof",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
@@ -250,35 +250,35 @@
     {
       "task_id": "sci-v0.1-l8-01",
       "level": "L8",
-      "prompt": "Investigate whether Lorenz sensitivity near rho=20 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=20.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
       "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l8-02",
       "level": "L8",
-      "prompt": "Investigate whether Lorenz sensitivity near rho=24 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=24.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
       "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l8-03",
       "level": "L8",
-      "prompt": "Investigate whether Lorenz sensitivity near rho=28 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=28.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
       "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l8-04",
       "level": "L8",
-      "prompt": "Investigate whether Lorenz sensitivity near rho=32 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=32.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
       "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     },
     {
       "task_id": "sci-v0.1-l8-05",
       "level": "L8",
-      "prompt": "Investigate whether Lorenz sensitivity near rho=40 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=40.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
       "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
       "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
     }
