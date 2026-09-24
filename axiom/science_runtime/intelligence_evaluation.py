@@ -15,7 +15,15 @@ from enum import StrEnum
 from typing import Callable
 
 from .agent_protocol import DeterministicLorenzPlanner
-from .intelligence_benchmark import BenchmarkLevel, BenchmarkScore, BenchmarkTask, Outcome, build_v0_1_tasks, score_contract
+from .intelligence_benchmark import (
+    BenchmarkLevel,
+    BenchmarkScore,
+    BenchmarkTask,
+    Outcome,
+    build_v0_1_tasks,
+    dataset_sha256,
+    score_contract,
+)
 from .llm_planners import validate_scientific_plan
 from .research_loop import ResearchQuestion, run_research
 
@@ -217,7 +225,12 @@ def run_v0_2_benchmark(
             )
     return {
         "benchmark": BENCHMARK_VERSION,
-        "dataset": {"version": "scientific-intelligence-v0.1", "task_count": len(selected)},
+        "dataset": {
+            "version": "scientific-intelligence-v0.1",
+            "task_count": len(selected),
+            "sha256": dataset_sha256() if tasks is None else None,
+            "immutable": tasks is None,
+        },
         "epistemic_boundary": "Scores measure benchmark behavior only; they do not establish general scientific intelligence.",
         "arms": [item.to_dict() for item in arms],
         "delta_report": [item.to_dict() for item in deltas],
