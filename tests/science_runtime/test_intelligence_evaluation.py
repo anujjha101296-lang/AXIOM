@@ -1,4 +1,4 @@
-from axiom.science_runtime.intelligence_benchmark import build_v0_1_tasks
+from axiom.science_runtime.intelligence_benchmark import BenchmarkLevel, build_v0_1_tasks, dataset_sha256
 from axiom.science_runtime.intelligence_evaluation import (
     ArmStatus,
     evaluate_text,
@@ -8,7 +8,16 @@ from axiom.science_runtime.intelligence_evaluation import (
 
 
 def test_executable_benchmark_has_40_tasks():
-    assert len(build_v0_1_tasks()) == 40
+    tasks = build_v0_1_tasks()
+    assert len(tasks) == 40
+    assert {level: sum(task.level is level for task in tasks) for level in BenchmarkLevel} == {
+        level: 5 for level in BenchmarkLevel
+    }
+    assert len({task.task_id for task in tasks}) == 40
+
+
+def test_immutable_dataset_hash_is_pinned():
+    assert dataset_sha256() == "b5299290fc320c36fb2006efcf6c9cdac8a92b14577223731133b058f1c47686"
 
 
 def test_text_evaluator_rejects_proof_claims():
@@ -44,3 +53,11 @@ def test_axiom_arm_executes_bounded_runtime():
     assert axiom["status"] == "COMPLETED"
     assert axiom["task_count"] == 1
     assert axiom["scores"][0]["false_proof"] is False
+
+
+def test_benchmark_report_contains_dataset_provenance():
+    result = run_v0_2_benchmark(tasks=None)
+    dataset = result["dataset"]
+    assert dataset["immutable"] is True
+    assert dataset["task_count"] == 40
+    assert dataset["sha256"] == "b5299290fc320c36fb2006efcf6c9cdac8a92b14577223731133b058f1c47686"
