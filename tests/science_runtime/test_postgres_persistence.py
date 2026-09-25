@@ -91,3 +91,53 @@ def test_replay_rejects_sequence_gaps(store):
 
     with pytest.raises(ValueError, match="sequence gap"):
         replay_research_events(events)
+
+
+def test_restart_resumes_from_durable_event_log(tmp_path):
+    db = f"sqlite:///{tmp_path / 'restart.db'}"
+    first = PostgresResearchRunStore(db, create_schema=True)
+    run = _run("restart-test")
+    run.stage = ResearchStage.PLANNED
+    first.persist_transition(run, Transition("PLANNED", "run_created", "created"))
+    first.close()
+
+    second = PostgresResearchRunStore(db, create_schema=False)
+    try:
+        events = second.read_events("restart-test")
+        snapshot = second.read_snapshot("restart-test")
+        replay = replay_research_events(events)
+        verify_snapshot_against_replay(snapshot, replay)
+        assert replay.last_sequence == 1
+        assert snapshot["run_id"] == "restart-test"
+    finally:
+        second.close()
+
+
+@pytest.mark.integration
+def test_concurrent_postgres_appends_preserve_sequence():
+    import os
+    from concurrent.futures import ThreadPoolExecutor
+
+    database_url = os.getenv("AXIOM_TEST_POSTGRES_URL")
+    if not database_url:
+        pytest.skip("AXIOM_TEST_POSTGRES_URL is not configured")
+
+    first = PostgresResearchRunStore(database_url, create_schema=True)
+    first.close()
+    run = _run("concurrency-test")
+
+    def append(index: int):
+        store = PostgresResearchRunStore(database_url)
+        try:
+            run.stage = ResearchStage.PLANNED
+            return store.persist_transition(
+                run,
+                Transition("PLANNED", f"concurrent_{index}", str(index)),
+            ).sequence
+        finally:
+            store.close()
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        sequences = list(executor.map(append, range(16)))
+
+    assert sorted(sequences) == list(range(1, 17))
