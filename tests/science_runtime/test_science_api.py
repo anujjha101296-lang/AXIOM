@@ -11,6 +11,7 @@ def test_science_router_exposes_research_contract() -> None:
     assert "/api/v1/science/research/{run_id}" in paths
     assert "/api/v1/science/research/{run_id}/events" in paths
     assert "/api/v1/science/research/{run_id}/events/stream" in paths
+    assert "/api/v1/science/research/{run_id}/replay" in paths
     assert "/api/v1/science/benchmark/lorenz" in paths
 
 
@@ -78,3 +79,42 @@ def test_queued_run_is_persisted_before_background_execution(monkeypatch, tmp_pa
     assert snapshot["stage"] == "PLANNED"
     assert events[0]["event_type"] == "RUN_QUEUED"
     assert events[0]["payload"]["transition_stage"] == "PLANNED"
+
+
+def test_queued_run_records_persistence_provenance(monkeypatch, tmp_path) -> None:
+    from axiom.services.api_gateway.routes import science
+    from axiom.science_runtime.persistence import ResearchRunStore
+
+    store = ResearchRunStore(tmp_path)
+    monkeypatch.setattr(science, "_store", store)
+    question = science.ResearchQuestion("Test whether nearby Lorenz trajectories separate.")
+
+    science._initialize_queued_run(question, "research-provenance-test")
+    snapshot = science._read_snapshot("research-provenance-test")
+
+    assert snapshot["metadata"]["persistence"]["backend"] == "local_test"
+    assert snapshot["metadata"]["persistence"]["event_schema"] == "axiom.research.event.v1"
+    assert snapshot["metadata"]["persistence"]["durable"] is False
+
+
+def test_replay_endpoint_is_fail_closed_on_tampered_snapshot(monkeypatch, tmp_path) -> None:
+    from axiom.services.api_gateway.routes import science
+    from axiom.science_runtime.persistence import ResearchRunStore
+    import pytest
+
+    store = ResearchRunStore(tmp_path)
+    monkeypatch.setattr(science, "_store", store)
+    run = science.ResearchRun(
+        run_id="replay-api-test",
+        question=science.ResearchQuestion("Test whether nearby Lorenz trajectories separate."),
+    )
+    science._persist_transition(run, science.Transition("PLANNED", "run_created", "created"))
+    path = store.root / "replay-api-test.snapshot.json"
+    data = __import__("json").loads(path.read_text())
+    data["stage"] = "COMPLETED"
+    path.write_text(__import__("json").dumps(data))
+
+    events = science._read_events("replay-api-test")
+    replay = science.replay_research_events(events)
+    with pytest.raises(ValueError):
+        science.verify_snapshot_against_replay(data, replay)
