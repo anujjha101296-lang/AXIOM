@@ -1,8 +1,9 @@
 {
-  "benchmark": "scientific-intelligence-v0.1",
+  "benchmark_version": "scientific-intelligence-v0.1",
+  "dataset_path": "benchmarks/scientific_intelligence/v0.1/tasks.json",
   "task_count": 40,
   "levels": {"L1": 5, "L2": 5, "L3": 5, "L4": 5, "L5": 5, "L6": 5, "L7": 5, "L8": 5},
-  "generator": "axiom.science_runtime.intelligence_benchmark.build_v0_1_tasks",
+  "sha256": "b5299290fc320c36fb2006efcf6c9cdac8a92b14577223731133b058f1c47686",
   "scoring": "axiom.science_runtime.intelligence_evaluation.evaluate_text",
   "epistemic_boundary": "Benchmark scores are bounded behavioral measurements, not claims of general scientific intelligence."
 }

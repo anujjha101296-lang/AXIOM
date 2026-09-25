@@ -3,12 +3,18 @@
 The benchmark measures whether a system can reason about a bounded scientific
 question, design valid experiments, interpret evidence, and avoid unsupported
 claims. It does not score eloquence or generic language ability.
+
+v0.1 tasks are loaded from an immutable, hashed JSON corpus committed under
+benchmarks/scientific_intelligence/v0.1. Runtime generation is deliberately
+not used so benchmark inputs cannot drift with code changes.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Callable
+from pathlib import Path
 
 
 class BenchmarkLevel(StrEnum):
@@ -59,60 +65,77 @@ class BenchmarkScore:
         }
 
 
-_LEVEL_PROMPTS: dict[BenchmarkLevel, tuple[str, str]] = {
-    BenchmarkLevel.NUMERICAL_REASONING: (
-        "For the Lorenz system at rho={rho}, explain what a finite paired-trajectory separation value establishes.",
-        "distinguish numerical observation from proof",
-    ),
-    BenchmarkLevel.EQUATION_INTERPRETATION: (
-        "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
-        "sigma controls the x-y coupling rate",
-    ),
-    BenchmarkLevel.HYPOTHESIS: (
-        "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho={rho}.",
-        "state a measurable observation and bounded conditions",
-    ),
-    BenchmarkLevel.EXPERIMENT_DESIGN: (
-        "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
-        "use a declared timestep ladder and fixed other inputs",
-    ),
-    BenchmarkLevel.FALSIFICATION: (
-        "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
-        "reject the robustness claim and request resolution checks",
-    ),
-    BenchmarkLevel.RESULT_INTERPRETATION: (
-        "A paired trajectory separates at rho={rho}, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
-        "numerically robust evidence, not formal proof",
-    ),
-    BenchmarkLevel.COMPETING_HYPOTHESES: (
-        "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
-        "retain uncertainty and identify the check that discriminates",
-    ),
-    BenchmarkLevel.AUTONOMOUS_INVESTIGATION: (
-        "Investigate whether Lorenz sensitivity near rho={rho} is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
-        "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
-    ),
-}
+_DATASET_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "benchmarks"
+    / "scientific_intelligence"
+    / "v0.1"
+    / "tasks.json"
+)
+_MANIFEST_PATH = _DATASET_PATH.with_name("manifest.json")
+
+
+def _load_v0_1_tasks() -> tuple[BenchmarkTask, ...]:
+    if not _DATASET_PATH.is_file() or not _MANIFEST_PATH.is_file():
+        raise RuntimeError("Scientific Intelligence v0.1 corpus or manifest is missing.")
+
+    raw = _DATASET_PATH.read_bytes()
+    manifest = json.loads(_MANIFEST_PATH.read_text(encoding="utf-8"))
+    digest = hashlib.sha256(raw).hexdigest()
+    expected_digest = manifest.get("sha256")
+    if digest != expected_digest:
+        raise RuntimeError(
+            "Scientific Intelligence v0.1 corpus hash mismatch: "
+            f"expected {expected_digest}, got {digest}."
+        )
+
+    payload = json.loads(raw.decode("utf-8"))
+    if payload.get("benchmark_version") != "scientific-intelligence-v0.1":
+        raise RuntimeError("Unexpected Scientific Intelligence v0.1 corpus version.")
+
+    raw_tasks = payload.get("tasks")
+    if not isinstance(raw_tasks, list) or len(raw_tasks) != 40:
+        raise RuntimeError("Scientific Intelligence v0.1 must contain exactly 40 tasks.")
+
+    tasks: list[BenchmarkTask] = []
+    seen: set[str] = set()
+    for item in raw_tasks:
+        if not isinstance(item, dict):
+            raise RuntimeError("Scientific Intelligence task entries must be objects.")
+        required = {"task_id", "level", "prompt", "expected_concept", "forbidden_shortcut"}
+        if set(item) != required:
+            raise RuntimeError(f"Unexpected task schema for {item.get('task_id', '<unknown>')}.")
+        task_id = str(item["task_id"])
+        if task_id in seen:
+            raise RuntimeError(f"Duplicate benchmark task id: {task_id}.")
+        seen.add(task_id)
+        tasks.append(
+            BenchmarkTask(
+                task_id=task_id,
+                level=BenchmarkLevel(str(item["level"])),
+                prompt=str(item["prompt"]),
+                expected_concept=str(item["expected_concept"]),
+                forbidden_shortcut=str(item["forbidden_shortcut"]),
+            )
+        )
+
+    counts = {level: 0 for level in BenchmarkLevel}
+    for task in tasks:
+        counts[task.level] += 1
+    if any(count != 5 for count in counts.values()):
+        raise RuntimeError(f"Each benchmark level must contain exactly 5 tasks: {counts}.")
+    return tuple(tasks)
 
 
 def build_v0_1_tasks() -> tuple[BenchmarkTask, ...]:
-    """Build 40 deterministic benchmark tasks: 5 tasks per capability level."""
-    tasks: list[BenchmarkTask] = []
-    rhos = (20.0, 24.0, 28.0, 32.0, 40.0)
-    for level in BenchmarkLevel:
-        template, concept = _LEVEL_PROMPTS[level]
-        for index, rho in enumerate(rhos, start=1):
-            task_id = f"sci-v0.1-{level.value.lower()}-{index:02d}"
-            tasks.append(
-                BenchmarkTask(
-                    task_id=task_id,
-                    level=level,
-                    prompt=template.format(rho=rho),
-                    expected_concept=concept,
-                    forbidden_shortcut="Do not call finite numerical evidence a mathematical proof.",
-                )
-            )
-    return tuple(tasks)
+    """Load the immutable 40-task Scientific Intelligence v0.1 corpus."""
+    return _load_v0_1_tasks()
+
+
+def dataset_sha256() -> str:
+    """Return the verified SHA-256 of the immutable v0.1 task corpus."""
+    _load_v0_1_tasks()
+    return hashlib.sha256(_DATASET_PATH.read_bytes()).hexdigest()
 
 
 def score_contract(
@@ -146,4 +169,12 @@ def score_contract(
     )
 
 
-__all__ = ["BenchmarkLevel", "BenchmarkScore", "BenchmarkTask", "Outcome", "build_v0_1_tasks", "score_contract"]
+__all__ = [
+    "BenchmarkLevel",
+    "BenchmarkScore",
+    "BenchmarkTask",
+    "Outcome",
+    "build_v0_1_tasks",
+    "dataset_sha256",
+    "score_contract",
+]

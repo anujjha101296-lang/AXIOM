@@ -1,0 +1,286 @@
+{
+  "benchmark_version": "scientific-intelligence-v0.1",
+  "task_count": 40,
+  "tasks": [
+    {
+      "task_id": "sci-v0.1-l1-01",
+      "level": "L1",
+      "prompt": "For the Lorenz system at rho=20.0, explain what a finite paired-trajectory separation value establishes.",
+      "expected_concept": "distinguish numerical observation from proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l1-02",
+      "level": "L1",
+      "prompt": "For the Lorenz system at rho=24.0, explain what a finite paired-trajectory separation value establishes.",
+      "expected_concept": "distinguish numerical observation from proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l1-03",
+      "level": "L1",
+      "prompt": "For the Lorenz system at rho=28.0, explain what a finite paired-trajectory separation value establishes.",
+      "expected_concept": "distinguish numerical observation from proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l1-04",
+      "level": "L1",
+      "prompt": "For the Lorenz system at rho=32.0, explain what a finite paired-trajectory separation value establishes.",
+      "expected_concept": "distinguish numerical observation from proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l1-05",
+      "level": "L1",
+      "prompt": "For the Lorenz system at rho=40.0, explain what a finite paired-trajectory separation value establishes.",
+      "expected_concept": "distinguish numerical observation from proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l2-01",
+      "level": "L2",
+      "prompt": "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
+      "expected_concept": "sigma controls the x-y coupling rate",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l2-02",
+      "level": "L2",
+      "prompt": "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
+      "expected_concept": "sigma controls the x-y coupling rate",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l2-03",
+      "level": "L2",
+      "prompt": "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
+      "expected_concept": "sigma controls the x-y coupling rate",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l2-04",
+      "level": "L2",
+      "prompt": "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
+      "expected_concept": "sigma controls the x-y coupling rate",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l2-05",
+      "level": "L2",
+      "prompt": "Given dx/dt=sigma(y-x), dy/dt=x(rho-z)-y, dz/dt=xy-beta z, identify which parameter changes the linear coupling in dx/dt.",
+      "expected_concept": "sigma controls the x-y coupling rate",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l3-01",
+      "level": "L3",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=20.0.",
+      "expected_concept": "state a measurable observation and bounded conditions",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l3-02",
+      "level": "L3",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=24.0.",
+      "expected_concept": "state a measurable observation and bounded conditions",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l3-03",
+      "level": "L3",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=28.0.",
+      "expected_concept": "state a measurable observation and bounded conditions",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l3-04",
+      "level": "L3",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=32.0.",
+      "expected_concept": "state a measurable observation and bounded conditions",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l3-05",
+      "level": "L3",
+      "prompt": "Formulate one falsifiable hypothesis about sensitivity of nearby Lorenz trajectories near rho=40.0.",
+      "expected_concept": "state a measurable observation and bounded conditions",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l4-01",
+      "level": "L4",
+      "prompt": "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
+      "expected_concept": "use a declared timestep ladder and fixed other inputs",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l4-02",
+      "level": "L4",
+      "prompt": "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
+      "expected_concept": "use a declared timestep ladder and fixed other inputs",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l4-03",
+      "level": "L4",
+      "prompt": "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
+      "expected_concept": "use a declared timestep ladder and fixed other inputs",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l4-04",
+      "level": "L4",
+      "prompt": "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
+      "expected_concept": "use a declared timestep ladder and fixed other inputs",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l4-05",
+      "level": "L4",
+      "prompt": "Design a bounded test of whether the Lorenz sensitivity observation is robust to timestep resolution.",
+      "expected_concept": "use a declared timestep ladder and fixed other inputs",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l5-01",
+      "level": "L5",
+      "prompt": "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
+      "expected_concept": "reject the robustness claim and request resolution checks",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l5-02",
+      "level": "L5",
+      "prompt": "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
+      "expected_concept": "reject the robustness claim and request resolution checks",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l5-03",
+      "level": "L5",
+      "prompt": "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
+      "expected_concept": "reject the robustness claim and request resolution checks",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l5-04",
+      "level": "L5",
+      "prompt": "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
+      "expected_concept": "reject the robustness claim and request resolution checks",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l5-05",
+      "level": "L5",
+      "prompt": "A sensitivity result changes substantially when dt is halved. What should a scientific critic do next?",
+      "expected_concept": "reject the robustness claim and request resolution checks",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l6-01",
+      "level": "L6",
+      "prompt": "A paired trajectory separates at rho=20.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "expected_concept": "numerically robust evidence, not formal proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l6-02",
+      "level": "L6",
+      "prompt": "A paired trajectory separates at rho=24.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "expected_concept": "numerically robust evidence, not formal proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l6-03",
+      "level": "L6",
+      "prompt": "A paired trajectory separates at rho=28.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "expected_concept": "numerically robust evidence, not formal proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l6-04",
+      "level": "L6",
+      "prompt": "A paired trajectory separates at rho=32.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "expected_concept": "numerically robust evidence, not formal proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l6-05",
+      "level": "L6",
+      "prompt": "A paired trajectory separates at rho=40.0, all states remain finite, and an independent solver agrees within tolerance. Interpret the evidence.",
+      "expected_concept": "numerically robust evidence, not formal proof",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l7-01",
+      "level": "L7",
+      "prompt": "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
+      "expected_concept": "retain uncertainty and identify the check that discriminates",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l7-02",
+      "level": "L7",
+      "prompt": "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
+      "expected_concept": "retain uncertainty and identify the check that discriminates",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l7-03",
+      "level": "L7",
+      "prompt": "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
+      "expected_concept": "retain uncertainty and identify the check that discriminates",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l7-04",
+      "level": "L7",
+      "prompt": "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
+      "expected_concept": "retain uncertainty and identify the check that discriminates",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l7-05",
+      "level": "L7",
+      "prompt": "Compare hypotheses H1='chaotic sensitivity' and H2='numerical artifact' after timestep and independent-solver checks disagree.",
+      "expected_concept": "retain uncertainty and identify the check that discriminates",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l8-01",
+      "level": "L8",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=20.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l8-02",
+      "level": "L8",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=24.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l8-03",
+      "level": "L8",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=28.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l8-04",
+      "level": "L8",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=32.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    },
+    {
+      "task_id": "sci-v0.1-l8-05",
+      "level": "L8",
+      "prompt": "Investigate whether Lorenz sensitivity near rho=40.0 is robust to numerical resolution and solver choice. Return the minimum bounded experiment sequence needed.",
+      "expected_concept": "question -> hypothesis -> experiment -> evidence -> critique -> independent check -> conclusion",
+      "forbidden_shortcut": "Do not call finite numerical evidence a mathematical proof."
+    }
+  ]
+}
