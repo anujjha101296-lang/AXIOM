@@ -8,6 +8,7 @@ from axiom.science_runtime.postgres_persistence import (
     _Base,
 )
 from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun, ResearchStage, Transition
+from axiom.science_runtime.replay import replay_research_events, verify_snapshot_against_replay
 
 
 @pytest.fixture
@@ -58,3 +59,35 @@ def test_event_row_is_linked_to_run(store):
         event = connection.execute(select(ResearchEventRow)).mappings().one()
         saved = connection.execute(select(ResearchRunRow)).mappings().one()
     assert event["run_id"] == saved["run_id"] == run.run_id
+
+
+def test_database_readiness_check_is_explicit(store):
+    store.check_ready()
+
+
+def test_event_log_replays_to_the_materialized_terminal_stage(store):
+    run = _run("replay-test")
+    run.stage = ResearchStage.PLANNED
+    store.persist_transition(run, Transition("PLANNED", "run_created", "created"))
+    run.stage = ResearchStage.COMPLETED
+    store.persist_transition(run, Transition("COMPLETED", "run_completed", "done"))
+
+    events = store.read_events(run.run_id)
+    snapshot = store.read_snapshot(run.run_id)
+    replay = replay_research_events(events)
+    verify_snapshot_against_replay(snapshot, replay)
+
+    assert replay.run_id == run.run_id
+    assert replay.last_sequence == 2
+    assert replay.stage == "COMPLETED"
+    assert replay.terminal
+
+
+def test_replay_rejects_sequence_gaps(store):
+    run = _run("gap-test")
+    store.persist_transition(run, Transition("PLANNED", "run_created", "created"))
+    events = store.read_events(run.run_id)
+    events[0]["sequence"] = 2
+
+    with pytest.raises(ValueError, match="sequence gap"):
+        replay_research_events(events)
