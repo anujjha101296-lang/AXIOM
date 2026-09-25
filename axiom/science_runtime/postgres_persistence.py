@@ -52,6 +52,16 @@ class PostgresResearchRunStore:
             _Base.metadata.create_all(self.engine)
 
     @staticmethod
+    @property
+    def backend_name(self) -> str:
+        return "postgresql"
+
+    def check_ready(self) -> None:
+        """Fail closed if the durable database cannot be reached."""
+        with self.engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+    @staticmethod
     def _lock_run(session: Session, run_id: str) -> None:
         """Serialize event sequence allocation for one run on PostgreSQL.
 
