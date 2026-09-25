@@ -17,6 +17,7 @@ from axiom.services.api_gateway.auth import verify_token
 from axiom.science_runtime.benchmark import run_lorenz_reference_benchmark
 from axiom.science_runtime.persistence import ResearchRunStore
 from axiom.science_runtime.postgres_persistence import PostgresResearchRunStore
+from axiom.science_runtime.replay import replay_research_events, verify_snapshot_against_replay
 from axiom.science_runtime.research_loop import (
     ResearchQuestion,
     ResearchRun,
@@ -37,7 +38,10 @@ def _build_store() -> ResearchRunStore | PostgresResearchRunStore:
     database_url = os.getenv("AXIOM_DATABASE_URL") or os.getenv("DATABASE_URL")
     environment = os.getenv("AXIOM_ENVIRONMENT") or os.getenv("ENVIRONMENT") or "development"
     if database_url:
-        return PostgresResearchRunStore(database_url, create_schema=False)
+        store = PostgresResearchRunStore(database_url, create_schema=False)
+        if environment.lower() in {"production", "prod"}:
+            store.check_ready()
+        return store
     if environment.lower() in {"production", "prod"}:
         raise RuntimeError(
             "Durable scientific persistence is required in production. "
@@ -74,6 +78,12 @@ def _question(payload: ResearchRequest) -> ResearchQuestion:
 
 def _persist_transition(run: ResearchRun, transition: Transition) -> None:
     """Persist every lifecycle transition before the next transition occurs."""
+    run.metadata["persistence"] = {
+        "backend": "postgresql" if isinstance(_store, PostgresResearchRunStore) else "local_test",
+        "system_of_record": "database" if isinstance(_store, PostgresResearchRunStore) else "filesystem",
+        "event_schema": "axiom.research.event.v1",
+        "durable": isinstance(_store, PostgresResearchRunStore),
+    }
     if isinstance(_store, PostgresResearchRunStore):
         _store.persist_transition(run, transition)
     else:
@@ -141,6 +151,10 @@ async def queue_bounded_research(
     """Queue a run so clients can subscribe to its lifecycle stream immediately."""
     question = _question(payload)
     run_id = f"research-{uuid4().hex[:12]}"
+    try:
+        _initialize_queued_run(question, run_id)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
     background_tasks.add_task(_execute_and_persist, question, run_id)
     return {"run_id": run_id, "status": "QUEUED"}
 
@@ -163,6 +177,21 @@ async def get_research_events(run_id: str, token: str = Depends(verify_token)) -
     if _read_snapshot(run_id) is None:
         raise HTTPException(status_code=404, detail="Research run not found")
     return _read_events(run_id)
+
+
+@router.get("/research/{run_id}/replay", response_model=dict[str, Any])
+async def replay_research_run(run_id: str, token: str = Depends(verify_token)) -> dict[str, Any]:
+    """Rebuild the lifecycle projection from durable events and verify the snapshot."""
+    snapshot = _read_snapshot(run_id)
+    if snapshot is None:
+        raise HTTPException(status_code=404, detail="Research run not found")
+    events = _read_events(run_id)
+    try:
+        replay = replay_research_events(events)
+        verify_snapshot_against_replay(snapshot, replay)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail="Research run replay integrity check failed") from exc
+    return replay.to_dict()
 
 
 @router.get("/research/{run_id}/events/stream")
