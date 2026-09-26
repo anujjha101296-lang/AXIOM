@@ -5,6 +5,7 @@ from axiom.science_runtime.postgres_persistence import (
     PostgresResearchRunStore,
     ResearchEventRow,
     ResearchRunRow,
+    ResearchSubmissionRow,
     _Base,
 )
 from axiom.science_runtime.research_loop import ResearchQuestion, ResearchRun, ResearchStage, Transition
@@ -156,3 +157,34 @@ def test_idempotency_key_cannot_change_request(store):
 
     with pytest.raises(ValueError, match="different research request"):
         store.reserve_submission("key-87654321", "b" * 64, "run-two")
+
+def test_idempotency_reservation_and_initial_event_are_atomic(store):
+    run = _run("atomic-submit")
+    transition = Transition(
+        ResearchStage.PLANNED.value,
+        "run_queued",
+        "queued",
+    )
+
+    first, created = store.reserve_submission_and_initialize(
+        "atomic-key-12345678",
+        "c" * 64,
+        run,
+        transition,
+    )
+    second, duplicate = store.reserve_submission_and_initialize(
+        "atomic-key-12345678",
+        "c" * 64,
+        _run("should-not-win"),
+        transition,
+    )
+
+    assert (first, created) == ("atomic-submit", True)
+    assert (second, duplicate) == ("atomic-submit", False)
+    assert store.read_snapshot("atomic-submit") is not None
+    assert store.read_events("atomic-submit")[0]["event_type"] == "RUN_QUEUED"
+    assert store.read_snapshot("should-not-win") is None
+
+    with store.engine.connect() as connection:
+        submission = connection.execute(select(ResearchSubmissionRow)).mappings().one()
+    assert submission["run_id"] == "atomic-submit"
