@@ -59,7 +59,6 @@ class ResearchRequest(BaseModel):
     question: str = Field(min_length=5, max_length=2000)
     model: str = Field(default="lorenz", min_length=1, max_length=64)
     max_experiments: int = Field(default=3, ge=1, le=10)
-    idempotency_key: str | None = Field(default=None, min_length=8, max_length=255)
     allowed_rho: list[float] = Field(
         default_factory=lambda: [20.0, 24.0, 28.0, 32.0, 40.0],
         min_length=1,
@@ -78,8 +77,7 @@ def _request_fingerprint(payload: ResearchRequest) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
-def _reserve_submission(payload: ResearchRequest, run_id: str) -> tuple[str, bool]:
-    key = payload.idempotency_key
+def _reserve_submission(payload: ResearchRequest, run_id: str, key: str | None) -> tuple[str, bool]:
     if not key:
         return run_id, True
     if isinstance(_store, PostgresResearchRunStore):
@@ -167,12 +165,13 @@ async def queue_bounded_research(
     payload: ResearchRequest,
     background_tasks: BackgroundTasks,
     token: str = Depends(verify_token),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key", min_length=8, max_length=255),
 ) -> dict[str, str]:
     """Queue a run so clients can subscribe to its lifecycle stream immediately."""
     question = _question(payload)
     candidate_run_id = f"research-{uuid4().hex[:12]}"
     try:
-        run_id, created = _reserve_submission(payload, candidate_run_id)
+        run_id, created = _reserve_submission(payload, candidate_run_id, idempotency_key)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except Exception as exc:
