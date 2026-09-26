@@ -118,3 +118,13 @@ def test_replay_endpoint_is_fail_closed_on_tampered_snapshot(monkeypatch, tmp_pa
     replay = science.replay_research_events(events)
     with pytest.raises(ValueError):
         science.verify_snapshot_against_replay(data, replay)
+
+
+def test_async_research_supports_standard_idempotency_key_header():
+    route = next(
+        route
+        for route in router.routes
+        if route.path == "/api/v1/science/research/async" and "POST" in route.methods
+    )
+    header_names = {parameter.alias for parameter in route.dependant.header_params}
+    assert "Idempotency-Key" in header_names
