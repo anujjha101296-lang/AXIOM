@@ -82,6 +82,50 @@ class ResearchRun:
             "metadata": self.metadata,
         }
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ResearchRun":
+        question_data = data["question"]
+        question = ResearchQuestion(
+            text=str(question_data["text"]),
+            model=str(question_data.get("model", "lorenz")),
+            max_experiments=int(question_data.get("max_experiments", 3)),
+            allowed_rho=tuple(float(value) for value in question_data.get("allowed_rho", ())),
+        )
+        hypothesis_data = data.get("hypothesis")
+        hypothesis = (
+            Hypothesis(
+                statement=str(hypothesis_data["statement"]),
+                rationale=str(hypothesis_data["rationale"]),
+            )
+            if hypothesis_data
+            else None
+        )
+        plans = [ExperimentPlan(**plan) for plan in data.get("plans", [])]
+        evidence = [EvidenceBundle(**item) for item in data.get("evidence", [])]
+        critiques = [
+            Critique(
+                verdict=str(item["verdict"]),
+                severity=str(item["severity"]),
+                checks={str(key): bool(value) for key, value in item["checks"].items()},
+                concerns=tuple(item.get("concerns", ())),
+                next_actions=tuple(item.get("next_actions", ())),
+            )
+            for item in data.get("critiques", [])
+        ]
+        transitions = [Transition(**item) for item in data.get("transitions", [])]
+        return cls(
+            run_id=str(data["run_id"]),
+            question=question,
+            hypothesis=hypothesis,
+            plans=plans,
+            evidence=evidence,
+            critiques=critiques,
+            stage=ResearchStage(str(data.get("stage", ResearchStage.PLANNED.value))),
+            transitions=transitions,
+            conclusion=data.get("conclusion"),
+            metadata=dict(data.get("metadata", {})),
+        )
+
     def markdown_report(self) -> str:
         lines = [
             "# AXIOM Bounded Scientific Research Run",
@@ -142,8 +186,12 @@ def run_research(
     planner: Planner = deterministic_planner,
     event_sink: EventSink | None = None,
     run_id: str | None = None,
+    initial_run: ResearchRun | None = None,
 ) -> ResearchRun:
-    run = ResearchRun(run_id=run_id or f"research-{uuid4().hex[:12]}", question=question)
+    run = initial_run or ResearchRun(
+        run_id=run_id or f"research-{uuid4().hex[:12]}",
+        question=question,
+    )
 
     def transition(stage: ResearchStage, action: str, detail: str) -> None:
         run.stage = stage
@@ -152,19 +200,47 @@ def run_research(
         if event_sink is not None:
             event_sink(run, item)
 
-    transition(ResearchStage.PLANNED, "run_created", "Bounded research run created.")
-    hypothesis, first_plan = planner(question)
-    run.hypothesis = hypothesis
-    transition(ResearchStage.HYPOTHESIS, "hypothesis_proposed", hypothesis.statement)
+    if run.stage in {ResearchStage.COMPLETED, ResearchStage.FAILED}:
+        return run
 
-    plan: ExperimentPlan | None = first_plan
+    if run.hypothesis is None:
+        hypothesis, first_plan = planner(question)
+        run.hypothesis = hypothesis
+        transition(ResearchStage.HYPOTHESIS, "hypothesis_proposed", hypothesis.statement)
+    else:
+        first_plan = run.plans[0] if run.plans else planner(question)[1]
+
+    plan: ExperimentPlan | None = None
+    if run.stage == ResearchStage.DESIGNED and run.plans and len(run.evidence) < len(run.plans):
+        plan = run.plans[-1]
+    elif run.stage == ResearchStage.EXECUTED and len(run.evidence) > len(run.critiques):
+        plan = run.plans[-1]
+    elif run.stage == ResearchStage.CRITIQUED:
+        if run.critiques and run.critiques[-1].verdict == "ACCEPT_NUMERICAL_EVIDENCE":
+            transition(ResearchStage.VERIFIED, "verify", "Numerical evidence satisfied all declared critic gates.")
+            run.conclusion = (
+                f"Numerical evidence at rho={run.plans[-1].rho:g} passed the bounded reproducibility, "
+                "convergence, provenance, and independent-check gates. This is not a formal proof of chaos."
+            )
+            transition(ResearchStage.COMPLETED, "run_completed", "Accepted bounded numerical result.")
+            return run
+        transition(ResearchStage.REPEATING, "repeat_requested", "Critic rejected the evidence; select the next allowed rho.")
+        plan = _next_plan(question, {p.rho for p in run.plans})
+    elif run.stage == ResearchStage.REPEATING:
+        plan = _next_plan(question, {p.rho for p in run.plans})
+    elif run.stage == ResearchStage.HYPOTHESIS:
+        plan = first_plan
+    elif run.stage == ResearchStage.PLANNED:
+        plan = first_plan
+
     while plan is not None and len(run.evidence) < question.max_experiments:
         if plan.rho not in question.allowed_rho:
             transition(ResearchStage.FAILED, "plan_rejected", "Planner proposed rho outside the allowlist.")
             run.conclusion = "Run failed closed because the experiment plan violated its declared parameter bounds."
             return run
 
-        run.plans.append(plan)
+        if not run.plans or run.plans[-1].rho != plan.rho:
+            run.plans.append(plan)
         transition(ResearchStage.DESIGNED, "experiment_designed", f"Execute Lorenz evidence experiment at rho={plan.rho:g}.")
 
         bundle = build_lorenz_evidence_bundle(
@@ -211,3 +287,4 @@ def run_research(
     run.conclusion = "No experiment satisfied the declared evidence gates within the bounded experiment budget."
     transition(ResearchStage.FAILED, "run_failed", "Experiment budget exhausted without verified numerical evidence.")
     return run
+\n
