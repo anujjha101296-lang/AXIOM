@@ -136,6 +136,7 @@ def _persist_transition(run: ResearchRun, transition: Transition) -> None:
     }
     if isinstance(_store, PostgresResearchRunStore):
         _store.persist_transition(run, transition)
+        _store.heartbeat_submission(run.run_id)
     else:
         _store.record_transition(run, transition)
         _store.snapshot(run)
@@ -266,6 +267,11 @@ async def queue_bounded_research(
     if not idempotency_key or not isinstance(_store, PostgresResearchRunStore):
         try:
             _initialize_queued_run(question, run_id)
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
+    elif isinstance(_store, PostgresResearchRunStore):
+        try:
+            _store.mark_submission_running(run_id)
         except Exception as exc:
             raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
     background_tasks.add_task(_execute_and_persist, question, run_id)
