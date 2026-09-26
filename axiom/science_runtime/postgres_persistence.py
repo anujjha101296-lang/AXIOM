@@ -60,7 +60,6 @@ class PostgresResearchRunStore:
         if create_schema:
             _Base.metadata.create_all(self.engine)
 
-    @staticmethod
     @property
     def backend_name(self) -> str:
         return "postgresql"
@@ -72,14 +71,21 @@ class PostgresResearchRunStore:
 
     @staticmethod
     def _lock_run(session: Session, run_id: str) -> None:
-        """Serialize event sequence allocation for one run on PostgreSQL.
-
-        SQLite has no equivalent advisory lock, so its single-writer behavior is
-        sufficient for the contract tests. PostgreSQL gets a transaction-scoped
-        advisory lock, including the first event where no run row exists yet.
-        """
+        """Serialize event sequence allocation for one run on PostgreSQL."""
         if session.bind is not None and session.bind.dialect.name == "postgresql":
-            session.execute(text("SELECT pg_advisory_xact_lock(hashtext(:run_id))"), {"run_id": run_id})
+            session.execute(
+                text("SELECT pg_advisory_xact_lock(hashtext(:run_id))"),
+                {"run_id": run_id},
+            )
+
+    @staticmethod
+    def _lock_submission(session: Session, idempotency_key: str) -> None:
+        """Serialize concurrent reservations for one idempotency key on PostgreSQL."""
+        if session.bind is not None and session.bind.dialect.name == "postgresql":
+            session.execute(
+                text("SELECT pg_advisory_xact_lock(hashtext(:idempotency_key))"),
+                {"idempotency_key": idempotency_key},
+            )
 
     def _ensure_run(self, session: Session, run: ResearchRun, now: datetime) -> ResearchRunRow:
         row = session.get(ResearchRunRow, run.run_id, with_for_update=True)
@@ -93,48 +99,97 @@ class PostgresResearchRunStore:
             session.flush()
         return row
 
+    def _append_locked(
+        self,
+        session: Session,
+        run: ResearchRun,
+        event_type: str,
+        payload: dict[str, Any],
+        now: datetime,
+    ) -> ResearchEventRow:
+        self._lock_run(session, run.run_id)
+        row = self._ensure_run(session, run, now)
+        last = session.execute(
+            select(ResearchEventRow.sequence)
+            .where(ResearchEventRow.run_id == run.run_id)
+            .order_by(ResearchEventRow.sequence.desc())
+            .limit(1)
+            .with_for_update()
+        ).scalar_one_or_none()
+        sequence = int(last or 0) + 1
+        event = ResearchEventRow(
+            run_id=run.run_id,
+            sequence=sequence,
+            event_id=f"{run.run_id}:{sequence}",
+            event_type=event_type,
+            stage=run.stage.value,
+            timestamp=now,
+            payload=payload,
+        )
+        session.add(event)
+        row.snapshot = asdict(run)
+        row.updated_at = now
+        session.flush()
+        return event
 
     def reserve_submission(self, idempotency_key: str, request_fingerprint: str, run_id: str) -> tuple[str, bool]:
         """Atomically reserve an idempotent submission or return its existing run."""
         now = datetime.now(timezone.utc)
         with Session(self.engine, expire_on_commit=False) as session, session.begin():
+            self._lock_submission(session, idempotency_key)
             row = session.get(ResearchSubmissionRow, idempotency_key, with_for_update=True)
             if row is not None:
                 if row.request_fingerprint != request_fingerprint:
                     raise ValueError("Idempotency key was already used for a different research request")
                 return row.run_id, False
-            session.add(ResearchSubmissionRow(
-                idempotency_key=idempotency_key,
-                request_fingerprint=request_fingerprint,
-                run_id=run_id,
-                created_at=now,
-            ))
+            session.add(
+                ResearchSubmissionRow(
+                    idempotency_key=idempotency_key,
+                    request_fingerprint=request_fingerprint,
+                    run_id=run_id,
+                    created_at=now,
+                )
+            )
             return run_id, True
+
+    def reserve_submission_and_initialize(
+        self,
+        idempotency_key: str,
+        request_fingerprint: str,
+        run: ResearchRun,
+        transition: Transition,
+    ) -> tuple[str, bool]:
+        """Reserve a submission and persist its initial run state in one transaction.
+
+        A successful reservation can never commit without the corresponding
+        research run/event. This prevents a client retry from resolving to a
+        run_id whose initial state was never durably created.
+        """
+        now = datetime.now(timezone.utc)
+        payload = {"detail": transition.detail, "transition_stage": transition.stage}
+        with Session(self.engine, expire_on_commit=False) as session, session.begin():
+            self._lock_submission(session, idempotency_key)
+            existing = session.get(ResearchSubmissionRow, idempotency_key, with_for_update=True)
+            if existing is not None:
+                if existing.request_fingerprint != request_fingerprint:
+                    raise ValueError("Idempotency key was already used for a different research request")
+                return existing.run_id, False
+
+            session.add(
+                ResearchSubmissionRow(
+                    idempotency_key=idempotency_key,
+                    request_fingerprint=request_fingerprint,
+                    run_id=run.run_id,
+                    created_at=now,
+                )
+            )
+            self._append_locked(session, run, transition.action.upper(), payload, now)
+            return run.run_id, True
 
     def append(self, run: ResearchRun, event_type: str, payload: dict[str, Any] | None = None) -> ResearchEventRow:
         now = datetime.now(timezone.utc)
         with Session(self.engine, expire_on_commit=False) as session, session.begin():
-            self._lock_run(session, run.run_id)
-            self._ensure_run(session, run, now)
-            last = session.execute(
-                select(ResearchEventRow.sequence)
-                .where(ResearchEventRow.run_id == run.run_id)
-                .order_by(ResearchEventRow.sequence.desc())
-                .limit(1)
-                .with_for_update()
-            ).scalar_one_or_none()
-            sequence = int(last or 0) + 1
-            event = ResearchEventRow(
-                run_id=run.run_id,
-                sequence=sequence,
-                event_id=f"{run.run_id}:{sequence}",
-                event_type=event_type,
-                stage=run.stage.value,
-                timestamp=now,
-                payload=payload or {},
-            )
-            session.add(event)
-            return event
+            return self._append_locked(session, run, event_type, payload or {}, now)
 
     def record_transition(self, run: ResearchRun, transition: Transition) -> ResearchEventRow:
         return self.append(
@@ -158,30 +213,7 @@ class PostgresResearchRunStore:
         now = datetime.now(timezone.utc)
         payload = {"detail": transition.detail, "transition_stage": transition.stage}
         with Session(self.engine, expire_on_commit=False) as session, session.begin():
-            self._lock_run(session, run.run_id)
-            row = self._ensure_run(session, run, now)
-            last = session.execute(
-                select(ResearchEventRow.sequence)
-                .where(ResearchEventRow.run_id == run.run_id)
-                .order_by(ResearchEventRow.sequence.desc())
-                .limit(1)
-                .with_for_update()
-            ).scalar_one_or_none()
-            sequence = int(last or 0) + 1
-            event = ResearchEventRow(
-                run_id=run.run_id,
-                sequence=sequence,
-                event_id=f"{run.run_id}:{sequence}",
-                event_type=transition.action.upper(),
-                stage=run.stage.value,
-                timestamp=now,
-                payload=payload,
-            )
-            session.add(event)
-            row.snapshot = asdict(run)
-            row.updated_at = now
-            session.flush()
-            return event
+            return self._append_locked(session, run, transition.action.upper(), payload, now)
 
     def read_events(self, run_id: str, after_sequence: int = 0) -> list[dict[str, Any]]:
         with Session(self.engine) as session:

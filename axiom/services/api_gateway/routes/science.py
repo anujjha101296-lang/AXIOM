@@ -77,12 +77,44 @@ def _request_fingerprint(payload: ResearchRequest) -> str:
     return hashlib.sha256(canonical).hexdigest()
 
 
-def _reserve_submission(payload: ResearchRequest, run_id: str, key: str | None) -> tuple[str, bool]:
+def _reserve_submission(
+    payload: ResearchRequest,
+    run_id: str,
+    key: str | None,
+) -> tuple[str, bool]:
     if not key:
         return run_id, True
     if isinstance(_store, PostgresResearchRunStore):
-        return _store.reserve_submission(key, _request_fingerprint(payload), run_id)
+        return _store.reserve_submission(
+            key,
+            _request_fingerprint(payload),
+            run_id,
+        )
     return run_id, True
+
+
+def _reserve_and_initialize_submission(
+    payload: ResearchRequest,
+    run_id: str,
+    key: str,
+) -> tuple[str, bool]:
+    if not isinstance(_store, PostgresResearchRunStore):
+        _initialize_queued_run(_question(payload), run_id)
+        return run_id, True
+
+    question = _question(payload)
+    run = ResearchRun(run_id=run_id, question=question)
+    transition = Transition(
+        ResearchStage.PLANNED.value,
+        "run_queued",
+        "Bounded research run accepted and queued for execution.",
+    )
+    return _store.reserve_submission_and_initialize(
+        key,
+        _request_fingerprint(payload),
+        run,
+        transition,
+    )
 def _question(payload: ResearchRequest) -> ResearchQuestion:
     if payload.model.lower() != "lorenz":
         raise HTTPException(status_code=422, detail="Only the Lorenz runtime is currently enabled")
@@ -171,7 +203,18 @@ async def queue_bounded_research(
     question = _question(payload)
     candidate_run_id = f"research-{uuid4().hex[:12]}"
     try:
-        run_id, created = _reserve_submission(payload, candidate_run_id, idempotency_key)
+        if idempotency_key and isinstance(_store, PostgresResearchRunStore):
+            run_id, created = _reserve_and_initialize_submission(
+                payload,
+                candidate_run_id,
+                idempotency_key,
+            )
+        else:
+            run_id, created = _reserve_submission(
+                payload,
+                candidate_run_id,
+                idempotency_key,
+            )
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except Exception as exc:
@@ -180,10 +223,11 @@ async def queue_bounded_research(
         snapshot = _read_snapshot(run_id)
         status = str(snapshot.get("stage", "PLANNED")) if snapshot else "QUEUED"
         return {"run_id": run_id, "status": status}
-    try:
-        _initialize_queued_run(question, run_id)
-    except Exception as exc:
-        raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
+    if not idempotency_key or not isinstance(_store, PostgresResearchRunStore):
+        try:
+            _initialize_queued_run(question, run_id)
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
     background_tasks.add_task(_execute_and_persist, question, run_id)
     return {"run_id": run_id, "status": "QUEUED"}
 
