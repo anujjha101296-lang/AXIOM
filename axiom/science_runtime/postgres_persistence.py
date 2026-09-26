@@ -35,6 +35,8 @@ class ResearchSubmissionRow(_Base):
     request_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
     run_id: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="QUEUED")
+    heartbeat_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
 class ResearchEventRow(_Base):
@@ -181,10 +183,57 @@ class PostgresResearchRunStore:
                     request_fingerprint=request_fingerprint,
                     run_id=run.run_id,
                     created_at=now,
+                    status="QUEUED",
+                    heartbeat_at=now,
                 )
             )
             self._append_locked(session, run, transition.action.upper(), payload, now)
             return run.run_id, True
+
+    def mark_submission_running(self, run_id: str) -> None:
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as session, session.begin():
+            row = session.execute(
+                select(ResearchSubmissionRow)
+                .where(ResearchSubmissionRow.run_id == run_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+            if row is not None:
+                row.status = "RUNNING"
+                row.heartbeat_at = now
+
+    def heartbeat_submission(self, run_id: str) -> None:
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as session, session.begin():
+            row = session.execute(
+                select(ResearchSubmissionRow)
+                .where(ResearchSubmissionRow.run_id == run_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+            if row is not None:
+                row.heartbeat_at = now
+
+    def mark_submission_terminal(self, run_id: str, status: str) -> None:
+        if status not in {"COMPLETED", "FAILED"}:
+            raise ValueError("Terminal submission status must be COMPLETED or FAILED")
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as session, session.begin():
+            row = session.execute(
+                select(ResearchSubmissionRow)
+                .where(ResearchSubmissionRow.run_id == run_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+            if row is not None:
+                row.status = status
+                row.heartbeat_at = now
+
+    def submission_status(self, run_id: str) -> tuple[str, datetime] | None:
+        with Session(self.engine) as session:
+            row = session.execute(
+                select(ResearchSubmissionRow.status, ResearchSubmissionRow.heartbeat_at)
+                .where(ResearchSubmissionRow.run_id == run_id)
+            ).one_or_none()
+            return None if row is None else (str(row.status), row.heartbeat_at)
 
     def append(self, run: ResearchRun, event_type: str, payload: dict[str, Any] | None = None) -> ResearchEventRow:
         now = datetime.now(timezone.utc)
