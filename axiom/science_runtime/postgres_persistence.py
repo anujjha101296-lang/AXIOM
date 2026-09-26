@@ -28,6 +28,15 @@ class ResearchRunRow(_Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
+class ResearchSubmissionRow(_Base):
+    __tablename__ = "research_submissions"
+
+    idempotency_key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    request_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    run_id: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 class ResearchEventRow(_Base):
     __tablename__ = "research_events"
 
@@ -83,6 +92,24 @@ class PostgresResearchRunStore:
             session.add(row)
             session.flush()
         return row
+
+
+    def reserve_submission(self, idempotency_key: str, request_fingerprint: str, run_id: str) -> tuple[str, bool]:
+        """Atomically reserve an idempotent submission or return its existing run."""
+        now = datetime.now(timezone.utc)
+        with Session(self.engine, expire_on_commit=False) as session, session.begin():
+            row = session.get(ResearchSubmissionRow, idempotency_key, with_for_update=True)
+            if row is not None:
+                if row.request_fingerprint != request_fingerprint:
+                    raise ValueError("Idempotency key was already used for a different research request")
+                return row.run_id, False
+            session.add(ResearchSubmissionRow(
+                idempotency_key=idempotency_key,
+                request_fingerprint=request_fingerprint,
+                run_id=run_id,
+                created_at=now,
+            ))
+            return run_id, True
 
     def append(self, run: ResearchRun, event_type: str, payload: dict[str, Any] | None = None) -> ResearchEventRow:
         now = datetime.now(timezone.utc)
@@ -189,4 +216,4 @@ class PostgresResearchRunStore:
         self.engine.dispose()
 
 
-__all__ = ["PostgresResearchRunStore", "ResearchEventRow", "ResearchRunRow"]
+__all__ = ["PostgresResearchRunStore", "ResearchEventRow", "ResearchRunRow", "ResearchSubmissionRow"]
