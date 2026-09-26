@@ -287,4 +287,3 @@ def run_research(
     run.conclusion = "No experiment satisfied the declared evidence gates within the bounded experiment budget."
     transition(ResearchStage.FAILED, "run_failed", "Experiment budget exhausted without verified numerical evidence.")
     return run
-\n
