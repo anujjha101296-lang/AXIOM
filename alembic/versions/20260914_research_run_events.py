@@ -38,8 +38,6 @@ def upgrade() -> None:
         sa.Column("request_fingerprint", sa.String(length=64), nullable=False),
         sa.Column("run_id", sa.String(length=128), nullable=False, unique=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("status", sa.String(length=32), nullable=False, server_default="QUEUED"),
-        sa.Column("heartbeat_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["run_id"], ["research_runs.run_id"], ondelete="CASCADE"),
     )
 
