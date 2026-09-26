@@ -66,6 +66,7 @@ class ResearchRun:
     stage: ResearchStage = ResearchStage.PLANNED
     transitions: list[Transition] = field(default_factory=list)
     conclusion: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -78,6 +79,7 @@ class ResearchRun:
             "stage": self.stage.value,
             "transitions": [asdict(item) for item in self.transitions],
             "conclusion": self.conclusion,
+            "metadata": self.metadata,
         }
 
     def markdown_report(self) -> str:
