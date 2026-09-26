@@ -227,6 +227,25 @@ class PostgresResearchRunStore:
                 row.status = status
                 row.heartbeat_at = now
 
+    def claim_stale_submission(self, run_id: str, stale_after_seconds: int = 60) -> bool:
+        now = datetime.now(timezone.utc)
+        with Session(self.engine) as session, session.begin():
+            row = session.execute(
+                select(ResearchSubmissionRow)
+                .where(ResearchSubmissionRow.run_id == run_id)
+                .with_for_update()
+            ).scalar_one_or_none()
+            if row is None or row.status in {"COMPLETED", "FAILED"}:
+                return False
+            heartbeat = row.heartbeat_at
+            if heartbeat.tzinfo is None:
+                heartbeat = heartbeat.replace(tzinfo=timezone.utc)
+            if row.status == "RUNNING" and (now - heartbeat).total_seconds() < stale_after_seconds:
+                return False
+            row.status = "RUNNING"
+            row.heartbeat_at = now
+            return True
+
     def submission_status(self, run_id: str) -> tuple[str, datetime] | None:
         with Session(self.engine) as session:
             row = session.execute(
