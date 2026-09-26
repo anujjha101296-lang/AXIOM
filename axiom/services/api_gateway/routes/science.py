@@ -136,6 +136,7 @@ def _persist_transition(run: ResearchRun, transition: Transition) -> None:
     }
     if isinstance(_store, PostgresResearchRunStore):
         _store.persist_transition(run, transition)
+        _store.heartbeat_submission(run.run_id)
     else:
         _store.record_transition(run, transition)
         _store.snapshot(run)
@@ -158,8 +159,33 @@ def _initialize_queued_run(question: ResearchQuestion, run_id: str) -> None:
     )
 
 
-def _execute_and_persist(question: ResearchQuestion, run_id: str) -> ResearchRun:
-    return run_research(question, event_sink=_persist_transition, run_id=run_id)
+def _execute_and_persist(
+    question: ResearchQuestion,
+    run_id: str,
+    resume: bool = False,
+) -> ResearchRun:
+    if isinstance(_store, PostgresResearchRunStore):
+        _store.mark_submission_running(run_id)
+    try:
+        initial_run = None
+        if resume:
+            snapshot = _read_snapshot(run_id)
+            if snapshot is None:
+                raise ValueError("Cannot resume a missing research snapshot")
+            initial_run = ResearchRun.from_dict(snapshot)
+        run = run_research(
+            question,
+            event_sink=_persist_transition,
+            run_id=run_id,
+            initial_run=initial_run,
+        )
+        if isinstance(_store, PostgresResearchRunStore):
+            _store.mark_submission_terminal(run_id, run.stage.value)
+        return run
+    except Exception:
+        if isinstance(_store, PostgresResearchRunStore):
+            _store.mark_submission_terminal(run_id, "FAILED")
+        raise
 
 
 def _read_snapshot(run_id: str) -> dict[str, Any] | None:
@@ -222,10 +248,30 @@ async def queue_bounded_research(
     if not created:
         snapshot = _read_snapshot(run_id)
         status = str(snapshot.get("stage", "PLANNED")) if snapshot else "QUEUED"
+        if isinstance(_store, PostgresResearchRunStore):
+            submission = _store.submission_status(run_id)
+            if submission is not None:
+                submission_status, _ = submission
+                if submission_status in {"COMPLETED", "FAILED"}:
+                    return {"run_id": run_id, "status": submission_status}
+                if _store.claim_stale_submission(run_id):
+                    background_tasks.add_task(
+                        _execute_and_persist,
+                        question,
+                        run_id,
+                        True,
+                    )
+                    return {"run_id": run_id, "status": "RESUMABLE"}
+                status = submission_status
         return {"run_id": run_id, "status": status}
     if not idempotency_key or not isinstance(_store, PostgresResearchRunStore):
         try:
             _initialize_queued_run(question, run_id)
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
+    elif isinstance(_store, PostgresResearchRunStore):
+        try:
+            _store.mark_submission_running(run_id)
         except Exception as exc:
             raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
     background_tasks.add_task(_execute_and_persist, question, run_id)
