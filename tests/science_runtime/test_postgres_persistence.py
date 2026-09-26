@@ -141,3 +141,18 @@ def test_concurrent_postgres_appends_preserve_sequence():
         sequences = list(executor.map(append, range(16)))
 
     assert sorted(sequences) == list(range(1, 17))
+
+
+def test_idempotency_reservation_is_stable(store):
+    first, created = store.reserve_submission("key-12345678", "a" * 64, "run-one")
+    second, duplicate = store.reserve_submission("key-12345678", "a" * 64, "run-two")
+
+    assert (first, created) == ("run-one", True)
+    assert (second, duplicate) == ("run-one", False)
+
+
+def test_idempotency_key_cannot_change_request(store):
+    store.reserve_submission("key-87654321", "a" * 64, "run-one")
+
+    with pytest.raises(ValueError, match="different research request"):
+        store.reserve_submission("key-87654321", "b" * 64, "run-two")
