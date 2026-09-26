@@ -32,9 +32,18 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["run_id"], ["research_runs.run_id"], ondelete="CASCADE"),
     )
     op.create_index("ix_research_events_run_sequence", "research_events", ["run_id", "sequence"])
+    op.create_table(
+        "research_submissions",
+        sa.Column("idempotency_key", sa.String(length=255), primary_key=True),
+        sa.Column("request_fingerprint", sa.String(length=64), nullable=False),
+        sa.Column("run_id", sa.String(length=128), nullable=False, unique=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+        sa.ForeignKeyConstraint(["run_id"], ["research_runs.run_id"], ondelete="CASCADE"),
+    )
 
 
 def downgrade() -> None:
     op.drop_index("ix_research_events_run_sequence", table_name="research_events")
     op.drop_table("research_events")
+    op.drop_table("research_submissions")
     op.drop_table("research_runs")
