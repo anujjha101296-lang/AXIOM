@@ -128,3 +128,36 @@ def test_async_research_supports_standard_idempotency_key_header():
     )
     header_names = {parameter.alias for parameter in route.dependant.header_params}
     assert "Idempotency-Key" in header_names
+
+
+def test_research_run_can_resume_from_executed_checkpoint():
+    from axiom.science_runtime.research_loop import (
+        ExperimentPlan,
+        Hypothesis,
+        ResearchRun,
+        ResearchStage,
+        run_research,
+    )
+    from axiom.science_runtime.report import build_lorenz_evidence_bundle
+
+    question = science.ResearchQuestion(
+        question="Test resuming a bounded Lorenz investigation.",
+        max_experiments=1,
+        allowed_rho=[28.0],
+    )
+    bundle = build_lorenz_evidence_bundle(28.0)
+    run = ResearchRun(
+        run_id="resume-contract",
+        question=question,
+        hypothesis=Hypothesis("A bounded numerical observation is testable.", "checkpoint"),
+        plans=[ExperimentPlan(rho=28.0)],
+        evidence=[bundle],
+        stage=ResearchStage.EXECUTED,
+    )
+
+    resumed = run_research(question, initial_run=run)
+
+    assert resumed.run_id == "resume-contract"
+    assert resumed.stage in {ResearchStage.COMPLETED, ResearchStage.FAILED}
+    assert len(resumed.evidence) == 1
+    assert len(resumed.critiques) == 1
