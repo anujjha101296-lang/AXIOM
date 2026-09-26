@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import hashlib
 import os
 from typing import Any, AsyncIterator
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
@@ -58,6 +59,7 @@ class ResearchRequest(BaseModel):
     question: str = Field(min_length=5, max_length=2000)
     model: str = Field(default="lorenz", min_length=1, max_length=64)
     max_experiments: int = Field(default=3, ge=1, le=10)
+    idempotency_key: str | None = Field(default=None, min_length=8, max_length=255)
     allowed_rho: list[float] = Field(
         default_factory=lambda: [20.0, 24.0, 28.0, 32.0, 40.0],
         min_length=1,
@@ -65,6 +67,24 @@ class ResearchRequest(BaseModel):
     )
 
 
+
+def _request_fingerprint(payload: ResearchRequest) -> str:
+    canonical = json.dumps({
+        "question": payload.question.strip(),
+        "model": payload.model.lower(),
+        "max_experiments": payload.max_experiments,
+        "allowed_rho": [float(value) for value in payload.allowed_rho],
+    }, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def _reserve_submission(payload: ResearchRequest, run_id: str) -> tuple[str, bool]:
+    key = payload.idempotency_key
+    if not key:
+        return run_id, True
+    if isinstance(_store, PostgresResearchRunStore):
+        return _store.reserve_submission(key, _request_fingerprint(payload), run_id)
+    return run_id, True
 def _question(payload: ResearchRequest) -> ResearchQuestion:
     if payload.model.lower() != "lorenz":
         raise HTTPException(status_code=422, detail="Only the Lorenz runtime is currently enabled")
@@ -150,7 +170,17 @@ async def queue_bounded_research(
 ) -> dict[str, str]:
     """Queue a run so clients can subscribe to its lifecycle stream immediately."""
     question = _question(payload)
-    run_id = f"research-{uuid4().hex[:12]}"
+    candidate_run_id = f"research-{uuid4().hex[:12]}"
+    try:
+        run_id, created = _reserve_submission(payload, candidate_run_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Durable research queue is unavailable") from exc
+    if not created:
+        snapshot = _read_snapshot(run_id)
+        status = str(snapshot.get("stage", "PLANNED")) if snapshot else "QUEUED"
+        return {"run_id": run_id, "status": status}
     try:
         _initialize_queued_run(question, run_id)
     except Exception as exc:
