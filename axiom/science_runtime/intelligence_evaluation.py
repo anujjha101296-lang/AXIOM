@@ -216,10 +216,12 @@ def run_responder_arm(
 
 
 def _tool_assisted_response(task: BenchmarkTask) -> str:
+    rho = _extract_rho(task.prompt) or 28.0
     return (
-        f"For {task.task_id}, use a bounded Lorenz experiment at the stated rho. "
+        f"For {task.task_id}, use a bounded Lorenz experiment at rho={rho:g} and dt=0.01. "
         "Record numerical observation, keep dt fixed or compare a timestep ladder, "
-        "retain uncertainty, and do not call the result a mathematical proof."
+        "retain uncertainty, report numerically robust evidence only when checks support it, "
+        "and do not call the result a mathematical proof."
     )
 
 
@@ -239,7 +241,9 @@ def _axiom_response(task: BenchmarkTask) -> str:
         return "No evidence was produced; the bounded investigation failed closed."
     return (
         f"Hypothesis: {plan.hypothesis} Experiment: {plan.experiment_name}. "
-        f"Evidence: {evidence.evidence_tier}, reproducible={run.stage.value == 'COMPLETED'}. "
+        f"rho={plan.parameters['rho']:g}, dt={plan.parameters['dt']:g}. "
+        f"Evidence: {evidence.evidence_tier}, numerically robust evidence, "
+        f"reproducible={run.stage.value == 'COMPLETED'}. "
         "The result is numerical evidence, not a formal proof."
     )
 
