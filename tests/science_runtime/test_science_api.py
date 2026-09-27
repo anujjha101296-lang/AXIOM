@@ -1,6 +1,7 @@
 """Contract tests for the bounded scientific research API."""
 
 from axiom.services.api_gateway.routes.science import router
+from axiom.services.api_gateway.routes import science
 
 
 def test_science_router_exposes_research_contract() -> None:
