@@ -188,3 +188,23 @@ def test_idempotency_reservation_and_initial_event_are_atomic(store):
     with store.engine.connect() as connection:
         submission = connection.execute(select(ResearchSubmissionRow)).mappings().one()
     assert submission["run_id"] == "atomic-submit"
+
+
+def test_submission_worker_status_can_be_claimed_after_stale_heartbeat(store):
+    run = _run("worker-status")
+    transition = Transition(ResearchStage.PLANNED.value, "run_queued", "queued")
+    store.reserve_submission_and_initialize(
+        "worker-key-12345678",
+        "d" * 64,
+        run,
+        transition,
+    )
+
+    store.mark_submission_running(run.run_id)
+    assert store.submission_status(run.run_id)[0] == "RUNNING"
+    assert store.claim_stale_submission(run.run_id, stale_after_seconds=3600) is False
+    assert store.claim_stale_submission(run.run_id, stale_after_seconds=0) is True
+
+    store.mark_submission_terminal(run.run_id, "COMPLETED")
+    assert store.submission_status(run.run_id)[0] == "COMPLETED"
+    assert store.claim_stale_submission(run.run_id, stale_after_seconds=0) is False
