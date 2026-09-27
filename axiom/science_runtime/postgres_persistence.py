@@ -13,6 +13,8 @@ from typing import Any
 from sqlalchemy import JSON, DateTime, Integer, String, create_engine, select, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
+from axiom.observability.science import persistence_span
+
 from .research_loop import ResearchRun, Transition
 
 
@@ -102,6 +104,21 @@ class PostgresResearchRunStore:
         return row
 
     def _append_locked(
+        self,
+        session: Session,
+        run: ResearchRun,
+        event_type: str,
+        payload: dict[str, Any],
+        now: datetime,
+    ) -> ResearchEventRow:
+        with persistence_span(
+            operation="append_event",
+            run_id=run.run_id,
+            event_type=event_type,
+        ):
+            return self._append_locked_impl(session, run, event_type, payload, now)
+
+    def _append_locked_impl(
         self,
         session: Session,
         run: ResearchRun,
