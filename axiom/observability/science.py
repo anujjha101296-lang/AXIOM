@@ -70,6 +70,26 @@ def record_failure(*, failure_class: str) -> None:
 
 
 @contextmanager
+def persistence_span(
+    *,
+    operation: str,
+    run_id: str,
+    event_type: str | None = None,
+) -> Iterator[Span]:
+    """Trace a durable persistence operation without recording its payload."""
+    with tracer.start_as_current_span("axiom.persistence.operation") as span:
+        span.set_attributes(
+            {
+                "axiom.run_id": run_id,
+                "axiom.persistence.operation": operation,
+            }
+        )
+        if event_type is not None:
+            span.set_attribute("axiom.persistence.event_type", event_type)
+        yield span
+
+
+@contextmanager
 def experiment_span(
     *,
     run_id: str,
