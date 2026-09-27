@@ -193,3 +193,12 @@ def test_vercel_production_without_database_uses_fail_closed_store(monkeypatch):
     assert isinstance(store, science.ResearchStoreUnavailable)
     with pytest.raises(RuntimeError, match="Durable scientific persistence is required"):
         store.record_transition(None, None)
+
+
+def test_vercel_production_knowledge_store_guard_is_non_persistent():
+    from axiom.services.api_gateway.main import UnavailableEpistemicStore
+
+    store = UnavailableEpistemicStore("missing durable knowledge store")
+    store.close()
+    with pytest.raises(RuntimeError, match="missing durable knowledge store"):
+        store.export_knowledge_graph()
