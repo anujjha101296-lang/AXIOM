@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from .critic import Critique
 from .report import EvidenceBundle, build_lorenz_evidence_bundle
+from axiom.observability.science import experiment_span, record_transition
 
 
 class ResearchStage(StrEnum):
@@ -198,6 +199,12 @@ def run_research(
         run.stage = stage
         item = Transition(stage.value, action, detail)
         run.transitions.append(item)
+        record_transition(
+            run_id=run.run_id,
+            sequence=len(run.transitions),
+            stage=item.stage,
+            action=item.action,
+        )
         if event_sink is not None:
             event_sink(run, item)
 
@@ -278,13 +285,15 @@ def run_research(
             run.plans.append(plan)
         transition(ResearchStage.DESIGNED, "experiment_designed", f"Execute Lorenz evidence experiment at rho={plan.rho:g}.")
 
-        bundle = build_lorenz_evidence_bundle(
-            plan.rho,
-            horizon=plan.horizon,
-            dts=plan.dts,
-            cross_check_horizon=plan.cross_check_horizon,
-            cross_check_dt=plan.cross_check_dt,
-        )
+        with experiment_span(run_id=run.run_id, rho=plan.rho) as experiment:
+            bundle = build_lorenz_evidence_bundle(
+                plan.rho,
+                horizon=plan.horizon,
+                dts=plan.dts,
+                cross_check_horizon=plan.cross_check_horizon,
+                cross_check_dt=plan.cross_check_dt,
+            )
+            experiment.set_attribute("axiom.experiment.id", bundle.experiment_id)
         run.evidence.append(bundle)
         transition(ResearchStage.EXECUTED, "experiment_executed", f"Generated deterministic evidence bundle {bundle.experiment_id}.")
 
