@@ -237,6 +237,37 @@ def run_research(
     elif run.stage == ResearchStage.PLANNED:
         plan = first_plan
 
+    if run.stage == ResearchStage.EXECUTED and len(run.evidence) > len(run.critiques):
+        bundle = run.evidence[-1]
+        convergence_errors = [
+            point["reference_error"]
+            for point in bundle.convergence
+            if point["reference_error"] is not None
+        ]
+        independent = bundle.independent_check
+        from .critic import critique_evidence
+
+        critique = critique_evidence(
+            evidence_tier=bundle.evidence_tier,
+            reproducible=True,
+            convergence_errors=convergence_errors,
+            independent_relative_error=float(independent["relative_error"]),
+            finite=bool(independent["finite"]),
+            has_provenance=bool(bundle.provenance),
+        )
+        run.critiques.append(critique)
+        transition(ResearchStage.CRITIQUED, "critique_completed", critique.verdict)
+        if critique.verdict == "ACCEPT_NUMERICAL_EVIDENCE":
+            transition(ResearchStage.VERIFIED, "verify", "Numerical evidence satisfied all declared critic gates.")
+            run.conclusion = (
+                f"Numerical evidence at rho={run.plans[-1].rho:g} passed the bounded reproducibility, "
+                "convergence, provenance, and independent-check gates. This is not a formal proof of chaos."
+            )
+            transition(ResearchStage.COMPLETED, "run_completed", "Accepted bounded numerical result.")
+            return run
+        transition(ResearchStage.REPEATING, "repeat_requested", "Critic rejected the evidence; select the next allowed rho.")
+        plan = _next_plan(question, {p.rho for p in run.plans})
+
     while plan is not None and len(run.evidence) < question.max_experiments:
         if plan.rho not in question.allowed_rho:
             transition(ResearchStage.FAILED, "plan_rejected", "Planner proposed rho outside the allowlist.")
