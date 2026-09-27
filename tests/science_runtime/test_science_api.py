@@ -1,3 +1,4 @@
+import pytest
 """Contract tests for the bounded scientific research API."""
 
 from axiom.services.api_gateway.routes.science import router
