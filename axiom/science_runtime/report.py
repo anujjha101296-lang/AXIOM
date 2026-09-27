@@ -34,6 +34,38 @@ class EvidenceBundle:
         return asdict(self)
 
 
+def evidence_content_sha256(bundle: EvidenceBundle) -> str:
+    """Recompute the immutable evidence digest from the stored scientific payload."""
+    record = {
+        "experiment_id": bundle.experiment_id,
+        "question": bundle.question,
+        "hypothesis": bundle.hypothesis,
+        "model": bundle.model,
+        "parameters": bundle.parameters,
+        "method": "fixed-step RK4; paired initial conditions",
+        "seed": int(bundle.provenance.get("deterministic_seed", 0)),
+        "result": bundle.primary_result,
+        "evidence_tier": bundle.evidence_tier,
+        "reproducible": True,
+    }
+    payload = {
+        "record": record,
+        "convergence": bundle.convergence,
+        "independent_check": bundle.independent_check,
+    }
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def verify_evidence_bundle_integrity(bundle: EvidenceBundle) -> None:
+    """Fail closed when durable evidence content has been modified."""
+    actual = evidence_content_sha256(bundle)
+    if actual != bundle.content_sha256:
+        raise ValueError(
+            f"Evidence content digest mismatch for experiment {bundle.experiment_id}."
+        )
+
+
 def build_lorenz_evidence_bundle(
     rho: float,
     *,
@@ -66,7 +98,7 @@ def build_lorenz_evidence_bundle(
         "independent integrator cross-check provide numerical robustness evidence. "
         "This bundle does not constitute a mathematical proof of chaos."
     )
-    return EvidenceBundle(
+    bundle = EvidenceBundle(
         schema_version="axiom.science.evidence.v1",
         experiment_id=record.experiment_id,
         generated_at_utc=datetime.now(timezone.utc).isoformat(),
@@ -88,6 +120,8 @@ def build_lorenz_evidence_bundle(
         provenance=provenance,
         content_sha256=digest,
     )
+    verify_evidence_bundle_integrity(bundle)
+    return bundle
 
 
 def render_markdown_report(bundle: EvidenceBundle) -> str:
@@ -138,6 +172,16 @@ def render_markdown_report(bundle: EvidenceBundle) -> str:
         f"- Deterministic seed: `{bundle.provenance['deterministic_seed']}`",
     ])
     return "\n".join(lines) + "\n"
+
+
+__all__ = [
+    "EvidenceBundle",
+    "build_lorenz_evidence_bundle",
+    "evidence_content_sha256",
+    "render_markdown_report",
+    "verify_evidence_bundle_integrity",
+    "write_bundle",
+]
 
 
 def write_bundle(bundle: EvidenceBundle, json_path: str, markdown_path: str) -> None:

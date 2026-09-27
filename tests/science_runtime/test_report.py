@@ -1,3 +1,4 @@
+import pytest
 from axiom.science_runtime.report import build_lorenz_evidence_bundle, render_markdown_report
 
 
@@ -28,3 +29,17 @@ def test_report_explicitly_limits_claim_strength():
     assert "does not constitute a mathematical proof" in report
     assert "Limitations" in report
     assert "Provenance" in report
+
+
+def test_evidence_bundle_integrity_fails_closed_on_digest_tampering():
+    from dataclasses import replace
+
+    from axiom.science_runtime.report import (
+        build_lorenz_evidence_bundle,
+        verify_evidence_bundle_integrity,
+    )
+
+    bundle = build_lorenz_evidence_bundle(28.0, horizon=0.1, dts=(0.05, 0.025))
+    tampered = replace(bundle, content_sha256="0" * 64)
+    with pytest.raises(ValueError, match="digest mismatch"):
+        verify_evidence_bundle_integrity(tampered)
