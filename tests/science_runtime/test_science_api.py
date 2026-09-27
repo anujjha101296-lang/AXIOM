@@ -46,15 +46,14 @@ def test_event_stream_is_server_sent_events() -> None:
 
 
 def test_production_requires_durable_database(monkeypatch) -> None:
-    import pytest
-    from axiom.services.api_gateway.routes import science
-
     monkeypatch.delenv("AXIOM_DATABASE_URL", raising=False)
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.setenv("AXIOM_ENVIRONMENT", "production")
 
+    store = science._build_store()
+    assert isinstance(store, science.ResearchStoreUnavailable)
     with pytest.raises(RuntimeError, match="Durable scientific persistence"):
-        science._build_store()
+        store.record_transition(None, None)
 
 def test_queued_run_is_persisted_before_background_execution(monkeypatch, tmp_path) -> None:
     from axiom.services.api_gateway.routes import science
