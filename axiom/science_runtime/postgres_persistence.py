@@ -150,6 +150,8 @@ class PostgresResearchRunStore:
                     request_fingerprint=request_fingerprint,
                     run_id=run_id,
                     created_at=now,
+                    status="QUEUED",
+                    heartbeat_at=now,
                 )
             )
             return run_id, True
