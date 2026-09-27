@@ -162,3 +162,20 @@ def test_research_run_can_resume_from_executed_checkpoint():
     assert resumed.stage in {ResearchStage.COMPLETED, ResearchStage.FAILED}
     assert len(resumed.evidence) == 1
     assert len(resumed.critiques) == 1
+
+
+def test_science_request_rejects_nonfinite_or_out_of_range_rho():
+    with pytest.raises(ValueError):
+        science.ResearchRequest(question="bounded lorenz test", allowed_rho=[28.0, float("nan")])
+
+    with pytest.raises(ValueError):
+        science.ResearchRequest(question="bounded lorenz test", allowed_rho=[0.5])
+
+
+def test_science_request_rejects_budget_larger_than_allowlist():
+    with pytest.raises(ValueError):
+        science.ResearchRequest(
+            question="bounded lorenz test",
+            max_experiments=3,
+            allowed_rho=[28.0, 32.0],
+        )
