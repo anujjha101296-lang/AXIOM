@@ -32,25 +32,44 @@ from axiom.science_runtime.research_loop import (
 router = APIRouter(prefix="/api/v1/science", tags=["science-runtime"])
 
 
-def _build_store() -> ResearchRunStore | PostgresResearchRunStore:
+def _build_store() -> ResearchRunStore | PostgresResearchRunStore | ResearchStoreUnavailable:
     """Select durable SQL storage when AXIOM_DATABASE_URL is configured.
 
     Local file persistence remains the explicit development/test fallback. The
     API never writes to both stores for one run, preventing split-brain state.
     """
     database_url = os.getenv("AXIOM_DATABASE_URL") or os.getenv("DATABASE_URL")
-    environment = os.getenv("AXIOM_ENVIRONMENT") or os.getenv("ENVIRONMENT") or "development"
+    environment = os.getenv("AXIOM_ENVIRONMENT") or os.getenv("ENVIRONMENT")
+    if not environment and os.getenv("VERCEL") == "1":
+        environment = os.getenv("VERCEL_ENV") or "production"
+    environment = environment or "development"
     if database_url:
         store = PostgresResearchRunStore(database_url, create_schema=False)
         if environment.lower() in {"production", "prod"}:
             store.check_ready()
         return store
     if environment.lower() in {"production", "prod"}:
-        raise RuntimeError(
+        return ResearchStoreUnavailable(
             "Durable scientific persistence is required in production. "
             "Set AXIOM_DATABASE_URL or DATABASE_URL."
         )
     return ResearchRunStore(os.getenv("AXIOM_RESEARCH_RUN_DIR", "data/research_runs"))
+
+
+class ResearchStoreUnavailable:
+    """Production-safe placeholder when durable scientific storage is unconfigured."""
+
+    backend_name = "unavailable"
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+
+    def _raise(self) -> None:
+        raise RuntimeError(self.reason)
+
+    def __getattr__(self, name: str) -> Any:
+        self._raise()
+        raise AssertionError("unreachable")
 
 
 _store = _build_store()
@@ -251,6 +270,8 @@ async def start_bounded_research(
         return run.to_dict()
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail="Durable scientific research storage is unavailable") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Scientific research run failed") from exc
 
