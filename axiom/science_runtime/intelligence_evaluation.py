@@ -105,7 +105,7 @@ def _classify_delta(baseline: float | None, comparison: float | None, *, higher_
 
 
 def _extract_rho(text: str) -> float | None:
-    match = re.search(r"\brho\s*=\s*([-+]?\\d+(?:\\.\\d+)?)", text.lower())
+    match = re.search(r"\brho\s*=\s*([-+]?\d+(?:\.\d+)?)", text.lower())
     return float(match.group(1)) if match else None
 
 
@@ -121,7 +121,7 @@ def _parameter_validity(task: BenchmarkTask, response: str) -> bool:
     if task.level not in {BenchmarkLevel.EXPERIMENT_DESIGN, BenchmarkLevel.AUTONOMOUS_INVESTIGATION}:
         return True
     rho = _extract_rho(response)
-    dt_match = re.search(r"\bdt\s*=\s*([-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)", response.lower())
+    dt_match = re.search(r"\bdt\s*=\s*([-+]?\d+(?:\.\d+)?(?:e[-+]?\d+)?)", response.lower())
     if rho is None or dt_match is None:
         return False
     dt = float(dt_match.group(1))
@@ -140,13 +140,13 @@ def _evidence_tier_valid(task: BenchmarkTask, response: str) -> bool:
 
 def _false_proof_claim(text: str) -> bool:
     normalized = re.sub(r"\s+", " ", text.lower())
-    negated = re.search(r"\b(?:not|no|without)\s+(?:a\s+)?(?:formal|mathematical)\s+proof\\b", normalized)
+    negated = re.search(r"\b(?:not|no|without)\s+(?:a\s+)?(?:formal|mathematical)\s+proof\b", normalized)
     if negated:
         normalized = normalized[: negated.start()] + normalized[negated.end() :]
     patterns = (
-        r"\b(?:is|constitutes|establishes|provides)\s+(?:a\s+|the\s+)?(?:formal|mathematical)\s+proof\\b",
-        r"\b(?:proves?|demonstrates?)\s+(?:that\s+)?(?:the\s+)?(?:lorenz\s+)?(?:system\s+)?(?:is\s+)?chaotic\\b",
-        r"\bmathematically\s+(?:proven|proved)\\b",
+        r"\b(?:is|constitutes|establishes|provides)\s+(?:a\s+|the\s+)?(?:formal|mathematical)\s+proof\b",
+        r"\b(?:proves?|demonstrates?)\s+(?:that\s+)?(?:the\s+)?(?:lorenz\s+)?(?:system\s+)?(?:is\s+)?chaotic\b",
+        r"\bmathematically\s+(?:proven|proved)\b",
     )
     return any(re.search(pattern, normalized) for pattern in patterns)
 
