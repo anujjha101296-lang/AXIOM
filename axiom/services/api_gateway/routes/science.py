@@ -5,13 +5,15 @@ from __future__ import annotations
 import asyncio
 import json
 import hashlib
+import math
 import os
-from typing import Any, AsyncIterator
+import re
+from typing import Annotated, Any, AsyncIterator
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Path
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 from starlette.concurrency import run_in_threadpool
 
 from axiom.services.api_gateway.auth import verify_token
@@ -64,6 +66,41 @@ class ResearchRequest(BaseModel):
         min_length=1,
         max_length=10,
     )
+
+    @field_validator("question")
+    @classmethod
+    def question_must_be_meaningful(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 5:
+            raise ValueError("question must contain at least 5 non-whitespace characters")
+        return value
+
+    @field_validator("allowed_rho")
+    @classmethod
+    def validate_rho_allowlist(cls, values: list[float]) -> list[float]:
+        if len(set(values)) != len(values):
+            raise ValueError("allowed_rho values must be unique")
+        if any(not math.isfinite(value) or not 1.0 <= value <= 40.0 for value in values):
+            raise ValueError("allowed_rho values must be finite and within [1, 40]")
+        return values
+
+    @model_validator(mode="after")
+    def validate_model_contract(self) -> "ResearchRequest":
+        if self.model.lower() != "lorenz":
+            raise ValueError("Only the Lorenz runtime is currently enabled")
+        if self.max_experiments > len(self.allowed_rho):
+            raise ValueError("max_experiments cannot exceed the number of allowed_rho values")
+        return self
+
+
+RunIdPath = Annotated[
+    str,
+    Path(
+        min_length=1,
+        max_length=128,
+        pattern=re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"),
+    ),
+]
 
 
 
@@ -279,7 +316,7 @@ async def queue_bounded_research(
 
 
 @router.get("/research/{run_id}", response_model=dict[str, Any])
-async def get_research_run(run_id: str, token: str = Depends(verify_token)) -> dict[str, Any]:
+async def get_research_run(run_id: RunIdPath, token: str = Depends(verify_token)) -> dict[str, Any]:
     """Return the latest durable snapshot of a research run."""
     try:
         snapshot = _read_snapshot(run_id)
@@ -291,7 +328,7 @@ async def get_research_run(run_id: str, token: str = Depends(verify_token)) -> d
 
 
 @router.get("/research/{run_id}/events", response_model=list[dict[str, Any]])
-async def get_research_events(run_id: str, token: str = Depends(verify_token)) -> list[dict[str, Any]]:
+async def get_research_events(run_id: RunIdPath, token: str = Depends(verify_token)) -> list[dict[str, Any]]:
     """Return the append-only event history for a research run."""
     if _read_snapshot(run_id) is None:
         raise HTTPException(status_code=404, detail="Research run not found")
@@ -299,7 +336,7 @@ async def get_research_events(run_id: str, token: str = Depends(verify_token)) -
 
 
 @router.get("/research/{run_id}/replay", response_model=dict[str, Any])
-async def replay_research_run(run_id: str, token: str = Depends(verify_token)) -> dict[str, Any]:
+async def replay_research_run(run_id: RunIdPath, token: str = Depends(verify_token)) -> dict[str, Any]:
     """Rebuild the lifecycle projection from durable events and verify the snapshot."""
     snapshot = _read_snapshot(run_id)
     if snapshot is None:
@@ -314,7 +351,7 @@ async def replay_research_run(run_id: str, token: str = Depends(verify_token)) -
 
 
 @router.get("/research/{run_id}/events/stream")
-async def stream_research_events(run_id: str, token: str = Depends(verify_token)) -> StreamingResponse:
+async def stream_research_events(run_id: RunIdPath, token: str = Depends(verify_token)) -> StreamingResponse:
     """Replay new lifecycle events as Server-Sent Events until the run terminates."""
     if _read_snapshot(run_id) is None:
         raise HTTPException(status_code=404, detail="Research run not found")
