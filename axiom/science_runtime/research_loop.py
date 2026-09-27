@@ -6,7 +6,11 @@ from typing import Any, Callable
 from uuid import uuid4
 
 from .critic import Critique
-from .report import EvidenceBundle, build_lorenz_evidence_bundle
+from .report import (
+    EvidenceBundle,
+    build_lorenz_evidence_bundle,
+    verify_evidence_bundle_integrity,
+)
 from axiom.observability.science import experiment_span, record_transition
 
 
@@ -103,6 +107,8 @@ class ResearchRun:
         )
         plans = [ExperimentPlan(**plan) for plan in data.get("plans", [])]
         evidence = [EvidenceBundle(**item) for item in data.get("evidence", [])]
+        for bundle in evidence:
+            verify_evidence_bundle_integrity(bundle)
         critiques = [
             Critique(
                 verdict=str(item["verdict"]),
