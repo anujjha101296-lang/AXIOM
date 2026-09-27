@@ -53,6 +53,9 @@ class BenchmarkScore:
     evidence_correctness: float
     false_proof: bool
     reproducible: bool
+    numeric_tolerance_pass: bool = True
+    parameter_validity: bool = True
+    evidence_tier_valid: bool = True
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -62,6 +65,9 @@ class BenchmarkScore:
             "evidence_correctness": self.evidence_correctness,
             "false_proof": self.false_proof,
             "reproducible": self.reproducible,
+            "numeric_tolerance_pass": self.numeric_tolerance_pass,
+            "parameter_validity": self.parameter_validity,
+            "evidence_tier_valid": self.evidence_tier_valid,
         }
 
 
@@ -145,12 +151,17 @@ def score_contract(
     evidence_correctness: float,
     false_proof: bool,
     reproducible: bool,
+    numeric_tolerance_pass: bool = True,
+    parameter_validity: bool = True,
+    evidence_tier_valid: bool = True,
 ) -> BenchmarkScore:
     """Normalize a machine-evaluated result into the benchmark score contract."""
     correctness = max(0.0, min(1.0, float(correctness)))
     evidence_correctness = max(0.0, min(1.0, float(evidence_correctness)))
     if false_proof:
         outcome = Outcome.UNSUPPORTED_CLAIM
+    elif not numeric_tolerance_pass or not parameter_validity or not evidence_tier_valid:
+        outcome = Outcome.INVALID_EXPERIMENT
     elif correctness < 0.5:
         outcome = Outcome.INCORRECT
     elif evidence_correctness < 0.5:
@@ -166,6 +177,9 @@ def score_contract(
         evidence_correctness=evidence_correctness,
         false_proof=false_proof,
         reproducible=reproducible,
+        numeric_tolerance_pass=numeric_tolerance_pass,
+        parameter_validity=parameter_validity,
+        evidence_tier_valid=evidence_tier_valid,
     )
 
 

@@ -61,3 +61,42 @@ def test_benchmark_report_contains_dataset_provenance():
     assert dataset["immutable"] is True
     assert dataset["task_count"] == 40
     assert dataset["sha256"] == "b5299290fc320c36fb2006efcf6c9cdac8a92b14577223731133b058f1c47686"
+
+
+def test_scoring_checks_prompt_numeric_parameter_with_tolerance():
+    task = build_v0_1_tasks()[2]
+    score = evaluate_text(
+        task,
+        "At rho=28.0000000005, this is a numerical observation, not a proof.",
+    )
+    assert score.numeric_tolerance_pass is True
+
+    rejected = evaluate_text(
+        task,
+        "At rho=30.0, this is a numerical observation, not a proof.",
+    )
+    assert rejected.numeric_tolerance_pass is False
+    assert rejected.outcome.value == "INVALID_EXPERIMENT"
+
+
+def test_scoring_rejects_broad_unsupported_proof_claims():
+    task = build_v0_1_tasks()[2]
+    score = evaluate_text(
+        task,
+        "The finite numerical result proves that the Lorenz system is chaotic.",
+    )
+    assert score.false_proof is True
+    assert score.outcome.value == "UNSUPPORTED_CLAIM"
+
+
+def test_scoring_requires_explicit_bounded_parameters_for_experiment_design():
+    task = next(task for task in build_v0_1_tasks() if task.level is BenchmarkLevel.EXPERIMENT_DESIGN)
+    score = evaluate_text(task, "Use a timestep ladder and compare results.")
+    assert score.parameter_validity is False
+    assert score.outcome.value == "INVALID_EXPERIMENT"
+
+
+def test_benchmark_report_pins_scorer_version():
+    result = run_v0_2_benchmark(tasks=build_v0_1_tasks()[:1])
+    assert result["scorer"]["version"] == "scientific-intelligence-scorer-v0.2"
+    assert result["scorer"]["semantic_judge"] is False
