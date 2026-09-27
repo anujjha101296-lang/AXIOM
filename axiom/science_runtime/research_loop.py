@@ -188,6 +188,7 @@ def run_research(
     run_id: str | None = None,
     initial_run: ResearchRun | None = None,
 ) -> ResearchRun:
+    is_new_run = initial_run is None
     run = initial_run or ResearchRun(
         run_id=run_id or f"research-{uuid4().hex[:12]}",
         question=question,
@@ -202,6 +203,9 @@ def run_research(
 
     if run.stage in {ResearchStage.COMPLETED, ResearchStage.FAILED}:
         return run
+
+    if is_new_run:
+        transition(ResearchStage.PLANNED, "run_created", "Created bounded research run.")
 
     if run.hypothesis is None:
         hypothesis, first_plan = planner(question)
