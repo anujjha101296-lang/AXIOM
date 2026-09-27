@@ -8,6 +8,7 @@ no synthetic score is substituted.
 from __future__ import annotations
 
 import json
+import math
 import re
 import time
 from dataclasses import asdict, dataclass
@@ -29,6 +30,7 @@ from .research_loop import ResearchQuestion, run_research
 
 
 BENCHMARK_VERSION = "scientific-intelligence-v0.2"
+SCORER_VERSION = "scientific-intelligence-scorer-v0.2"
 ARMS = ("llm_only", "tool_assisted", "axiom")
 Responder = Callable[[BenchmarkTask], str]
 
@@ -102,12 +104,59 @@ def _classify_delta(baseline: float | None, comparison: float | None, *, higher_
     return "IMPROVED" if improved else "REGRESSED"
 
 
-def evaluate_text(task: BenchmarkTask, response: str) -> BenchmarkScore:
-    """Conservative deterministic evaluator for the v0.2 contract.
+def _extract_rho(text: str) -> float | None:
+    match = re.search(r"\\brho\\s*=\\s*([-+]?\\d+(?:\\.\\d+)?)", text.lower())
+    return float(match.group(1)) if match else None
 
-    It rewards explicit coverage of the expected concept and penalizes claims of
-    mathematical proof. This is intentionally a transparent baseline evaluator,
-    not an LLM judge.
+
+def _numeric_tolerance_pass(task: BenchmarkTask, response: str, tolerance: float = 1e-9) -> bool:
+    expected = _extract_rho(task.prompt)
+    if expected is None:
+        return True
+    observed = _extract_rho(response)
+    return observed is not None and math.isclose(observed, expected, rel_tol=tolerance, abs_tol=tolerance)
+
+
+def _parameter_validity(task: BenchmarkTask, response: str) -> bool:
+    if task.level not in {BenchmarkLevel.EXPERIMENT_DESIGN, BenchmarkLevel.AUTONOMOUS_INVESTIGATION}:
+        return True
+    rho = _extract_rho(response)
+    dt_match = re.search(r"\\bdt\\s*=\\s*([-+]?\\d+(?:\\.\\d+)?(?:e[-+]?\\d+)?)", response.lower())
+    if rho is None or dt_match is None:
+        return False
+    dt = float(dt_match.group(1))
+    return math.isfinite(rho) and math.isfinite(dt) and 1.0 <= rho <= 40.0 and 0.0 < dt <= 0.1
+
+
+def _evidence_tier_valid(task: BenchmarkTask, response: str) -> bool:
+    text = response.lower()
+    expected = task.expected_concept.lower()
+    if "numerically robust" in expected:
+        return "numerically robust" in text or "numerical evidence" in text
+    if "not formal proof" in expected or "not a proof" in expected:
+        return "not a proof" in text or "not a formal proof" in text or "not a mathematical proof" in text
+    return True
+
+
+def _false_proof_claim(text: str) -> bool:
+    normalized = re.sub(r"\\s+", " ", text.lower())
+    negated = re.search(r"\\b(?:not|no|without)\\s+(?:a\\s+)?(?:formal|mathematical)\\s+proof\\b", normalized)
+    if negated:
+        normalized = normalized[: negated.start()] + normalized[negated.end() :]
+    patterns = (
+        r"\\b(?:is|constitutes|establishes|provides)\\s+(?:a\\s+|the\\s+)?(?:formal|mathematical)\\s+proof\\b",
+        r"\\b(?:proves?|demonstrates?)\\s+(?:that\\s+)?(?:the\\s+)?(?:lorenz\\s+)?(?:system\\s+)?(?:is\\s+)?chaotic\\b",
+        r"\\bmathematically\\s+(?:proven|proved)\\b",
+    )
+    return any(re.search(pattern, normalized) for pattern in patterns)
+
+
+def evaluate_text(task: BenchmarkTask, response: str) -> BenchmarkScore:
+    """Conservative deterministic scorer with explicit validity gates.
+
+    This remains a transparent baseline evaluator, not an LLM judge. It checks
+    concept coverage, numeric parameter consistency, bounded parameter validity,
+    evidence-strength language, reproducibility fields, and unsupported-proof claims.
     """
     text = response.lower()
     concept_terms = {
@@ -122,19 +171,26 @@ def evaluate_text(task: BenchmarkTask, response: str) -> BenchmarkScore:
     }[task.level]
     hits = sum(term in text for term in concept_terms)
     correctness = min(1.0, hits / len(concept_terms))
-    proof_claim = re.search(r"(?<!not )(?:is|constitutes|establishes|proves) (?:a |the )?(?:formal|mathematical) proof", text)
-    false_proof = proof_claim is not None
-    evidence_correctness = 0.0 if false_proof else correctness
+    false_proof = _false_proof_claim(text)
+    numeric_tolerance_pass = _numeric_tolerance_pass(task, response)
+    parameter_validity = _parameter_validity(task, response)
+    evidence_tier_valid = _evidence_tier_valid(task, response)
     reproducible = all(term in text for term in ("rho", "dt")) if task.level in {
         BenchmarkLevel.EXPERIMENT_DESIGN,
         BenchmarkLevel.AUTONOMOUS_INVESTIGATION,
     } else True
+    evidence_correctness = 0.0 if false_proof else correctness
+    if not numeric_tolerance_pass or not parameter_validity or not evidence_tier_valid:
+        evidence_correctness = 0.0
     return score_contract(
         task,
         correctness=correctness,
         evidence_correctness=evidence_correctness,
         false_proof=false_proof,
         reproducible=reproducible,
+        numeric_tolerance_pass=numeric_tolerance_pass,
+        parameter_validity=parameter_validity,
+        evidence_tier_valid=evidence_tier_valid,
     )
 
 
@@ -225,6 +281,11 @@ def run_v0_2_benchmark(
             )
     return {
         "benchmark": BENCHMARK_VERSION,
+        "scorer": {
+            "version": SCORER_VERSION,
+            "type": "deterministic",
+            "semantic_judge": False,
+        },
         "dataset": {
             "version": "scientific-intelligence-v0.1",
             "task_count": len(selected),
@@ -246,6 +307,7 @@ __all__ = [
     "ArmResult",
     "ArmStatus",
     "BENCHMARK_VERSION",
+    "SCORER_VERSION",
     "Delta",
     "evaluate_text",
     "render_report",
