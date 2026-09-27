@@ -142,7 +142,7 @@ def test_research_run_can_resume_from_executed_checkpoint():
     from axiom.science_runtime.report import build_lorenz_evidence_bundle
 
     question = science.ResearchQuestion(
-        question="Test resuming a bounded Lorenz investigation.",
+        text="Test resuming a bounded Lorenz investigation.",
         max_experiments=1,
         allowed_rho=[28.0],
     )
