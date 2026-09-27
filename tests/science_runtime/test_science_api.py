@@ -180,3 +180,17 @@ def test_science_request_rejects_budget_larger_than_allowlist():
             max_experiments=3,
             allowed_rho=[28.0, 32.0],
         )
+
+
+def test_vercel_production_without_database_uses_fail_closed_store(monkeypatch):
+    monkeypatch.delenv("AXIOM_DATABASE_URL", raising=False)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AXIOM_ENVIRONMENT", raising=False)
+    monkeypatch.delenv("ENVIRONMENT", raising=False)
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+
+    store = science._build_store()
+    assert isinstance(store, science.ResearchStoreUnavailable)
+    with pytest.raises(RuntimeError, match="Durable scientific persistence is required"):
+        store.record_transition(None, None)
