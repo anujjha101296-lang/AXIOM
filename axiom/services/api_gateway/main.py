@@ -36,6 +36,19 @@ from axiom.services.api_gateway.routes.documents import router as documents_rout
 from axiom.services.api_gateway.routes.search import router as search_router
 from axiom.services.api_gateway.routes.science import router as science_router
 
+class UnavailableEpistemicStore:
+    """Fail-closed placeholder for deployments without durable graph storage."""
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+
+    def close(self) -> None:
+        return None
+
+    def __getattr__(self, name: str) -> Any:
+        raise RuntimeError(self.reason)
+
+
 # Initialise structured logging from settings
 configure_logging(level=settings.log_level, log_format=settings.log_format)
 logger = get_logger("axiom.api_gateway")
@@ -153,7 +166,12 @@ app.include_router(science_router)
 
 # ── Singletons (Sprint 0: driven by settings) ────────────────────────────────
 db_path = settings.db_path
-store = EpistemicStore(db_path)
+if os.getenv("VERCEL") == "1" and (os.getenv("VERCEL_ENV") or "production") == "production":
+    store = UnavailableEpistemicStore(
+        "Durable knowledge-graph storage is not configured for Vercel production."
+    )
+else:
+    store = EpistemicStore(db_path)
 parser = ArxivParser()
 smt_gateway = SmtGateway()
 lean_exporter = LeanExporter()
